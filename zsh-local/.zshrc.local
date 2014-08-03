@@ -1,0 +1,55 @@
+if [ -e /usr/share/doc/pkgfile/command-not-found.zsh ]; then
+    source /usr/share/doc/pkgfile/command-not-found.zsh
+fi
+
+function fun_purge() {
+    sudo pacman -Rnsc $1
+}
+function fun_purgeorphans() {
+    sudo pacman -Rnsc $(pacman -Qtdq)
+}
+function fun_showremote() {
+    pacman -Si $1
+}
+function fun_showlocal() {
+    pacman -Qi $1
+}
+function fun_listfiles() {
+    pacman -Ql $1
+}
+function fun_adopt() {
+    sudo pacman -D --asexplicit $1
+}
+function fun_abandon() {
+    sudo pacman -D --asdeps $1
+}
+function fun_ownedby() {
+    pacman -Qo $1
+}
+function fun_addandsign() {
+    sudo -- sh -c 'pacman-key -r $1 && pacman-key --lsign-key $1'
+}
+
+ukill() { ps x -o  "%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
+
+alias psign='fun_addandsign'
+alias ownedby='fun_ownedby'
+alias orphans='pacman -Qtdq'
+alias update-dist='sudo pacman -Syu'
+alias listaur='pacman -Qm'
+alias purgeall='purgeorphans'
+alias purge='fun_purge'
+alias purgeorphans='fun_purgeorphans'
+alias showlocal='fun_showlocal'
+alias showremote='fun_showremote'
+alias listfiles='fun_listfiles'
+alias adopt='fun_adopt'
+alias abandon='fun_abandon'
+
+alias update-repo='git checkout master && git pull && git checkout - && git rebase master'
+alias list-services='sudo systemctl list-units --type=service'
+alias sctl='systemctl'
+alias ssctl='sudo systemctl'
+
+PATH=~/bin:$PATH
+
