@@ -166,10 +166,10 @@ bar {
         tray_output DVI-D-0
 }
 
-
 # custom stuff
 # Make the currently focused window a scratchpad
 bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
+bindsym $mod+shift+w exec --no-startup-id i3lock --color=000000
 #for_window [title="Buddy List"] floating enable
