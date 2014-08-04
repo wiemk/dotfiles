@@ -15,7 +15,7 @@ set $mod Mod4
 exec --no-startup-id compton --config ~/.config/compton/config -b
 exec --no-startup-id nm-applet
 exec --no-startup-id pasystray
-
+exec --no-startup-id nvidia-settings --load-config-only
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
