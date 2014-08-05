@@ -14,8 +14,9 @@ set $pasink alsa_output.usb-Binary_Audio_UAC1_DAC-01-DAC.analog-stereo
 
 # autostarts
 exec --no-startup-id compton --config ~/.config/compton/config -b
-exec --no-startup-id nm-applet
-exec --no-startup-id pasystray
+exec --no-startup-id dex -ae i3
+#exec --no-startup-id nm-applet
+#exec --no-startup-id pasystray
 #exec --no-startup-id nvidia-settings --load-config-only
 
 # Font for window titles. Will also be used by the bar unless a different font
@@ -164,7 +165,7 @@ bar {
         mode hide
         hidden_state hide
         status_command i3status
-        tray_output DVI-D-0
+        tray_output DVI-I-1
 }
 
 # custom stuff
