@@ -1,5 +1,5 @@
 backend="glx"
-vsync="opengl"
+vsync="opengl-swc"
 paint-on-overlay="true"
 glx-no-stencil="true"
 glx-no-rebind-pixmap="true"
