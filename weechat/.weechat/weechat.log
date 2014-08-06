@@ -1,0 +1,48 @@
+[2014-07-31 16:58:01] WeeChat 0.4.3 (compiled on May 31 2014 03:48:43)
+[2014-07-31 16:58:01] Reading configuration file sec.conf
+[2014-07-31 16:58:01] Reading configuration file weechat.conf
+[2014-07-31 16:58:01] Reading configuration file plugins.conf
+[2014-07-31 16:58:01] Reading configuration file irc.conf
+[2014-07-31 16:58:01] Reading configuration file charset.conf
+[2014-07-31 16:58:01] Reading configuration file relay.conf
+[2014-07-31 16:58:01] Reading configuration file alias.conf
+[2014-07-31 16:58:01] Reading configuration file script.conf
+[2014-07-31 16:58:01] Reading configuration file logger.conf
+[2014-07-31 16:58:02] Reading configuration file xfer.conf
+[2014-07-31 16:58:02] Reading configuration file rmodifier.conf
+[2014-07-31 16:59:41] irc: connecting to server kornbluth.freenode.net/7000 (SSL)...
+[2014-08-04 00:53:59] irc: connecting to server kornbluth.freenode.net/7000 (SSL)...
+[2014-08-05 15:09:32] Writing configuration file sec.conf 
+[2014-08-05 15:09:32] Writing configuration file weechat.conf 
+[2014-08-05 15:09:32] Writing configuration file plugins.conf 
+[2014-08-05 15:09:32] Writing configuration file irc.conf 
+[2014-08-05 15:09:32] Writing configuration file charset.conf 
+[2014-08-05 15:09:32] Writing configuration file relay.conf 
+[2014-08-05 15:09:32] Writing configuration file alias.conf 
+[2014-08-05 15:09:32] Writing configuration file script.conf 
+[2014-08-05 15:09:32] Writing configuration file logger.conf 
+[2014-08-05 15:09:32] Writing configuration file xfer.conf 
+[2014-08-05 15:09:32] Writing configuration file rmodifier.conf 
+[2014-08-06 06:29:15] irc: connecting to server kornbluth.freenode.net/7000 (SSL)...
+[2014-08-06 16:15:29] Writing configuration file sec.conf 
+[2014-08-06 16:15:29] Writing configuration file weechat.conf 
+[2014-08-06 16:15:29] Writing configuration file plugins.conf 
+[2014-08-06 16:15:29] Writing configuration file irc.conf 
+[2014-08-06 16:15:29] Writing configuration file charset.conf 
+[2014-08-06 16:15:29] Writing configuration file relay.conf 
+[2014-08-06 16:15:29] Writing configuration file alias.conf 
+[2014-08-06 16:15:29] Writing configuration file script.conf 
+[2014-08-06 16:15:29] Writing configuration file logger.conf 
+[2014-08-06 16:15:29] Writing configuration file xfer.conf 
+[2014-08-06 16:15:29] Writing configuration file rmodifier.conf 
+[2014-08-06 16:15:31] Writing configuration file plugins.conf 
+[2014-08-06 16:15:31] Writing configuration file rmodifier.conf 
+[2014-08-06 16:15:31] Writing configuration file xfer.conf 
+[2014-08-06 16:15:31] Writing configuration file logger.conf 
+[2014-08-06 16:15:31] Writing configuration file script.conf 
+[2014-08-06 16:15:31] Writing configuration file alias.conf 
+[2014-08-06 16:15:31] Writing configuration file relay.conf 
+[2014-08-06 16:15:31] Writing configuration file charset.conf 
+[2014-08-06 16:15:31] Writing configuration file irc.conf 
+[2014-08-06 16:15:32] Writing configuration file weechat.conf 
+[2014-08-06 16:15:32] Writing configuration file sec.conf 
