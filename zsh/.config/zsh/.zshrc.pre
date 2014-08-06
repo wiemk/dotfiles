@@ -1,3 +1,8 @@
 # ~/.config/zsh/.zprofile
-export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 export PATH="$HOME"/.local/bin:"$PATH"
+
+# for fixing non standard applications which ignore the standard
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+
+# overriding non XDG respecting applications
+export MPV_HOME=${MPV_HOME:-$XDG_CONFIG_HOME/mpv}
