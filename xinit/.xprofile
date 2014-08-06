@@ -2,7 +2,8 @@
 export DESKTOP_SESSION=gnome
 export XDG_CURRENT_DESKTOP=gnome
 
-# not sure if needed, may fix non stabdard behaviour for some applications forked without a terminal parent
+# not sure if needed, may fix non standard behavior for some applications forked without a terminal parent (?)
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+export MPV_HOME=${MPV_HOME:-$XDG_CONFIG_HOME/mpv}
 
 # # vim:filetype=zsh
