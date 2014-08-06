@@ -1,0 +1,129 @@
+# ~/.gitconfig: git-config(1) - Git configuration
+# # vim: ft=gitconfig
+
+[core]
+    excludefiles = ~/.config/git/ignore
+    askpass =
+    autocrlf = input
+    logAllRefUpdates = true
+[user]
+    name = Thorsten Schubert
+    email = tschubert@bafh.org
+[alias]
+    a = add --all
+    a-p = add --all --patch
+    amend = commit --amend
+    br = branch
+    bra = branch -vv
+    ci = commit
+    ci-m = commit -m
+    cim = commit -m
+    co = checkout
+    di = diff
+    empty = !git init && git commit --allow-empty -m Initial
+    export = !touch $(git rev-parse --git-dir)/git-daemon-export-ok
+    fa = fetch --all
+    follow = log --oneline --follow --stat --summary --
+    fun = "!git fsck | awk '/dangling commit/ {print $3 \"^!\"}' | xargs git log"
+    in = log --oneline --decorate ..@{upstream}
+    lg = log --oneline --decorate
+    lgs = log --format=\"%C(yellow)%h%C(reset)%C(cyan)% GK%C(reset) %s\"
+    ls = ls-files
+    lsr = "!_() { [ \"$1\" ] || set -- HEAD; git ls-tree -r \"$@\"; }; _"
+    logs = log --show-signature
+    mend = commit --amend --reuse-message HEAD
+    mirror = clone --mirror
+    mkobject = hash-object --stdin -w
+    mrproper = !git reset --hard HEAD && git clean -fdx
+    out = log --oneline --decorate @{upstream}..
+    rbc = rebase --continue
+    rbs = rebase -i
+    re = rebase
+    rec = rebase --continue
+    refs = for-each-ref
+    repack-to-alternate = repack -dal
+    repack-to-local = repack -da
+    sg = diff --cached
+    st = status
+    staged = diff --cached
+    stat = diff --stat
+    statg = diff --cached --stat
+    tagv = !git tag -v $(git describe --abbrev=0)
+    tg = log --oneline --decorate --graph
+    tip = !git --no-pager log -1 --decorate --abbrev-commit --date=relative --show-signature
+    undo = reset --soft HEAD^
+    unexport = !rm -v $(git rev-parse --git-dir)/git-daemon-export-ok
+    wdiff = diff --word-diff
+    wshow = show --word-diff
+    fpush = push --force-with-lease
+    uncommit = reset HEAD^
+[color]
+    ui = auto
+    branch = auto
+    diff = auto
+    status = auto
+[color "diff"]
+    whitespace = red reverse
+[color "grep"]
+    filename = magenta
+    linenumber = green
+[column]
+    ui = auto
+    branch = never
+    status = never
+    tag = auto dense
+[credential]
+    helper = cache --socket $XDG_RUNTIME_DIR/git-credential-cache.socket
+    helper = lib gnomekeyring
+    #helper = store --file ~/.auth/git-credential-store
+    useHttpPath = false
+[grep]
+    lineNumber = true
+    extendedRegexp = true
+[init]
+    templateDir = ~/.config/git/template
+[merge]
+    conflictStyle = diff3
+[pack]
+    writebitmaps = true
+[push]
+    #default = upstream
+    default = current
+[rebase]
+    autosquash = true
+[receive]
+    denyCurrentBranch = refuse
+[sendemail]
+    from = Thorsten Schubert <tschubert@bafh.org>
+    confirm = auto
+    chainReplyTo = false
+    smtpServer = /usr/bin/msmtp
+    #smtpServerOption = --debug
+    smtpServerOption = --read-envelope-from
+[tig]
+    show-date = relative
+    #show-author = abbreviated
+    show-filename = false
+    author-width = 12
+    show-rev-graph = true
+    line-graphics = true
+    commit-order = topo
+    split-view-height = 75%
+    #vertical-split = true
+    ignore-case = true
+    #diff-options = --patience
+    #main-view = date:relative author:full,width=12 commit-title:graph=yes,refs=yes
+[tig "bind"]
+    generic = Backspace view-close
+    generic = E !git format-patch -1 %(commit)
+    # noop on unrecognized escape sequences
+    main = ~ none
+    main = 4 toggle-graphic
+    main = G move-last-line
+[tig "color"]
+    cursor = black green
+    #title-focus = color16 color39
+    #title-blur = color16 color25
+
+[include]
+    path = ~/.gitconfig.local

@@ -1,0 +1,15 @@
+*.a
+*.o
+*.py[co]
+*.sw[nop]
+*~
+.vimdir
+Thumbs.db
+\#*#
+__pycache__
+core
+!core/
+core.*.*
+
+# OpenOffice lock files
+.~lock.*#
