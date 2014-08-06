@@ -7,29 +7,42 @@
 # If the above line is not correctly displayed, fix your editor first!
 
 general {
-        output_format = "i3bar"
-        colors = true
-        interval = 5
+    output_format = "i3bar"
+    colors = false
+    interval = 3
 }
 
+order += "cpu_usage"
 order += "cpu_temperature 0"
 order += "disk /"
 order += "load"
+order += "volume master"
 order += "tztime local"
 
+volume master {
+    format = "VOL:%volume"
+    device = "default"
+    mixer = "Master"
+    mixer_idx = 0
+}
+
+cpu_usage {
+    format = "CPU:%usage"
+}
+
 cpu_temperature 0 {
-       format = "T0: %degrees °C"
-       path = "/sys/class/hwmon/hwmon1/temp1_input"
+    format = "TEMP: %degrees °C"
+    path = "/sys/class/hwmon/hwmon1/temp1_input"
 }
 
 tztime local {
-        format = "%Y-%m-%d %H:%M"
+    format = "%Y-%m-%d %H:%M"
 }
 
 load {
-        format = "%1min %5min %15min"
+    format = "%1min %5min %15min"
 }
 
 disk "/" {
-        format = "%avail"
+    format = "SSD:%used/%avail"
 }

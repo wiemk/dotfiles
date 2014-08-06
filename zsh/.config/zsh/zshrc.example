@@ -521,10 +521,6 @@ for var in LANG LC_ALL LC_MESSAGES ; do
     [[ -n ${(P)var} ]] && export $var
 done
 
-xsource "/etc/sysconfig/keyboard"
-
-TZ=$(xcat /etc/timezone)
-
 # set some variables
 if check_com -c vim ; then
 #v#
@@ -540,7 +536,12 @@ export PAGER=${PAGER:-less}
 export MAIL=${MAIL:-/var/mail/$USER}
 
 # if we don't set $SHELL then aterm, rxvt,.. will use /bin/sh or /bin/bash :-/
-export SHELL='/bin/zsh'
+if [[ -z "$SHELL" ]] ; then
+  SHELL="$(which zsh)"
+  if [[ -x "$SHELL" ]] ; then
+    export SHELL
+  fi
+fi
 
 # color setup for ls:
 check_com -c dircolors && eval $(dircolors -b)
@@ -605,8 +606,9 @@ if is4 ; then
 fi
 
 # completion system
+COMPDUMPFILE=${COMPDUMPFILE:-${ZDOTDIR:-${HOME}}/.zcompdump}
 if zrcautoload compinit ; then
-    compinit || print 'Notice: no compinit available :('
+    compinit -d ${COMPDUMPFILE} || print 'Notice: no compinit available :('
 else
     print 'Notice: no compinit available :('
     function compdef { }
@@ -773,7 +775,7 @@ grmlcomp() {
 
     # use generic completion system for programs not yet defined; (_gnu_generic works
     # with commands that provide a --help option with "standard" gnu-like output.)
-    for compcom in cp deborphan df feh fetchipac head hnb ipacsum mv \
+    for compcom in cp deborphan df feh fetchipac gpasswd head hnb ipacsum mv \
                    pal stow tail uname ; do
         [[ -z ${_comps[$compcom]} ]] && compdef _gnu_generic ${compcom}
     done; unset compcom
@@ -815,21 +817,6 @@ beginning-or-end-of-somewhere() {
 }
 zle -N beginning-of-somewhere beginning-or-end-of-somewhere
 zle -N end-of-somewhere beginning-or-end-of-somewhere
-
-## toggle the ,. abbreviation feature on/off
-# NOABBREVIATION: default abbreviation-state
-#                 0 - enabled (default)
-#                 1 - disabled
-NOABBREVIATION=${NOABBREVIATION:-0}
-
-grml_toggle_abbrev() {
-    if (( ${NOABBREVIATION} > 0 )) ; then
-        NOABBREVIATION=0
-    else
-        NOABBREVIATION=1
-    fi
-}
-zle -N grml_toggle_abbrev
 
 # add a command line to the shells history without executing it
 commit-to-history() {
@@ -1027,11 +1014,6 @@ zleiab() {
     setopt extendedglob
     local MATCH
 
-    if (( NOABBREVIATION > 0 )) ; then
-        LBUFFER="${LBUFFER},."
-        return 0
-    fi
-
     LBUFFER=${LBUFFER%%(#m)[.\-+:|_a-zA-Z0-9]#}
     LBUFFER+=${abk[$MATCH]:-$MATCH}
 }
@@ -1040,7 +1022,7 @@ zle -N zleiab
 
 help-show-abk()
 {
-  zle -M "$(print "Type ,. after these abbreviations to expand them:"; print -a -C 2 ${(kv)abk})"
+  zle -M "$(print "Available abbreviations for expansion:"; print -a -C 2 ${(kv)abk})"
 }
 
 zle -N help-show-abk
@@ -1122,7 +1104,6 @@ inplaceMkDirs() {
     fi
 }
 
-#k# mkdir -p <dir> from string under cursor or marked area
 zle -N inplaceMkDirs
 
 #v1# set number of lines to display per page
@@ -1406,9 +1387,11 @@ bind2maps       viins vicmd -- Left   vi-backward-char
 bind2maps emacs             -- Right  forward-char
 bind2maps       viins vicmd -- Right  vi-forward-char
 bind2maps       viins vicmd -- Right  vi-forward-char
-#k# Display list of abbreviations that expand when followed by ,.
+#k# Perform abbreviation expansion
 bind2maps emacs viins       -- -s '^x.' zleiab
+#k# Display list of abbreviations that would expand
 bind2maps emacs viins       -- -s '^xb' help-show-abk
+#k# mkdir -p <dir> from string under cursor or marked area
 bind2maps emacs viins       -- -s '^xM' inplaceMkDirs
 #k# display help for keybindings and ZLE
 bind2maps emacs viins       -- -s '^xz' help-zle
@@ -1424,8 +1407,6 @@ bind2maps emacs viins       -- -s '^xP' history-beginning-search-forward-end
 bind2maps emacs viins       -- PageUp history-beginning-search-backward-end
 #k# search history forward for entry beginning with typed text
 bind2maps emacs viins       -- PageDown history-beginning-search-forward-end
-#k# Toggle abbreviation expansion on/off
-bind2maps emacs viins       -- -s '^xA' grml_toggle_abbrev
 bind2maps emacs viins       -- -s "^x^h" commit-to-history
 #k# Kill left-side word or everything up to next slash
 bind2maps emacs viins       -- -s '\ev' slash-backward-kill-word
@@ -1560,6 +1541,7 @@ if [[ -f ${DIRSTACKFILE} ]] && [[ ${#dirstack[*]} -eq 0 ]] ; then
 fi
 
 chpwd() {
+    if (( $DIRSTACKSIZE <= 0 )) || [[ -z $DIRSTACKFILE ]]; then return; fi
     local -ax my_stack
     my_stack=( ${PWD} ${dirstack} )
     if is42 ; then
@@ -1615,7 +1597,16 @@ fi # is433
 # set colors for use in prompts (modern zshs allow for the use of %F{red}foo%f
 # in prompts to get a red "foo" embedded, but it's good to keep these for
 # backwards compatibility).
-if zrcautoload colors && colors 2>/dev/null ; then
+if is437; then
+    BLUE="%F{blue}"
+    RED="%F{red}"
+    GREEN="%F{green}"
+    CYAN="%F{cyan}"
+    MAGENTA="%F{magenta}"
+    YELLOW="%F{yellow}"
+    WHITE="%F{white}"
+    NO_COLOR="%f"
+elif zrcautoload colors && colors 2>/dev/null ; then
     BLUE="%{${fg[blue]}%}"
     RED="%{${fg_bold[red]}%}"
     GREEN="%{${fg[green]}%}"
@@ -1698,21 +1689,61 @@ if zrcautoload vcs_info; then
     fi
 fi
 
+typeset -A grml_vcs_coloured_formats
+typeset -A grml_vcs_plain_formats
+
+grml_vcs_plain_formats=(
+    format "(%s%)-[%b] "    "zsh: %r"
+    actionformat "(%s%)-[%b|%a] " "zsh: %r"
+    rev-branchformat "%b:%r"
+)
+
+grml_vcs_coloured_formats=(
+    format "${MAGENTA}(${NO_COLOR}%s${MAGENTA})${YELLOW}-${MAGENTA}[${GREEN}%b${MAGENTA}]${NO_COLOR} "
+    actionformat "${MAGENTA}(${NO_COLOR}%s${MAGENTA})${YELLOW}-${MAGENTA}[${GREEN}%b${YELLOW}|${RED}%a${MAGENTA}]${NO_COLOR} "
+    rev-branchformat "%b${RED}:${YELLOW}%r"
+)
+
+typeset GRML_VCS_COLOUR_MODE=xxx
+
+grml_vcs_info_toggle_colour () {
+    emulate -L zsh
+    if [[ $GRML_VCS_COLOUR_MODE == plain ]]; then
+        grml_vcs_info_set_formats coloured
+    else
+        grml_vcs_info_set_formats plain
+    fi
+    return 0
+}
+
+grml_vcs_info_set_formats () {
+    emulate -L zsh
+    #setopt localoptions xtrace
+    local mode=$1 AF F BF
+    if [[ $mode == coloured ]]; then
+        AF=${grml_vcs_coloured_formats[actionformat]}
+        F=${grml_vcs_coloured_formats[format]}
+        BF=${grml_vcs_coloured_formats[rev-branchformat]}
+        GRML_VCS_COLOUR_MODE=coloured
+    else
+        AF=${grml_vcs_plain_formats[actionformat]}
+        F=${grml_vcs_plain_formats[format]}
+        BF=${grml_vcs_plain_formats[rev-branchformat]}
+        GRML_VCS_COLOUR_MODE=plain
+    fi
+
+    zstyle ':vcs_info:*'              actionformats "$AF" "zsh: %r"
+    zstyle ':vcs_info:*'              formats       "$F"  "zsh: %r"
+    zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat  "$BF"
+    return 0
+}
+
 # Change vcs_info formats for the grml prompt. The 2nd format sets up
 # $vcs_info_msg_1_ to contain "zsh: repo-name" used to set our screen title.
-# TODO: The included vcs_info() version still uses $VCS_INFO_message_N_.
-#       That needs to be the use of $VCS_INFO_message_N_ needs to be changed
-#       to $vcs_info_msg_N_ as soon as we use the included version.
 if [[ "$TERM" == dumb ]] ; then
-    zstyle ':vcs_info:*' actionformats "(%s%)-[%b|%a] " "zsh: %r"
-    zstyle ':vcs_info:*' formats       "(%s%)-[%b] "    "zsh: %r"
+    grml_vcs_info_set_formats plain
 else
-    # these are the same, just with a lot of colors:
-    zstyle ':vcs_info:*' actionformats "${MAGENTA}(${NO_COLOR}%s${MAGENTA})${YELLOW}-${MAGENTA}[${GREEN}%b${YELLOW}|${RED}%a${MAGENTA}]${NO_COLOR} " \
-                                       "zsh: %r"
-    zstyle ':vcs_info:*' formats       "${MAGENTA}(${NO_COLOR}%s${MAGENTA})${YELLOW}-${MAGENTA}[${GREEN}%b${MAGENTA}]${NO_COLOR}%} " \
-                                       "zsh: %r"
-    zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat "%b${RED}:${YELLOW}%r"
+    grml_vcs_info_set_formats coloured
 fi
 
 # Now for the fun part: The grml prompt themes in `promptsys' mode of operation
@@ -2295,8 +2326,8 @@ fi
 
 # do we have GNU ls with color-support?
 if [[ "$TERM" != dumb ]]; then
-    #a1# List files with colors (\kbd{ls -b -CF \ldots})
-    alias ls='ls -b -CF '${ls_options:+"${ls_options[*]}"}
+    #a1# List files with colors (\kbd{ls -CF \ldots})
+    alias ls='ls -CF '${ls_options:+"${ls_options[*]}"}
     #a1# List all files, with colors (\kbd{ls -la \ldots})
     alias la='ls -la '${ls_options:+"${ls_options[*]}"}
     #a1# List files with long colored list, without dotfiles (\kbd{ls -l \ldots})
@@ -2306,7 +2337,7 @@ if [[ "$TERM" != dumb ]]; then
     #a1# List files with long colored list, append qualifier to filenames (\kbd{ls -lF \ldots})\\&\quad(\kbd{/} for directories, \kbd{@} for symlinks ...)
     alias l='ls -lF '${ls_options:+"${ls_options[*]}"}
 else
-    alias ls='ls -b -CF'
+    alias ls='ls -CF'
     alias la='ls -la'
     alias ll='ls -l'
     alias lh='ls -hAl'
@@ -2534,6 +2565,7 @@ compdef _functions freload
 #f1# List symlinks in detail (more detailed version of 'readlink -f' and 'whence -s')
 sll() {
     [[ -z "$1" ]] && printf 'Usage: %s <file(s)>\n' "$0" && return 1
+    local file
     for file in "$@" ; do
         while [[ -h "$file" ]] ; do
             ls -l $file
@@ -2546,26 +2578,31 @@ sll() {
 #   PAGER='less -Mr' - If so, the use of $PAGER here needs fixing
 # with respect to wordsplitting. (ie. ${=PAGER})
 if check_com -c $PAGER ; then
-    #f3# View Debian's changelog of a given package
+    #f3# View Debian's changelog of given package(s)
     dchange() {
         emulate -L zsh
-        if [[ -r /usr/share/doc/$1/changelog.Debian.gz ]] ; then
-            $PAGER /usr/share/doc/$1/changelog.Debian.gz
-        elif [[ -r /usr/share/doc/$1/changelog.gz ]] ; then
-            $PAGER /usr/share/doc/$1/changelog.gz
-        else
-            if check_com -c aptitude ; then
-                echo "No changelog for package $1 found, using aptitude to retrieve it."
-                if isgrml ; then
-                    aptitude -t unstable changelog $1
-                else
-                    aptitude changelog $1
-                fi
+        [[ -z "$1" ]] && printf 'Usage: %s <package_name(s)>\n' "$0" && return 1
+
+        local package
+        for package in "$@" ; do
+            if [[ -r /usr/share/doc/${package}/changelog.Debian.gz ]] ; then
+                $PAGER /usr/share/doc/${package}/changelog.Debian.gz
+            elif [[ -r /usr/share/doc/${package}/changelog.gz ]] ; then
+                $PAGER /usr/share/doc/${package}/changelog.gz
+            elif [[ -r /usr/share/doc/${package}/changelog ]] ; then
+                $PAGER /usr/share/doc/${package}/changelog
             else
-                echo "No changelog for package $1 found, sorry."
-                return 1
+                if check_com -c aptitude ; then
+                    echo "No changelog for package $package found, using aptitude to retrieve it."
+                    aptitude changelog "$package"
+                elif check_com -c apt-get ; then
+                    echo "No changelog for package $package found, using apt-get to retrieve it."
+                    apt-get changelog "$package"
+                else
+                    echo "No changelog for package $package found, sorry."
+                fi
             fi
-        fi
+        done
     }
     _dchange() { _files -W /usr/share/doc -/ }
     compdef _dchange dchange
@@ -2750,11 +2787,6 @@ if check_com vim; then
         VIM_PLEASE_SET_TITLE='yes' command vim ${VIM_OPTIONS} "$@"
     }
 fi
-
-# make a backup of a file
-bk() {
-    cp -a "$1" "${1}_$(date --iso-8601=seconds)"
-}
 
 ssl_hashes=( sha512 sha256 sha1 md5 )
 
@@ -2943,8 +2975,13 @@ modified() {
 check_com new || alias new=modified
 
 # use colors when GNU grep with color-support
-#a2# Execute \kbd{grep -{}-color=auto}
-(( $#grep_options > 0 )) && alias grep='grep '${grep_options:+"${grep_options[*]}"}
+if (( $#grep_options > 0 )); then
+    o=${grep_options:+"${grep_options[*]}"}
+    #a2# Execute \kbd{grep -{}-color=auto}
+    alias grep='grep '$o
+    alias egrep='egrep '$o
+    unset o
+fi
 
 # Translate DE<=>EN
 # 'translate' looks up fot a word in a file with language-to-language
