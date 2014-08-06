@@ -26,6 +26,7 @@
     follow = log --oneline --follow --stat --summary --
     fun = "!git fsck | awk '/dangling commit/ {print $3 \"^!\"}' | xargs git log"
     in = log --oneline --decorate ..@{upstream}
+	la = "!git config --get-regexp '^alias\\.' | sed -e 's#^alias\\.##' -e 's#\\ #\\\\#'| column -t -s '\\'"
     lg = log --oneline --decorate
     lgs = log --format=\"%C(yellow)%h%C(reset)%C(cyan)% GK%C(reset) %s\"
     ls = ls-files
@@ -101,16 +102,16 @@
     #smtpServerOption = --debug
     smtpServerOption = --read-envelope-from
 [tig]
-    show-date = relative
+    #show-date = relative
     #show-author = abbreviated
-    show-filename = false
-    author-width = 12
-    show-rev-graph = true
-    line-graphics = true
-    commit-order = topo
-    split-view-height = 75%
+    #show-filename = false
+    #author-width = 12
+    #show-rev-graph = true
+    #line-graphics = true
+    #commit-order = topo
+    #split-view-height = 75%
     #vertical-split = true
-    ignore-case = true
+    #ignore-case = true
     #diff-options = --patience
     #main-view = date:relative author:full,width=12 commit-title:graph=yes,refs=yes
 [tig "bind"]
