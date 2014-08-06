@@ -1,3 +1,8 @@
+# this is a hack for native gtk widgets in qt apps
 export DESKTOP_SESSION=gnome
 export XDG_CURRENT_DESKTOP=gnome
-nvidia-settings --load-config-only
+
+# not sure if needed, may fix non stabdard behaviour for some applications forked without a terminal parent
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+
+# # vim:filetype=zsh
