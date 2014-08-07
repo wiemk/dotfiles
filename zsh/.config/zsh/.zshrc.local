@@ -65,8 +65,8 @@ alias chgrp='chgrp -c --preserve-root'
 alias ls='ls --color=auto --group-directories-first -AhXF'
 alias ll='ls --color=auto --group-directories-first -AlhXF'
 
-alias tmux=tmux -2
-alias dmesg=dmesg -exL
+alias tmux='tmux -2'
+alias dmesg='dmesg -exL'
 alias ix="curl -F 'f:1=<-' ix.io"
 alias sprunge="curl -F 'sprunge=<-' sprunge.us"
 alias xc='xclip -o | ix'
