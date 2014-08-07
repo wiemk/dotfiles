@@ -37,6 +37,8 @@
     mkobject = hash-object --stdin -w
     mrproper = !git reset --hard HEAD && git clean -fdx
     out = log --oneline --decorate @{upstream}..
+    p = pull --ff-only
+    prb = pull --rebase
     rbc = rebase --continue
     rbs = rebase -i
     re = rebase
