@@ -1,3 +1,5 @@
 logs
 xfer
-
+.log
+script/
+*_fifo_*
