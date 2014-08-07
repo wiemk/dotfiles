@@ -1,5 +1,5 @@
-logs
-xfer
-.log
+logs/
+xfer/
+*.log
 script/
 *_fifo_*
