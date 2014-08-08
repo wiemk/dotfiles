@@ -1,5 +1,5 @@
 # ~/.config/zsh/.zprofile
-export PATH="$HOME"/.local/bin:"$PATH"
+export PATH="$HOME"/.local/bin:"$HOME"/Development/code/bin:"$PATH"
 
 # for fixing non standard applications which ignore the standard
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
