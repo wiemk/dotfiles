@@ -29,6 +29,10 @@ function fun_ownedby() {
 function fun_addandsign() {
     sudo -- sh -c 'pacman-key -r $1 && pacman-key --lsign-key $1'
 }
+function fun_checkmodified() {
+    pacman -Qii $1
+}
+
 
 ukill() { ps x -o  "%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
 
@@ -45,6 +49,7 @@ alias showremote='fun_showremote'
 alias listfiles='fun_listfiles'
 alias adopt='fun_adopt'
 alias abandon='fun_abandon'
+alias modified='fun_checkmodified'
 
 alias update-repo='git checkout master && git pull && git checkout - && git rebase master'
 alias list-services='sudo systemctl list-units --type=service'
