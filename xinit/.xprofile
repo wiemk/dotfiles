@@ -2,12 +2,6 @@
 export DESKTOP_SESSION=gnome
 export XDG_CURRENT_DESKTOP=gnome
 
-# not sure if needed, may fix non standard behavior for some applications forked without a terminal parent (?)
-export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
-export MPV_HOME=${MPV_HOME:-$XDG_CONFIG_HOME/mpv}
-
-# at-spi annoyance fix
-[[ -n $DBUS_SESSION_BUS_ADDRESS ]] && unset DBUS_SESSION_BUS_ADDRESS
-export NO_AT_BRIDGE=1
-
-# # vim:filetype=zsh
+# .zshenv isn't sourced yet, do it manually
+[[ -e ~/.zshenv ]] && source ~/.zshenv
+[[ -e "$ZDOTDIR"/.zshrc.pre ]] && source "$ZDOTDIR"/.zshrc.pre
