@@ -1,4 +1,5 @@
 # ~/.config/zsh/.zprofile
+# this file gets sources by ~/.xprofile aswell
 export PATH="$HOME"/.local/bin:"$HOME"/dev/code/bin:"$PATH"
 
 # for fixing non standard applications which ignore the standard
@@ -8,7 +9,7 @@ export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 export MPV_HOME=${MPV_HOME:-$XDG_CONFIG_HOME/mpv}
 
 # at-spi annoyance fix
-[[ -n $DBUS_SESSION_BUS_ADDRESS ]] && unset DBUS_SESSION_BUS_ADDRESS
+[[ -n "$DBUS_SESSION_BUS_ADDRESS" ]] && unset DBUS_SESSION_BUS_ADDRESS
 export NO_AT_BRIDGE=1
 
 export ALTERNATE_EDITOR=emacs
