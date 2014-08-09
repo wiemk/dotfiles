@@ -1,7 +1,9 @@
 ;;(let ((default-directory "~/.emacs.d/elpa"))
 ;;  (normal-top-level-add-subdirs-to-load-path))
 ;;; esc quits
-
+;;(setq server-socket-dir (format "/run/user/%d/emacs" (user-uid)))
+(if (> (length (getenv "XDG_RUNTIME_DIR")) 0)
+    (setq server-socket-dir (format "%s/emacs" (getenv "XDG_RUNTIME_DIR"))))
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
