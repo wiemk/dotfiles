@@ -32,7 +32,9 @@ function fun_addandsign() {
 function fun_checkmodified() {
     pacman -Qii $1
 }
-
+function fun_performance() {
+    perf top -g -p $1
+}
 
 ukill() { ps x -o  "%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
 
@@ -77,6 +79,8 @@ alias dmesg='dmesg -exL'
 alias ix="curl -F 'f:1=<-' ix.io"
 alias sprunge="curl -F 'sprunge=<-' sprunge.us"
 alias xc='xclip -o | ix'
+
+alias performance='fun_performance'
 
 if [[ -n "$VTE_VERSION" ]]; then
     source /etc/profile.d/vte.sh
