@@ -6,3 +6,5 @@ export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 
 # overriding non XDG respecting applications
 export MPV_HOME=${MPV_HOME:-$XDG_CONFIG_HOME/mpv}
+
+unset DBUS_DBUS_SESSION_BUS_ADDRESS

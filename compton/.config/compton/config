@@ -1,6 +1,6 @@
-backend="glx"
-vsync="opengl"
-paint-on-overlay="true"
-glx-no-stencil="true"
-glx-no-rebind-pixmap="true"
-glx-swap-method="buffer-age"
+backend="glx";
+vsync="opengl";
+paint-on-overlay=true;
+glx-no-stencil=true;
+glx-no-rebind-pixmap=true;
+glx-swap-method="buffer-age";
