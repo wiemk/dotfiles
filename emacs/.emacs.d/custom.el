@@ -6,6 +6,7 @@
  '(custom-enabled-themes (quote (tango-dark)))
  '(font-use-system-font t)
  '(indent-tabs-mode nil)
+ '(inhibit-startup-screen t)
  '(vc-follow-symlinks t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
