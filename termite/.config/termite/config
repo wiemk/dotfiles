@@ -8,7 +8,7 @@ modify_other_keys = true
 mouse_autohide = true
 allow_bold = true
 dynamic_title = true
-urgent_on_bell = true
+urgent_on_bell = false 
 clickable_url = true
 
 #font = Audimat Mono Regular 12.5
