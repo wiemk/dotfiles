@@ -3,14 +3,15 @@
 export PATH="$HOME"/.local/bin:"$HOME"/dev/code/bin:"$PATH"
 
 # for fixing non standard applications which ignore the standard
-export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME"/.config}
 
 # overriding non XDG respecting applications
-export MPV_HOME=${MPV_HOME:-$XDG_CONFIG_HOME/mpv}
+export MPV_HOME=${MPV_HOME:-"$XDG_CONFIG_HOME"/mpv}
 
 # at-spi annoyance fix
 #[[ -n "$DBUS_SESSION_BUS_ADDRESS" ]] && unset DBUS_SESSION_BUS_ADDRESS
 #export NO_AT_BRIDGE=1
 
-export ALTERNATE_EDITOR=emacs
-export EDITOR=emc
+export ALTERNATE_EDITOR='emacs'
+export EDITOR='emc'
+export GTK_IM_MODULE='uim'
