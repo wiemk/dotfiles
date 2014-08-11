@@ -5,3 +5,5 @@ Xft.hinting: 1
 Xft.hintstyle: hintfull
 Xft.lcdfilter: lcddefault
 Xft.rgba: rgb
+Emacs.font: DejaVu Sans Mono:size=13
+Emacs.fontBackend: xft
