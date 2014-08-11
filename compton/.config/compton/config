@@ -1,7 +1,8 @@
 backend="glx";
 #vsync="opengl"; #seems faster but has tearing issues with 120hz primary display
 vsync="opengl-swc"
-glx-swap-method="exchange"; 
+#glx-swap-method="exchange"; 
+glx-swap-method=3
 paint-on-overlay=true;
 glx-no-stencil=true;
 glx-no-rebind-pixmap=true;
