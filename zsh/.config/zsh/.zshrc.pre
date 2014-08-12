@@ -12,7 +12,9 @@ export MPV_HOME=${MPV_HOME:-"$XDG_CONFIG_HOME"/mpv}
 #[[ -n "$DBUS_SESSION_BUS_ADDRESS" ]] && unset DBUS_SESSION_BUS_ADDRESS # this breaks everything :(
 export NO_AT_BRIDGE=1
 
-export ALTERNATE_EDITOR=emacs
-export EDITOR=emc
+#export ALTERNATE_EDITOR=emacs
+#export EDITOR=emc
+export EDITOR=vim
+export ALTERNATE_EDITOR=vi
 export GTK_IM_MODULE=uim
 export XMODIFIERS=@im=uim
