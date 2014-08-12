@@ -1,6 +1,4 @@
-colorscheme molokai
 if has("gui_running")
     set guifont=DejaVu\ Sans\ Mono\ 9
-//    set guioptions+=LlRrb
-//    set guioptions-=LlRrb
 endif
+
