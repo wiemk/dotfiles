@@ -3,5 +3,7 @@ export DESKTOP_SESSION=gnome
 export XDG_CURRENT_DESKTOP=gnome
 
 # .zshenv isn't sourced yet, do it manually
-[[ -e ~/.zshenv ]] && source ~/.zshenv
-[[ -e "$ZDOTDIR"/.zshrc.pre ]] && source "$ZDOTDIR"/.zshrc.pre
+[[ -r ~/.zshenv ]] && source ~/.zshenv
+#[[ -e "$ZDOTDIR"/.zshrc.pre ]] && source "$ZDOTDIR"/.zshrc.pre
+[[ -r ${ZDOTDIR:-${HOME}}/.zshrc.pre ]] && source ${ZDOTDIR:-${HOME}}/.zshrc.pre
+
