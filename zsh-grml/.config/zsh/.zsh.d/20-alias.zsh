@@ -1,43 +1,3 @@
-if [ -e /usr/share/doc/pkgfile/command-not-found.zsh ]; then
-    source /usr/share/doc/pkgfile/command-not-found.zsh
-fi
-
-function fun_purge() {
-    sudo pacman -Rnsc $1
-}
-function fun_purgeorphans() {
-    sudo pacman -Rnsc $(pacman -Qtdq)
-}
-function fun_showremote() {
-    pacman -Si $1
-}
-function fun_showlocal() {
-    pacman -Qi $1
-}
-function fun_listfiles() {
-    pacman -Ql $1
-}
-function fun_adopt() {
-    sudo pacman -D --asexplicit $1
-}
-function fun_abandon() {
-    sudo pacman -D --asdeps $1
-}
-function fun_ownedby() {
-    pacman -Qo $1
-}
-function fun_addandsign() {
-    sudo -- sh -c 'pacman-key -r $1 && pacman-key --lsign-key $1'
-}
-function fun_checkmodified() {
-    pacman -Qii $1
-}
-function fun_performance() {
-    perf top -g -p $1
-}
-
-ukill() { ps x -o  "%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
-
 alias psign='fun_addandsign'
 alias ownedby='fun_ownedby'
 alias orphans='pacman -Qtdq'
@@ -83,10 +43,3 @@ alias xc='xclip -o | ix'
 
 alias performance='fun_performance'
 
-if [[ -n "$VTE_VERSION" ]]; then
-    source /etc/profile.d/vte.sh
-    __vte_prompt_command
-fi
-
-eval $(dircolors "${XDG_CONFIG_HOME:-$HOME/.config}"/dircolors)
-#export GALLIUM_HUD="cpu0+cpu1+cpu2+cpu3:100,cpu:100,fps;draw-calls,requested-VRAM+requested-GTT,VRAM-usage+GTT-usage"
