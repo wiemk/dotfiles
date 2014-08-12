@@ -15,17 +15,18 @@
     amend = commit --amend
     br = branch
     bra = branch -vv
-    ci = commit
-    ci-m = commit -m
+    c = commit -m 'rebase -i ahead'
     cim = commit -m
     co = checkout
     di = diff
+    dt = difftool
     empty = !git init && git commit --allow-empty -m Initial
     export = !touch $(git rev-parse --git-dir)/git-daemon-export-ok
     fa = fetch --all
     follow = log --oneline --follow --stat --summary --
     fun = "!git fsck | awk '/dangling commit/ {print $3 \"^!\"}' | xargs git log"
     in = log --oneline --decorate ..@{upstream}
+    l = log --decorate --graph --oneline --all
 	la = "!git config --get-regexp '^alias\\.' | sed -e 's#^alias\\.##' -e 's#\\ #\\\\#'| column -t -s '\\'"
     lg = log --oneline --decorate
     lgs = log --format=\"%C(yellow)%h%C(reset)%C(cyan)% GK%C(reset) %s\"
@@ -46,6 +47,7 @@
     refs = for-each-ref
     repack-to-alternate = repack -dal
     repack-to-local = repack -da
+    s = status -sb
     sg = diff --cached
     st = status
     staged = diff --cached
@@ -65,11 +67,23 @@
     branch = auto
     diff = auto
     status = auto
+[color "branch"]
+    current = green bold
+    local = blue
+    remote = red reverse
 [color "diff"]
-    whitespace = red reverse
+    func = cyan bold
+    old = red bold
+    new = green bold
+    whitespace = magenta bold
+[color "status"]
+    added = green bold
+    changed = yellow bold
+    untracked = red bold
 [color "grep"]
     filename = magenta
     linenumber = green
+    match = green bold
 [column]
     ui = auto
     branch = never
