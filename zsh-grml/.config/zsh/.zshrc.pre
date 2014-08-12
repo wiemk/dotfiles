@@ -18,3 +18,4 @@ export EDITOR=vim
 export ALTERNATE_EDITOR=vi
 export GTK_IM_MODULE=uim
 export XMODIFIERS=@im=uim
+

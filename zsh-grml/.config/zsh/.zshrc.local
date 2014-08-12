@@ -1,0 +1,8 @@
+# configs
+for i in "$ZDOTDIR"/.zsh.d/*; do
+    if [[ -r "$i" ]]; then
+        source "$i"
+    fi
+done
+unset i
+
