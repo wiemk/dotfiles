@@ -17,7 +17,7 @@ workspace_layout tabbed
 
 # autostarts
 exec_always --no-startup-id compton --config ~/.config/compton/config -b
-exec_always --no-startup-id hhpc -i9 -- > /dev/null 2>&1 & 
+exec_always --no-startup-id killall hhpc; hhpc -i9 -- > /dev/null 2>&1 & 
 exec --no-startup-id dex -ae i3
 #exec --no-startup-id nm-applet
 #exec --no-startup-id pasystray
