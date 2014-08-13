@@ -2,6 +2,7 @@
 
 browser "firefox %u &> /dev/null &"
 #html-renderer "elinks -dump"
+html-renderer "lynx -stdin --dump"
 
 auto-reload yes
 reload-time 30
