@@ -38,6 +38,7 @@ include "%S/en_US.UTF-8/Compose"
 <Multi_key> <less> <3> : "❤"
 <Multi_key> <bar> <asciicircum> : "↑"
 <Multi_key> <bar> <v> : "↓"
+<Multi_key> <minus> <greater> : "→"
 
 # irc shortcuts
 <Multi_key> <v> <i> : "$EDITOR"

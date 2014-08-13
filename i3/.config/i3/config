@@ -185,12 +185,23 @@ bindsym $mod+shift+Delete exec --no-startup-id i3lock --color=000000
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume $pasink -- +5%
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume $pasink -- -5%
 bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute $pasink toggle
+
 # toggle mic mute
 # bindsym XF86AudioMicMute exec --no-startup-id ponymix -t source -d alsa_input.pci-0000_00_1b.0.analog-stereo toggle
 #bindsym XF86AudioMute exec --no-startup-id ponymix toggle
 #bindsym XF86AudioLowerVolume exec --no-startup-id ponymix decrease 3
 #bindsym XF86AudioRaiseVolume exec --no-startup-id ponymix increase 3
-for_window [class="^mpv"] move workspace 2
-#assign [class=^mpv$"] workspace → 3
+
+
+# workspace reordering
 workspace 2 output DVI-D-0
 workspace 3 output HDMI-0
+assign [class="^mpv$"] workspace → 2
+
+# window specific settings
+for_window [class="^mpv$"] move workspace 2
+for_window [class="Wine"] floating enable
+
+# focus latest urgent window
+bindsym $mod+u [urgent="latest"] focus
+
