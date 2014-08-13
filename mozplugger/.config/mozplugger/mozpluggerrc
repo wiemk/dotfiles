@@ -73,6 +73,7 @@ video/theora:ogg:OGG stream with video
 video/ogg:ogg:OGG stream with video
 video/x-ogg:ogm,ogv:OGG stream with video
 video/webm:webm:WEBM stream with video
+application/octet-stream:webm:WEBM stream with video wrong mime type
 	MP_VIDEO_STREAM()
 
 ### Audio ###
