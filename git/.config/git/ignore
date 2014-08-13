@@ -1,5 +1,12 @@
-*.a
+# compiled
+*.com
+*.class
+*.dll
+*.elc
+*.exe
 *.o
+*.so
+*.a
 *.py[co]
 *.sw[nop]
 *~
@@ -13,3 +20,43 @@ core.*.*
 
 # OpenOffice lock files
 .~lock.*#
+# archives
+*.7z
+*.bin
+*.bz2
+*.gz
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.tbz2
+*.tgz
+*.xz
+*.zip
+*.Z
+
+# logs and databases
+*.log
+*.sql
+*.sqlite
+# temp files
+*.swp
+
+# crypto
+*.asc
+*.crt
+*.gpg
+*.key
+*.pem
+*.sig
+*.tc
+*.kbx
+
+# OS generated
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
