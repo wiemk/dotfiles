@@ -13,6 +13,7 @@ alias listfiles='fun_listfiles'
 alias adopt='fun_adopt'
 alias abandon='fun_abandon'
 alias modified='fun_checkmodified'
+alias explicit='pacman -Qet'
 
 alias update-repo='git checkout master && git pull && git checkout - && git rebase master'
 alias list-services='sudo systemctl list-units --type=service'
