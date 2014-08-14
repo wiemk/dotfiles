@@ -32,7 +32,7 @@ notify-format      "%d new articles (%n unread articles, %f unread feeds)"
 
 # tt-rss
 urls-source "ttrss"
-ttrss-url "http://rss.zerofill.de/"
+ttrss-url "https://rss.zerofill.de/"
 ttrss-login "zeno"
 ttrss-passwordfile "/home/zeno/.config/gnupg/ttrss_password"
 ttrss-mode "multi"
