@@ -201,6 +201,7 @@ assign [class="^mpv$"] workspace → 2
 # window specific settings
 for_window [class="^mpv$"] move workspace 2
 for_window [class="Wine"] floating enable
+for_window [class="^Nemo$"] floating enable
 
 # focus latest urgent window
 bindsym $mod+u [urgent="latest"] focus
