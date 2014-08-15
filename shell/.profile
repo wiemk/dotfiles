@@ -1,5 +1,3 @@
-# ~/.config/zsh/.zprofile
-# this file gets sources by ~/.xprofile aswell
 export PATH="$HOME"/.local/bin:"$HOME"/dev/code/bin:"$PATH"
 
 # for fixing non standard applications which ignore the standard
@@ -17,7 +15,6 @@ export PENTADACTYL_RUNTIME="$XDG_CONFIG_HOME"/pentadactyl
 export GTK2_RC_FILES="$XDG_CONFIG_HOME"/gtk-2.0/settings.ini
 
 # at-spi annoyance fix
-#[[ -n "$DBUS_SESSION_BUS_ADDRESS" ]] && unset DBUS_SESSION_BUS_ADDRESS # this breaks everything :(
 export NO_AT_BRIDGE=1
 
 #export ALTERNATE_EDITOR=emacs
@@ -41,3 +38,4 @@ export GREP_OPTIONS=--color=auto
 export LESS=-R
 export SDL_AUDIODRIVER=pulse
 
+export ABSROOT="$HOME"/dev/build/arch/abs

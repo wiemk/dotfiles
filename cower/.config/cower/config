@@ -1,0 +1,4 @@
+Color = auto
+TargetDir = ~/dev/build/arch/aur
+
+# vim: set noet syn=conf
