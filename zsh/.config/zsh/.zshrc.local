@@ -1,4 +1,6 @@
-# configs
+# gets sourced by .zshrc after .zshrc.pre, has to be treatet as .zshrc
+
+# config dropins
 for i ("$ZDOTDIR"/.zsh.d/*.zsh(N)); do
     if [[ -r "$i" ]]; then
         source "$i"
