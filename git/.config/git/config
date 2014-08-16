@@ -28,7 +28,7 @@
     ignored = ls-files --other -i --exclude-standard
     in = log --oneline --decorate ..@{upstream}
     l = log --decorate --graph --oneline --all
-	la = "!git config --get-regexp '^alias\\.' | sed -e 's#^alias\\.##' -e 's#\\ #\\\\#'| column -t -s '\\'"
+    la = "!git config --get-regexp '^alias\\.' | sed -e 's#^alias\\.##' -e 's#\\ #\\\\#'| column -t -s '\\'"
     lg = log --oneline --decorate
     lgs = log --format=\"%C(yellow)%h%C(reset)%C(cyan)% GK%C(reset) %s\"
     ls = ls-files
@@ -96,6 +96,8 @@
     helper = lib gnomekeyring
     #helper = store --file ~/.auth/git-credential-store
     useHttpPath = false
+[diff]
+    tool = vimdiff
 [grep]
     lineNumber = true
     extendedRegexp = true
