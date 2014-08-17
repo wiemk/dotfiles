@@ -1,3 +1,4 @@
+# vim: ft=m4
 # Configure file for MozPlugger
 # Version: Jan 20, 2013
 #
@@ -73,7 +74,6 @@ video/theora:ogg:OGG stream with video
 video/ogg:ogg:OGG stream with video
 video/x-ogg:ogm,ogv:OGG stream with video
 video/webm:webm:WEBM stream with video
-application/octet-stream:webm:WEBM stream with video wrong mime type
 	MP_VIDEO_STREAM()
 
 ### Audio ###
