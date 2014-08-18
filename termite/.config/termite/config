@@ -8,7 +8,7 @@ modify_other_keys = true
 mouse_autohide = true
 allow_bold = true
 dynamic_title = true
-urgent_on_bell = false 
+urgent_on_bell = true
 clickable_url = true
 
 #font = Audimat Mono Regular 12.5
@@ -54,7 +54,7 @@ browser = firefox
 # (default if unset: all graphic non-punctuation/space characters)
 #word_chars = -A-Za-z0-9,./?%&#:_=+@~
 
-[colors]
+#[colors]
 #foreground = #000000
 #background = #ede8ed
 #
