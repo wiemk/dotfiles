@@ -26,6 +26,10 @@ alias cp='cp -vi'
 alias mv='mv -vi'
 alias ln='ln -vi'
 alias mkdir='mkdir -vp'
+alias sude='sudo -E'
+
+alias e="$EDITOR"
+alias ae="$ALTERNATE_EDITOR"
 
 alias chmod='chmod -c --preserve-root'
 alias chown='chown -c --preserve-root'

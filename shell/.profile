@@ -19,8 +19,8 @@ export NO_AT_BRIDGE=1
 
 #export ALTERNATE_EDITOR=emacs
 #export EDITOR=emc
-export EDITOR=vim
-export ALTERNATE_EDITOR=vi
+export EDITOR='gvim -f'
+export ALTERNATE_EDITOR=vim
 export PAGER=less
 export LESSHISTFILE="$XDG_CACHE_HOME"/lesshist
 export BROWSER=firefox
