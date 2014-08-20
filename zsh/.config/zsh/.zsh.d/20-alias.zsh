@@ -47,4 +47,4 @@ alias sprunge="curl -F 'sprunge=<-' sprunge.us"
 alias xc='xclip -o | ix'
 
 alias performance='perf top -g -p'
-
+alias largest='du --max-depth=1 2> /dev/null | sort -n -r | head -n20'
