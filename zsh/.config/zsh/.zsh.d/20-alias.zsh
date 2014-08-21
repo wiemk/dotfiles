@@ -17,8 +17,8 @@ alias explicit='pacman -Qet'
 
 alias update-repo='git checkout master && git pull && git checkout - && git rebase master'
 alias list-services='sudo systemctl list-units --type=service'
-alias sctl='systemctl'
-alias ssctl='sudo systemctl'
+alias sctlu='systemctl --user'
+alias sctl='sudo systemctl'
 
 alias rr='rm -rvI'
 alias rm='rm -vI'

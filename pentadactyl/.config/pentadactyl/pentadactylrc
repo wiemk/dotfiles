@@ -11,6 +11,7 @@ source ~/.config/pentadactyl/chrome.css
 
 set guioptions=bCrs
 set hlfind
+set hintkeys=asdfjkl
 
 " Speed up scrolling
 nmap -b h 5h
@@ -52,7 +53,7 @@ au fullscreen off set go+=s
 
 " Change some default about:configs
 set! extensions.checkCompatibility.nightly=false
-set! noscript.keys.tempAllowPage="alt z"
+set! noscript.keys.tempAllowPage="alt y"
 set! noscript.keys.revokeTemp="alt x"
 set! noscript.notify=false
 set! plugins.click_to_play=true
