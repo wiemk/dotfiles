@@ -9,3 +9,8 @@ function ukill() {
 function awp() {
     awk '{print $'$1'}';
 }
+
+function +() { sudo "$@" }
+function -() { builtin cd .. }
+function @() { cat "$@" }
+function p() { $PAGER "$@" }
