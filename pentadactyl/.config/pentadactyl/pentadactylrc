@@ -41,7 +41,7 @@ nmap <C-j> <nop>
 nmap <C-k> <nop>
 
 " Open the current URL as an argument to yt-dl
-nmap <S-u> -e :launchv
+nmap <S-v> -e :launchv
 
 " Use vim instead of gvim for now
 " set editor='termite -e "vim +<line> <file>"'
