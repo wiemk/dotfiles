@@ -12,7 +12,6 @@ alias showremote='pacman -Si'
 alias listfiles='pacman -Ql'
 alias adopt='sudo pacman -D --asexplicit'
 alias abandon='sudo pacman -D --asdeps'
-alias modified='pacman -Qii'
 alias explicit='pacman -Qet'
 
 alias update-repo='git checkout master && git pull && git checkout - && git rebase master'

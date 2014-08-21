@@ -1,3 +1,6 @@
+[DEFAULT]
+# Teach mr how to `mr gc` in git repos.
+git_gc = git gc --aggressive "$@"
 
 [.dotfiles]
 checkout = git clone 'git@bitbucket.org:zenofx/dotfiles.git' '.dotfiles'

@@ -16,3 +16,8 @@ endf
 " Jump to tag
 nn <M-g> :call JumpToDef()<cr>
 ino <M-g> <esc>:call JumpToDef()<cr>i
+
+" map tab switch to alt+jk
+nnoremap <A-j> gt
+nnoremap <A-k> gT
+
