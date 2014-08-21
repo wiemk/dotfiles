@@ -12,6 +12,7 @@ export TIGRC_USER="$XDG_CONFIG_HOME"/tigrc
 #export XAUTHORITY="$XDG_RUNTIME_DIR"/X11-authority
 export XCOMPOSEFILE="$XDG_CONFIG_HOME"/X11/xcompose
 export PENTADACTYL_RUNTIME="$XDG_CONFIG_HOME"/pentadactyl
+export PENTADACTYL_INIT=":source $PENTADACTYL_RUNTIME/pentadactylrc"
 export GTK2_RC_FILES="$XDG_CONFIG_HOME"/gtk-2.0/settings.ini
 
 # at-spi annoyance fix
@@ -39,3 +40,5 @@ export LESS=-R
 export SDL_AUDIODRIVER=pulse
 
 export ABSROOT="$HOME"/dev/build/arch/abs
+
+# vim: set ft=sh
