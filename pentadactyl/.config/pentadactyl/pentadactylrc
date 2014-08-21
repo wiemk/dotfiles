@@ -13,6 +13,9 @@ set guioptions=bCrs
 set hlfind
 set hintkeys=asdfjkl
 
+" google focus steal fix
+set strictfocus='chrome:*':laissez-faire,google.*:despotic,*:moderate
+
 " Speed up scrolling
 nmap -b h 5h
 nmap -b j 5j
