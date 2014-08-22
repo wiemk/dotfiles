@@ -46,8 +46,9 @@ nmap <A-S-Right> -e :tabmove +1
 " Toggle bookmark toolbar
 nmap s -e :sidebar! Bookmarks
 
-" Easily show downloads
-nmap <S-d> -e :downloads
+" remap close tab to D and :downloads to d
+nmap -b d D
+nmap d -e :downloads
 
 " Stop <C-j> and <C-k> doing whatever it does
 nmap <C-j> <nop>
