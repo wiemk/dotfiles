@@ -22,27 +22,30 @@ function launchv(target){
     function exec(launcher, uri){
 
         /* If we're using dactyl then echo the action as io.system won't */
-        if(typeof dactyl !== "undefined")
+        if(typeof dactyl !== "undefined") {
             dactyl.echomsg("Launching: " + launcher + " " + uri);
-
+        }
         return io.system(launcher + ' "' + uri + '" &');
     }
 
     /* filter certain urls to more appropriate programs before passing to
      * quvi */
-    if(uri.match(/twitch\.tv\/.*\/[bc]\/[0-9]+/))
+    if(uri.match(/twitch\.tv\/.*\/[bc]\/[0-9]+/)) {
 
         /* XXX Currently youtube-dl will only fetch the first 30 minutes of the
          *     stream.  Replacing this with livestreamer until fixed. */
         //exec("yt-title", uri);
         exec("livestreamer", uri);
+    }
 
     /* Currently youtube-dl's support is buggy but adding for future */
-    else if(uri.match(/twitch\.tv/))
+    else if(uri.match(/twitch\.tv/)) {
         exec("livestreamer", uri);
+    }
 
-    else if(uri.match(/youtube.*[?&]list=(?:RD|UU)/))
-            exec("yt-title", uri);
+    else if(uri.match(/youtube.*[?&]list=(?:RD|UU)/)) {
+        exec("yt-title", uri);
+    }
 
     /* Open youtube playlists of any kind directly with mpv */
     else if(uri.match(/youtube.*[?&]list=PL/)) {
@@ -51,12 +54,14 @@ function launchv(target){
         if(uri.match(/watch\?v=/)) {
             var uri = uri.replace(/watch\?v.+?\&/, "playlist\?")
             exec("yt-title", uri);
-        } else
+        } else {
             exec("yt-title", uri);
+        }
 
     /* For everything else */
-    } else
+    } else {
         exec("yt-title", uri);
+    }
 }
 
 hints.addMode("q", "Launch video from hint", function (elem, loc) launchv(loc));

@@ -212,6 +212,7 @@ for_window [class="^Nemo$"] floating enable
 for_window [class="^Firefox$" instance="^Browser$" window_role="^(page-info|Preferences)$"] floating enable
 for_window [class="^File-roller$"] floating enable
 for_window [class="^Gedit$" instance="^gedit$"] floating enable
+for_window [class="^Nvidia-settings$" instance="^nvidia-settings$"] floating enable
 
 exec --no-startup-id i3-session-restore
 
