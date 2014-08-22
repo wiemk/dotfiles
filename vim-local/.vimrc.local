@@ -20,4 +20,5 @@ ino <M-g> <esc>:call JumpToDef()<cr>i
 " map tab switch to alt+jk
 nnoremap <A-j> gt
 nnoremap <A-k> gT
-
+" only useful information in tabs
+set guitablabel=\[%N\]\ %t\ %M 

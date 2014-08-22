@@ -86,4 +86,7 @@ set! security.ssl.treat_unsafe_negotiation_as_broken=true
 " Style
 colorscheme molokai
 
+" plugin options
+set pintaboardToken="@TOKEN@"
+
 " vim: set ft=javascript
