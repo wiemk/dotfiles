@@ -1,49 +1,65 @@
 # .zsh.d/20-alias.zsh
-alias pm_ownedby='pacman -Qo'
-alias pm_orphans='pacman -Qtdq'
-alias pm_update-dist='sudo pacman -Syu'
-alias pm_listaur='pacman -Qm'
-alias pm_checkinstalled='pacman -Qkk'
+#########################################################################
+# PACKAGE MANAGEMENT
+#########################################################################
+#
+alias pm_ownedby='pm -Qo'
+alias pm_orphans='pm -Qtdq'
+alias pm_listaur='pm -Qm'
+alias pm_checkinstalled='pm -Qkk'
 alias pm_purgeall='purgeorphans'
-alias pm_purge='sudo pacman -Rnsc'
-alias pm_purgeorphans='sudo pacman -Rnsc $(pacman -Qtdq)'
-alias pm_showlocal='pacman -Qi'
-alias pm_showremote='pacman -Si'
-alias pm_listfiles='pacman -Ql'
-alias pm_adopt='sudo pacman -D --asexplicit'
-alias pm_abandon='sudo pacman -D --asdeps'
-alias pm_explicit='pacman -Qet'
+alias pm_showlocal='pm -Qi'
+alias pm_showremote='pm -Si'
+alias pm_listfiles='pm -Ql'
+alias pm_explicit='pm -Qet'
+# privileged
+alias pm_purge='pm+ -Rnsc'
+alias pm_adopt='pm+ -D --asexplicit'
+alias pm_abandon='pm+ -D --asdeps'
+alias pm_up='+pm -Syyu'
+alias pm_purgeorphans='pm+ -Rnsc $(pm -Qtdq)'
 
-alias git_update-repo='git checkout master && git pull && git checkout - && git rebase master'
-alias list-services='sudo systemctl list-units --type=service'
-alias sctlu='systemctl --user'
-alias sctl='sudo systemctl'
+#########################################################################
+# SYSTEMD
+#########################################################################
+#
+alias s_ls='+s list-units --type=service'
 
+#########################################################################
+# COREUTILS
+#########################################################################
+#
+# file operations
 alias rr='rm -rvI'
 alias rm='rm -vI'
 alias cp='cp -vi'
 alias mv='mv -vi'
 alias ln='ln -vi'
 alias mkdir='mkdir -vp'
-alias sude='sudo -E'
-
+# permissions
+alias sudo=ngsudo
 alias chmod='chmod -c --preserve-root'
 alias chown='chown -c --preserve-root'
 alias chgrp='chgrp -c --preserve-root'
-
+# navigation
 alias ls='ls --color=auto --group-directories-first -AhXF'
 alias ll='ls --color=auto --group-directories-first -AlhXF'
-
+# information
 alias netstat='lsof -Pnl +M -i4'
 alias netstat6='lsof -Pnl +M -i6'
 alias tmux='tmux -2'
 alias dmesg='dmesg -exL'
+
+#########################################################################
+# UTILITY
+#########################################################################
+#
 alias ix="curl -F 'f:1=<-' ix.io"
 alias sprunge="curl -F 'sprunge=<-' sprunge.us"
 alias xc='xclip -o | ix'
-
 alias performance='perf top -g -p'
 alias largest='du --max-depth=1 2> /dev/null | sort -n -r | head -n20'
+
 #
 # EOF
 # vim :set ts=4 sw=4 sts=4 et :
