@@ -94,7 +94,7 @@ function ngsudo {
 }
 # shortcuts
 function cd() { builtin cd "$@" && ls -- }
-function ukill() { ps x -o  "%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
+#function ukill() { ps x -o  "%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
 function +() { sudo "$@" }
 function -() { builtin cd .. }
 function @() { cat "$@" }
