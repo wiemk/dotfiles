@@ -77,13 +77,34 @@ function x() {
         shift
     done
 }
-
+# noglob for sudo
+function ngsudo {
+    while [[ $# > 0 ]]; do
+        case "$1" in
+        command) shift ; break ;;
+        nocorrect|noglob) shift ;;
+        *) break ;;
+        esac
+    done
+    if [[ $# = 0 ]]; then
+        command sudo zsh
+    else
+        noglob command sudo $@
+    fi
+}
+# shortcuts
 function cd() { builtin cd "$@" && ls -- }
 function ukill() { ps x -o  "%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
 function +() { sudo "$@" }
 function -() { builtin cd .. }
 function @() { cat "$@" }
 function p() { $PAGER "$@" }
+function pm() { pacman "$@" }
+function +pm() { sudo pacman "$@" }
+function s() { systemctl "$@" }
+function +s() { sudo systemctl "$@" }
+function su() { systemctl --user "$@" }
+function ?() { run-help "$1" }
 #
 # EOF
 # vim :set ts=4 sw=4 sts=4 et :
