@@ -1,3 +1,4 @@
+# .zsh.d/50-git.zsh
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:*' check-for-changes true
@@ -61,3 +62,5 @@ function +vi-git-remotebranch() {
         hook_com[branch]="${hook_com[branch]}(%F{cyan}${remote}%f)"
     fi
 }
+# EOF
+# vim :set ts=4 sw=4 sts=4 et :

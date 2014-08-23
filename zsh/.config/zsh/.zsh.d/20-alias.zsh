@@ -1,20 +1,20 @@
-alias psign='fun_addandsign'
-alias ownedby='pacman -Qo'
-alias orphans='pacman -Qtdq'
-alias update-dist='sudo pacman -Syu'
-alias listaur='pacman -Qm'
-alias checkinstalled='pacman -Qkk'
-alias purgeall='purgeorphans'
-alias purge='sudo pacman -Rnsc'
-alias purgeorphans='sudo pacman -Rnsc $(pacman -Qtdq)'
-alias showlocal='pacman -Qi'
-alias showremote='pacman -Si'
-alias listfiles='pacman -Ql'
-alias adopt='sudo pacman -D --asexplicit'
-alias abandon='sudo pacman -D --asdeps'
-alias explicit='pacman -Qet'
+# .zsh.d/20-alias.zsh
+alias pm_ownedby='pacman -Qo'
+alias pm_orphans='pacman -Qtdq'
+alias pm_update-dist='sudo pacman -Syu'
+alias pm_listaur='pacman -Qm'
+alias pm_checkinstalled='pacman -Qkk'
+alias pm_purgeall='purgeorphans'
+alias pm_purge='sudo pacman -Rnsc'
+alias pm_purgeorphans='sudo pacman -Rnsc $(pacman -Qtdq)'
+alias pm_showlocal='pacman -Qi'
+alias pm_showremote='pacman -Si'
+alias pm_listfiles='pacman -Ql'
+alias pm_adopt='sudo pacman -D --asexplicit'
+alias pm_abandon='sudo pacman -D --asdeps'
+alias pm_explicit='pacman -Qet'
 
-alias update-repo='git checkout master && git pull && git checkout - && git rebase master'
+alias git_update-repo='git checkout master && git pull && git checkout - && git rebase master'
 alias list-services='sudo systemctl list-units --type=service'
 alias sctlu='systemctl --user'
 alias sctl='sudo systemctl'
@@ -26,9 +26,6 @@ alias mv='mv -vi'
 alias ln='ln -vi'
 alias mkdir='mkdir -vp'
 alias sude='sudo -E'
-
-alias e="$EDITOR"
-alias ae="$ALTERNATE_EDITOR"
 
 alias chmod='chmod -c --preserve-root'
 alias chown='chown -c --preserve-root'
@@ -47,3 +44,6 @@ alias xc='xclip -o | ix'
 
 alias performance='perf top -g -p'
 alias largest='du --max-depth=1 2> /dev/null | sort -n -r | head -n20'
+#
+# EOF
+# vim :set ts=4 sw=4 sts=4 et :
