@@ -34,12 +34,19 @@ function pm_sign() { sudo -- sh -c 'pacman-key -r $1 && pacman-key --lsign-key $
 # TEXT MANIPULATION
 #########################################################################
 #
-function e() { 
+# buffer version
+function e() {
     local editor=vim
     [[ -n $DISPLAY ]] && editor=gvim
-    $editor --remote-tab-silent "$@"
+    (( $# > 0 )) && $editor --remote-silent "$@" || $editor --remote-silent .
 }
-
+# tab version
+function et() {
+    local editor=vim
+    [[ -n $DISPLAY ]] && editor=gvim
+    (( $# > 0 )) && $editor --remote-tab-silent "$@" || $editor --remote-tab-silent .
+}
+#
 # strip whitespaces, newlines and comments from stdin
 function stripall() { sed -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^$/d' -e '/^\#/d' -- }
 # strip whitespaces

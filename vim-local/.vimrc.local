@@ -1,4 +1,6 @@
+" .vimrc.local
 colorscheme molokai
+"
 if has("gui_running")
     set guifont=DejaVu\ Sans\ Mono\ 9
 endif
@@ -12,13 +14,27 @@ fun! JumpToDef()
     exe "norm! <C-]>"
   endif
 endf
-
 " Jump to tag
 nn <M-g> :call JumpToDef()<cr>
 ino <M-g> <esc>:call JumpToDef()<cr>i
+"
 
 " map tab switch to alt+jk
-nnoremap <A-j> gt
-nnoremap <A-k> gT
+nnoremap <A-k> gt
+nnoremap <A-j> gT
+" map buffer switch to gB/gb
+nnoremap gb :bnext<cr>
+nnoremap gB :bprevious<cr>
+" list all possible buffers with "gl"
+nnoremap gl :ls<cr>
+" list all possible buffers with "gb" and accept a new buffer argument [1]
+nnoremap gn :ls<cr>:b
+"
+"
 " only useful information in tabs
 set guitablabel=\[%N\]\ %t\ %M 
+"
+
+
+" EOF
+" vim :set ts=4 sw=4 sts=4 et :
