@@ -41,6 +41,7 @@
     out = log --oneline --decorate @{upstream}..
     p = pull --ff-only
     prb = pull --rebase
+    puam = "!git remote --| while read -r i; do git push $i master; done"
     rbc = rebase --continue
     rbs = rebase -i
     re = rebase
