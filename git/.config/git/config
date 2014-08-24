@@ -93,8 +93,8 @@
     status = never
     tag = auto dense
 [credential]
-    helper = cache --socket $XDG_RUNTIME_DIR/git-credential-cache.socket
-    helper = lib gnomekeyring
+    helper = gnome-keyring
+    #helper = cache --socket $XDG_RUNTIME_DIR/git-credential-cache.socket
     #helper = store --file ~/.auth/git-credential-store
     useHttpPath = false
 [diff]
