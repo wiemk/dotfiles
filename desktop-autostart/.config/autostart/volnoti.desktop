@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Exec=volnoti
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=volnoti
+Name=volnoti
+Comment[en_US]=volume notification
+Comment=volume notification
+X-GNOME-Autostart-Delay=0
+OnlyShowIn=i3;

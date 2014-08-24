@@ -10,22 +10,31 @@
 #
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
+# variables
 set $mod Mod4
 set $pasink alsa_output.usb-Binary_Audio_UAC1_DAC-01-DAC.analog-stereo
+set $pasource alsa_input.usb-Binary_Audio_UAC1_DAC-01-DAC.analog-stereo
+set $primaryout DVI-I-1
 
 workspace_auto_back_and_forth yes
 workspace_layout tabbed
 
 # autostarts
+# compton for countering tearing only
 exec_always --no-startup-id compton --config ~/.config/compton/config -b
-exec_always --no-startup-id killall hhpc; hhpc -i9 -- > /dev/null 2>&1 & 
+# hide mouse cursor after 9 seconds
+exec_always --no-startup-id killall hhpc; hhpc -i9 -- > /dev/null 2>&1 &
+# disable audible bell
 exec --no-startup-id xset b off
+# start .desktop crap, replaces most application starts below
 exec --no-startup-id dex -ae i3
 #exec --no-startup-id autocutsel -fork
 #exec --no-startup-id autocutsel -selection PRIMARY -fork
 #exec --no-startup-id nm-applet
 #exec --no-startup-id pasystray
 #exec --no-startup-id nvidia-settings --load-config-only
+# volume notification
+#exec --no-startup-id volnoti
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -176,7 +185,7 @@ bar {
         mode hide
         hidden_state hide
         status_command i3status
-        tray_output DVI-I-1
+        tray_output $primaryout
 }
 
 # custom stuff
@@ -184,18 +193,19 @@ bar {
 bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
 
+# black background when screen is locked, saves power
 bindsym $mod+shift+w exec --no-startup-id i3lock --color=000000
 bindsym $mod+shift+Delete exec --no-startup-id i3lock --color=000000
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume $pasink -- +5%
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume $pasink -- -5%
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute $pasink toggle
 
+# volume management
+#bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume $pasink -- +5%
+#bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume $pasink -- -5%
+#bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute $pasink toggle
+bindsym XF86AudioRaiseVolume exec --no-startup-id volctl inc 5
+bindsym XF86AudioLowerVolume exec --no-startup-id volctl dec 5
+bindsym XF86AudioMute exec --no-startup-id volctl mute
 # toggle mic mute
-# bindsym XF86AudioMicMute exec --no-startup-id ponymix -t source -d alsa_input.pci-0000_00_1b.0.analog-stereo toggle
-#bindsym XF86AudioMute exec --no-startup-id ponymix toggle
-#bindsym XF86AudioLowerVolume exec --no-startup-id ponymix decrease 3
-#bindsym XF86AudioRaiseVolume exec --no-startup-id ponymix increase 3
-
+bindsym XF86AudioMicMute exec --no-startup-id ponymix -t source -d $pasource toggle
 
 # workspace reordering
 workspace 2 output DVI-D-0
@@ -216,5 +226,6 @@ for_window [class="^File-roller$"] floating enable
 for_window [class="^Gedit$" instance="^gedit$"] floating enable
 for_window [class="^Nvidia-settings$" instance="^nvidia-settings$"] floating enable
 
+# restore our saved session (i3-save-tree)
 exec --no-startup-id i3-session-restore
 

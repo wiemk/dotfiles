@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Exec=pasystray
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=pasystray
+Name=pasystray
+Comment[en_US]=pulseaudio tray icon
+Comment=pulseaudio tray icon
+X-GNOME-Autostart-Delay=0
+OnlyShowIn=i3;
