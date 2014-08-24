@@ -16,7 +16,7 @@
                "x": 0,
                "y": 0
             },
-            "name": "Google Play Music",
+            "name": "Google Play Music - Pentadactyl",
             "percent": 0.25,
             "swallows": [
                {
@@ -42,25 +42,6 @@
                {
                 "class": "^Thunderbird$",
                 "instance": "^Mail$"
-               }
-            ],
-            "type": "con"
-        },
-        {
-            "border": "pixel",
-            "floating": "auto_off",
-            "geometry": {
-               "height": 338,
-               "width": 562,
-               "x": 0,
-               "y": 0
-            },
-            "name": "zeno@zenbox: ~",
-            "percent": 0.25,
-            "swallows": [
-               {
-                "class": "^Termite$",
-                "instance": "^termite$"
                }
             ],
             "type": "con"
@@ -114,6 +95,25 @@
                     "type": "con"
                 }
             ]
+        },
+        {
+            "border": "pixel",
+            "floating": "auto_off",
+            "geometry": {
+               "height": 338,
+               "width": 562,
+               "x": 0,
+               "y": 0
+            },
+            "name": "zeno@zenbox: ~",
+            "percent": 0.25,
+            "swallows": [
+               {
+                "class": "^Termite$",
+                "instance": "^termite$"
+               }
+            ],
+            "type": "con"
         }
     ]
 }

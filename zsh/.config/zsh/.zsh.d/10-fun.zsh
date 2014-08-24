@@ -68,7 +68,6 @@ function x() {
         printf '%s\n' "usage: x <archive1> [<archive2> [...]]"
         return 1
     fi
-
     while (( $# > 0 )); do
         case "$1" in
             *.tar.gz | *.tgz) bsdtar -xvzf "$1";;
@@ -80,7 +79,6 @@ function x() {
             *.zip) unzip "$1";;
             *) bsdtar -xvf "$1";;
         esac
-
         shift
     done
 }
@@ -99,9 +97,22 @@ function ngsudo {
         noglob command sudo $@
     fi
 }
+# simple and quick HTTP Server
+function sweb {
+    local -i port=8080
+    local host=0.0.0.0
+    if (( $# > 0 )); then
+        port=$1
+        (( $port == 0 )) && port=8080
+        if (( $# > 1 )); then
+            host=$2
+        fi
+    fi
+    /usr/bin/env python3 -m http.server $port --bind $host
+}
 # shortcuts
-function cd() { builtin cd "$@" && ls -- }
 #function ukill() { ps x -o  "%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
+function cd() { builtin cd "$@" && ls -- }
 function +() { sudo "$@" }
 function -() { builtin cd .. }
 function @() { cat "$@" }
@@ -112,6 +123,6 @@ function s() { systemctl "$@" }
 function +s() { sudo systemctl "$@" }
 function su() { systemctl --user "$@" }
 function ?() { run-help "$1" }
-#
+
 # EOF
 # vim :set ts=4 sw=4 sts=4 et :
