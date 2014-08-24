@@ -1,4 +1,7 @@
+# ~/.xprofile
 # this is a hack for native gtk widgets in qt apps
 export DESKTOP_SESSION=gnome
 export XDG_CURRENT_DESKTOP=gnome
 
+# EOF
+# vim :set ft=bash ts=4 sw=4 sts=4 et :
