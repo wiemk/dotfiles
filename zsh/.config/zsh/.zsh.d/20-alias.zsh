@@ -4,14 +4,15 @@
 #########################################################################
 #
 alias pm_ownedby='pm -Qo'
-alias pm_orphans='pm -Qtdq'
-alias pm_listaur='pm -Qm'
+alias pm_orphans='pm -Qtd'
+alias pm_listaur='pm -Qmq'
 alias pm_checkinstalled='pm -Qkk'
-alias pm_purgeall='purgeorphans'
 alias pm_showlocal='pm -Qi'
 alias pm_showremote='pm -Si'
 alias pm_listfiles='pm -Ql'
 alias pm_explicit='pm -Qet'
+alias pm_listofficial='pm -Qn'
+alias pm_reversedep='pactree -lrud1'
 # privileged
 alias pm_purge='pm+ -Rnsc'
 alias pm_adopt='pm+ -D --asexplicit'

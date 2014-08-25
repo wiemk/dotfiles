@@ -13,6 +13,20 @@ function pm_modified() {
     )
 }
 
+function pm_nodeps() {
+    local ignoregrp="base base-devel"
+    local ignorepkg=
+    comm -23 <(
+        pacman -Qqt |
+        sort
+    ) <(
+        echo $ignorepkg |
+        tr ' ' '\n' |
+        cat <(pacman -Sqg $ignoregrp) - |
+        sort -u
+    )
+}
+
 function pm_provisions() {
     expac -S "%n %P" |
         awk 'NF>1 {
@@ -27,8 +41,70 @@ function pm_provisions() {
         }' | sort | less
 }
 
-function pm_allmodified() { modified }
-function pm_sign() { sudo -- sh -c 'pacman-key -r $1 && pacman-key --lsign-key $1' }
+function +pm_foreignfiles() {
+    # no traps here due to being a interactive shell function
+    # it would persist after being triggered
+    local p=$1
+    local tmp=$(mktemp)
+    (( $# == 0 )) && p="/"
+    sudo find $p \( \
+        -path '/dev' \
+        -o -path '/sys' \
+        -o -path '/run' \
+        -o -path '/tmp' \
+        -o -path '/mnt' \
+        -o -path '/srv' \
+        -o -path '/proc' \
+        -o -path '/boot' \
+        -o -path '/home' \
+        -o -path '/root' \
+        -o -path '/media' \
+        -o -path '/var/lib/pacman' \
+        -o -path '/var/lib/container' \
+        -o -path '/var/cache/pacman' \
+    \)  -prune -o -type f -print > $tmp 2>/dev/null
+    comm -23 <(sort -u $tmp) <(pacman -Qlq | sort -u)
+    command rm -f $tmp
+}
+
+function +pm_foreigndirs() {
+    local p=$1
+    local tmp=$(mktemp)
+    (( $# == 0 )) && p="/"
+    sudo find $p \( \
+        -path '/dev' \
+        -o -path '/sys' \
+        -o -path '/run' \
+        -o -path '/tmp' \
+        -o -path '/mnt' \
+        -o -path '/srv' \
+        -o -path '/proc' \
+        -o -path '/boot' \
+        -o -path '/home' \
+        -o -path '/root' \
+        -o -path '/media' \
+        -o -path '/var/lib/pacman' \
+        -o -path '/var/lib/container' \
+        -o -path '/var/cache/pacman' \
+    \)  -prune -o -type d -print > $tmp 2>/dev/null
+    comm -23 <(sed 's/\([^/]\)$/\1\//' $tmp | sort -u) <(pacman -Qlq | sort -u)
+    command rm -f $tmp
+}
+
+# specific & total size of local packages
+function pm_size() {
+    pacman -Qi "$@" 2>/dev/null |
+        awk -F ": " -v filter="Size" -v pkg="Name" \
+            '$0 ~ pkg {pkgname=$2} $0 ~ filter {gsub(/\..*/,"") ; printf("%6s KiB %s\n", $2, pkgname)}' |
+        sort -u -k3 |
+        tee >(awk '{TOTAL=$1+TOTAL} END {printf("Total : %d KiB\n",TOTAL)}')
+}
+
+# dependencies of package $1
+function pm_getdeps() { expac -l '\n' %E -S "$@" | sort -u }
+
+# import and sign maintainer key
+function +pm_sign() { sudo -- sh -c 'pacman-key -r $1 && pacman-key --lsign-key $1' }
 
 #########################################################################
 # TEXT MANIPULATION
@@ -57,6 +133,8 @@ function stripempty() { sed -e '/^$/d' -- }
 function stripcomment() { sed -e '/^\#/d' -- }
 # quick column select with standard whitespace delimeter
 function awp() { awk '{print $'$1'}'; }
+# enclose a line in $1
+function enclose() { sed "s/.*/$1&$1/" -- }
 
 #########################################################################
 # UTILITY & SIMPLIFICATION
