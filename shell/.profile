@@ -1,5 +1,5 @@
 # ~/.profile
-export PATH=${XDG_DATA_HOME:-"$HOME"/.local/share}/../bin:"$HOME"/dev/code/bin:"$PATH"
+export PATH=${XDG_DATA_HOME:-"$HOME"/.local/share}/../bin:"$PATH"
 
 # let's be explicit here
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME"/.config}

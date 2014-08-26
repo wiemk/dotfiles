@@ -1,39 +1,35 @@
 [DEFAULT]
 # Teach mr how to `mr gc` in git repos.
 git_gc = git gc --aggressive "$@"
+update = git pull --ff-only
+puam = git puam
 
 [.dotfiles]
 checkout = git clone 'git@bitbucket.org:zenofx/dotfiles.git' '.dotfiles'
-update = git pull --ff-only
-
-[dev/code]
-checkout = git clone 'git@bitbucket.org:zenofx/code.git' 'code'
-update = git pull --ff-only
 
 [dev/thirdparty/github/grawity/code]
 checkout = git clone 'https://github.com/grawity/code' 'code'
-update = git pull --ff-only
 
 [dev/thirdparty/github/grawity/dotfiles]
 checkout = git clone 'https://github.com/grawity/dotfiles' 'dotfiles'
-update = git pull --ff-only
 
 [dev/thirdparty/github/grawity/irc-docs]
 checkout = git clone 'https://github.com/grawity/irc-docs.git' 'irc-docs'
-update = git pull --ff-only
 
 [dev/thirdparty/github/grawity/systemd-user-units]
 checkout = git clone 'https://github.com/grawity/systemd-user-units.git' 'systemd-user-units'
-update = git pull --ff-only
 
 [dev/thirdparty/github/ian-kelling/evhz]
 checkout = git clone 'https://github.com/ian-kelling/evhz.git' 'evhz'
-update = git pull --ff-only
 
 [dev/thirdparty/github/vodik/clique]
 checkout = git clone 'https://github.com/vodik/clique.git' 'clique'
-update = git pull --ff-only
 
 [dev/thirdparty/systemd]
 checkout = git clone 'git://anongit.freedesktop.org/systemd/systemd' 'systemd'
-update = git pull --ff-only
+
+[dev/projects]
+checkout = git clone 'git@bitbucket.org:zenofx/project-collection.git' 'projects'
+
+[dev/system]
+checkout = git clone 'git@bitbucket.org:zenofx/system.git' 'system'
