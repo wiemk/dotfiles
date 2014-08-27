@@ -188,6 +188,16 @@ function sweb {
     fi
     /usr/bin/env python3 -m http.server $port --bind $host
 }
+
+# use systemd resolver
+function shost {
+    local cmd='/usr/lib/systemd/systemd-resolve-host'
+    if [[ -x $cmd ]]; then
+        $cmd "$@"
+    else
+        echo "$cmd not found."
+    fi
+}
 # shortcuts
 #function ukill() { ps x -o  "%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
 function cd() { builtin cd "$@" && ls -- }
