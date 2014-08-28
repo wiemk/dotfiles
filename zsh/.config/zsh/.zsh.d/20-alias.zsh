@@ -14,11 +14,11 @@ alias pm_explicit='pm -Qet'
 alias pm_listofficial='pm -Qn'
 alias pm_reversedep='pactree -lrud1'
 # privileged
-alias pm_purge='pm+ -Rnsc'
-alias pm_adopt='pm+ -D --asexplicit'
-alias pm_abandon='pm+ -D --asdeps'
+alias pm_purge='+pm -Rnsc'
+alias pm_adopt='+pm -D --asexplicit'
+alias pm_abandon='+pm -D --asdeps'
 alias pm_up='+pm -Syyu'
-alias pm_purgeorphans='pm+ -Rnsc $(pm -Qtdq)'
+alias pm_purgeorphans='+pm -Rnsc $(pm -Qtdq)'
 
 #########################################################################
 # SYSTEMD
