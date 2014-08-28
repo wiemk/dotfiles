@@ -99,6 +99,7 @@ function pm_size() {
         sort -u -k3 |
         tee >(awk '{TOTAL=$1+TOTAL} END {printf("Total : %d KiB\n",TOTAL)}')
 }
+function pm_size2() { expac -Q '%m'| awk '{TOTAL+=$1} END {printf "Installed: %i MiB\n", TOTAL/1024^2}' }
 
 # dependencies of package $1
 function pm_getdeps() { expac -l '\n' %E -S "$@" | sort -u }
