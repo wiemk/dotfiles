@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=PrisonArchitect
+Name[de]=PrisonArchitect
+Exec=env -- SDL_VIDEO_FULLSCREEN_HEAD=0 SDL_AUDIODRIVER=alsa AUDIODEV=sysdefault:CARD=DAC pasuspender -- ~/opt/prison/prisonarchitect-alpha23d-linux/PrisonArchitect &>/dev/null
+Icon=PrisonArchitect
+Terminal=false
+Type=Application
+Categories=Game;
+StartupNotify=true

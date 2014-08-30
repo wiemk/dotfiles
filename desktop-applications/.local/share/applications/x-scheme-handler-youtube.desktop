@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=x-scheme-handler-youtube %u
+Terminal=false
+Categories=Utility
+MimeType=x-scheme-handler/youtube
+Name=x-scheme-handler-youtube
+Comment=strips youtube: from URL and passes the result to yt-title
