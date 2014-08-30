@@ -36,7 +36,7 @@ nnoremap gn :ls<cr>:b
 " only useful information in tabs
 set guitablabel=\[%N\]\ %t\ %M 
 "
-
+set shell=$SHELL
 
 " EOF
 " vim :set ts=4 sw=4 sts=4 et :

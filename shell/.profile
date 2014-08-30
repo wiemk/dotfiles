@@ -3,7 +3,11 @@ export PATH=${XDG_DATA_HOME:-"$HOME"/.local/share}/../bin:"$PATH"
 
 # let's be explicit here
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME"/.config}
-export XDG_CACHE_HOME=${XDG_CACHE_HOME:-"$HOME"/.cache}
+if [[ -d "$HOME"/tmp ]]; then
+    export XDG_CACHE_HOME="$HOME"/tmp/.cache
+else
+    export XDG_CACHE_HOME=${XDG_CACHE_HOME:-"$HOME"/.cache}
+fi
 export XDG_DATA_HOME=${XDG_DATA_HOME:-"$HOME"/.local/share}
 
 # agents (gnome-keyring-daemon -s output)
