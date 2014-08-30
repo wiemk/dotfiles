@@ -33,7 +33,7 @@ export EDITOR='gvim -f'
 export ALTERNATE_EDITOR='vim'
 export PAGER=less
 export LESSHISTFILE="$XDG_CACHE_HOME"/lesshist
-export BROWSER=firefox
+export BROWSER=chromium
 export TERMINAL=termite
 
 # uim
