@@ -11,18 +11,18 @@
             "border": "pixel",
             "floating": "auto_off",
             "geometry": {
-               "height": 1080,
+               "height": 1064,
                "width": 1920,
-               "x": 0,
-               "y": 0
+               "x": 1920,
+               "y": 16
             },
-            "name": "Google Play Music - Pentadactyl",
+            "name": "Google Play Music - Chromium",
             "percent": 0.25,
             "swallows": [
                {
-                "class": "^Firefox$",
-                "instance": "^Navigator$",
-                "window_role": "^browser$"
+                "class": "^Chromium$",
+                "instance": "^music\\.google\\.com$",
+                "window_role": "^pop\\-up$"
                }
             ],
             "type": "con"
@@ -59,12 +59,12 @@
                     "floating": "auto_off",
                     "geometry": {
                        "height": 1063,
-                       "width": 241,
+                       "width": 225,
                        "x": 0,
                        "y": 16
                     },
                     "name": "Buddy List",
-                    "percent": 0.117708333333333,
+                    "percent": 0.119791666666667,
                     "swallows": [
                        {
                         "class": "^Pidgin$",
@@ -78,13 +78,13 @@
                     "border": "pixel",
                     "floating": "auto_off",
                     "geometry": {
-                       "height": 1063,
-                       "width": 1677,
+                       "height": 531,
+                       "width": 1920,
                        "x": 0,
                        "y": 0
                     },
-                    "name": "Dominic Sudy",
-                    "percent": 0.882291666666667,
+                    "name": "Conversation",
+                    "percent": 0.880208333333333,
                     "swallows": [
                        {
                         "class": "^Pidgin$",
@@ -97,23 +97,81 @@
             ]
         },
         {
+            // splith split container with 2 children
             "border": "pixel",
             "floating": "auto_off",
-            "geometry": {
-               "height": 338,
-               "width": 562,
-               "x": 0,
-               "y": 0
-            },
-            "name": "zeno@zenbox: ~",
+            "layout": "splith",
             "percent": 0.25,
-            "swallows": [
-               {
-                "class": "^Termite$",
-                "instance": "^termite$"
-               }
-            ],
-            "type": "con"
+            "type": "con",
+            "nodes": [
+                {
+                    "border": "pixel",
+                    "floating": "auto_off",
+                    "geometry": {
+                       "height": 338,
+                       "width": 562,
+                       "x": 0,
+                       "y": 0
+                    },
+                    "name": "zeno@zenbox: ~",
+                    "percent": 0.624479166666667,
+                    "swallows": [
+                       {
+                        "class": "^Termite$",
+                        "instance": "^termite$"
+                       }
+                    ],
+                    "type": "con"
+                },
+                {
+                    // splitv split container with 2 children
+                    "border": "pixel",
+                    "floating": "auto_off",
+                    "layout": "splitv",
+                    "percent": 0.375520833333333,
+                    "type": "con",
+                    "nodes": [
+                        {
+                            "border": "pixel",
+                            "floating": "auto_off",
+                            "geometry": {
+                               "height": 338,
+                               "width": 562,
+                               "x": 0,
+                               "y": 0
+                            },
+                            "name": "zeno@zenbox: ~",
+                            "percent": 0.5,
+                            "swallows": [
+                               {
+                                "class": "^Termite$",
+                                "instance": "^termite$"
+                               }
+                            ],
+                            "type": "con"
+                        },
+                        {
+                            "border": "pixel",
+                            "floating": "auto_off",
+                            "geometry": {
+                               "height": 338,
+                               "width": 562,
+                               "x": 0,
+                               "y": 0
+                            },
+                            "name": "zeno@zenbox: ~",
+                            "percent": 0.5,
+                            "swallows": [
+                               {
+                                "class": "^Termite$",
+                                "instance": "^termite$"
+                               }
+                            ],
+                            "type": "con"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

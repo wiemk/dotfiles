@@ -1,58 +1,105 @@
 // vim:ts=4:sw=4:et
 {
-    // splith split container with 1 children
+    // tabbed split container with 2 children
     "border": "pixel",
     "floating": "auto_off",
-    "layout": "splith",
+    "layout": "tabbed",
     "percent": 1,
     "type": "con",
     "nodes": [
         {
-            // tabbed split container with 2 children
             "border": "pixel",
             "floating": "auto_off",
-            "layout": "tabbed",
-            "percent": 1,
+            "geometry": {
+               "height": 564,
+               "width": 580,
+               "x": 0,
+               "y": 0
+            },
+            "name": "[No Name] - GVIM",
+            "percent": 0.5,
+            "swallows": [
+               {
+                "class": "^Gvim$",
+                "instance": "^gvim$"
+               }
+            ],
+            "type": "con"
+        },
+        {
+            // splith split container with 2 children
+            "border": "pixel",
+            "floating": "auto_off",
+            "layout": "splith",
+            "percent": 0.5,
             "type": "con",
             "nodes": [
                 {
                     "border": "pixel",
                     "floating": "auto_off",
                     "geometry": {
-                       "height": 1080,
-                       "width": 1920,
+                       "height": 338,
+                       "width": 562,
                        "x": 0,
                        "y": 0
                     },
-                    "name": "Pentadactyl",
-                    "percent": 0.5,
+                    "name": "zeno@zenbox: ~",
+                    "percent": 0.619270833333333,
                     "swallows": [
                        {
-                       "class": "^Firefox$",
-                       "instance": "^Navigator$",
-                       "window_role": "^browser$"
+                        "class": "^Termite$",
+                        "instance": "^termite$"
                        }
                     ],
                     "type": "con"
                 },
                 {
+                    // splitv split container with 2 children
                     "border": "pixel",
                     "floating": "auto_off",
-                    "geometry": {
-                       "height": 564,
-                       "width": 1938,
-                       "x": 0,
-                       "y": 0
-                    },
-                    "name": "gvim",
-                    "percent": 0.5,
-                    "swallows": [
-                       {
-                       "class": "^Gvim$",
-                       "instance": "^gvim$"
-                       }
-                    ],
-                    "type": "con"
+                    "layout": "splitv",
+                    "percent": 0.380729166666667,
+                    "type": "con",
+                    "nodes": [
+                        {
+                            "border": "pixel",
+                            "floating": "auto_off",
+                            "geometry": {
+                               "height": 338,
+                               "width": 562,
+                               "x": 0,
+                               "y": 0
+                            },
+                            "name": "zeno@zenbox: ~",
+                            "percent": 0.5,
+                            "swallows": [
+                               {
+                                "class": "^Termite$",
+                                "instance": "^termite$"
+                               }
+                            ],
+                            "type": "con"
+                        },
+                        {
+                            "border": "pixel",
+                            "floating": "auto_off",
+                            "geometry": {
+                               "height": 338,
+                               "width": 562,
+                               "x": 0,
+                               "y": 0
+                            },
+                            "name": "zeno@zenbox: ~",
+                            "percent": 0.5,
+                            "swallows": [
+                               {
+                                "class": "^Termite$",
+                                "instance": "^termite$"
+                               }
+                            ],
+                            "type": "con"
+                        }
+                    ]
                 }
             ]
         }
