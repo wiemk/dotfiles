@@ -19,9 +19,11 @@ nn <M-g> :call JumpToDef()<cr>
 ino <M-g> <esc>:call JumpToDef()<cr>i
 "
 
-" map tab switch to alt+jk
-nnoremap <A-k> gt
-nnoremap <A-j> gT
+" map  buffer switch to alt+jk
+nnoremap <A-k> :bnext<cr>
+nnoremap <A-j> :bprevious<cr>
+nnoremap <A-right> :bnext<cr>
+nnoremap <A-left> :bprevious<cr>
 " map buffer switch to gB/gb
 nnoremap gb :bnext<cr>
 nnoremap gB :bprevious<cr>
