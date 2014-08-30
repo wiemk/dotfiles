@@ -1,6 +1,6 @@
 # newsbeuter/config
 
-browser "firefox %u &> /dev/null &"
+browser "chromium --disable-gpu-sandbox %u &> /dev/null &"
 html-renderer "lynx -stdin --dump"
 
 auto-reload yes
