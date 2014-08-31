@@ -1,1 +1,1 @@
-chromium --disable-gpu-sandbox --app="https://music.google.com"
+chromium --app=https://music.google.com --disable-gpu-sandbox
