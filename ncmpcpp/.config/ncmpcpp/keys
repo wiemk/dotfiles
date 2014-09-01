@@ -1,0 +1,14 @@
+# ncmpcpp/keys
+
+key_page_up = 'b'
+key_page_down = 'f'
+key_prev_column = 'h'
+key_next_column = 'l'
+key_pause = 'p'
+key_update_db = 'U'
+key_next_found_position = 'n'
+key_prev_found_position = 'N'
+key_move_song_up = 0
+key_move_song_down = 0
+key_toggle_auto_center = 0
+key_toggle_display_mode = 'P'

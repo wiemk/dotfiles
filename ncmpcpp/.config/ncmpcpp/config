@@ -1,0 +1,24 @@
+# ncmpcpp/config
+
+##### directories ######
+ncmpcpp_directory = "~/.config/ncmpcpp"
+lyrics_directory = "~/.local/share/ncmpcpp/lyrics"
+mpd_music_dir = "~/media/audio"
+
+##### columns settings #####
+song_columns_list_format = "(40)[]{t|f} (8f)[green]{lr} (35)[cyan]{a} (20)[red]{b}"
+
+##### various settings #####
+playlist_display_mode = "columns"
+browser_display_mode = "columns"
+playlist_editor_display_mode = "columns"
+centered_cursor = "yes"
+user_interface = "alternative"
+
+##### colors definitions #####
+state_line_color = "black"
+color1 = "green"
+color2 = "cyan"
+progressbar_elapsed_color = "red"
+progressbar_color = "yellow"
+statusbar_color = "red"
