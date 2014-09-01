@@ -8,3 +8,5 @@ for i ("$ZDOTDIR"/.zsh.d/*.zsh(N)); do
 done
 unset i
 
+# EOF
+# vim :set ts=4 sw=4 sts=4 et :

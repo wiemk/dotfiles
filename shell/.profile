@@ -1,14 +1,36 @@
 # ~/.profile
-export PATH=${XDG_DATA_HOME:-"$HOME"/.local/share}/../bin:"$PATH"
+# assume bash compatible shell
 
 # let's be explicit here
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME"/.config}
 if [[ -d "$HOME"/tmp ]]; then
-    export XDG_CACHE_HOME="$HOME"/tmp/.cache
+    XDG_CACHE_HOME="$HOME"/tmp/.cache
 else
-    export XDG_CACHE_HOME=${XDG_CACHE_HOME:-"$HOME"/.cache}
+    XDG_CACHE_HOME=${XDG_CACHE_HOME:-"$HOME"/.cache}
 fi
+export XDG_CACHE_HOME
 export XDG_DATA_HOME=${XDG_DATA_HOME:-"$HOME"/.local/share}
+
+# define additional PATH folders here
+pathar=("$XDG_DATA_HOME"/../bin)
+##
+# PATH handling
+if type realpath >/dev/null 2>&1; then
+    for (( i=0; i < ${#pathar[@]}; i++ )); do
+        pathar[$i]="$(realpath -s "${pathar[$i]}")"
+    done
+    unset i
+fi
+if [[ -n "$ZSH_VERSION" ]]; then
+    emulate zsh -c 'path=($pathar $path)'
+else
+    path=("${pathar[@]}" "$PATH")
+    path="$( printf '%s:' "${path[@]%/}" )"
+    path="${path:0:-1}"
+    export PATH="$path"
+    unset path
+fi
+unset pathar
 
 # agents (gnome-keyring-daemon -s output)
 export GPG_AGENT_INFO=${XDG_RUNTIME_DIR:-/run/user/$UID}/keyring/gpg:0:1
