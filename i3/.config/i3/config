@@ -206,6 +206,10 @@ bindsym XF86AudioLowerVolume exec --no-startup-id volctl dec 5
 bindsym XF86AudioMute exec --no-startup-id volctl mute
 # toggle mic mute
 bindsym XF86AudioMicMute exec --no-startup-id ponymix -t source -d $pasource toggle
+bindsym XF86AudioStop exec mpc stop
+bindsym XF86AudioPlay exec mpc toggle
+bindsym XF86AudioNext exec mpc next
+bindsym XF86AudioPrev exec mpc prev
 
 # workspace reordering
 workspace 2 output DVI-D-0

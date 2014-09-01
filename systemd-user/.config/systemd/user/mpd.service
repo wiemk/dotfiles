@@ -1,0 +1,19 @@
+# ~/.config/systemd/user/mpd.service
+
+[Unit]
+Description=Music Player Daemon
+After=sound.target network.target pulse.service
+Requires=pulse.service
+
+[Service]
+Type=forking
+Environment=PULSE_PROP=application.icon_name=sound
+PIDFile=%t/mpd.pid
+ExecStart=/usr/bin/mpd
+ExecStop=/usr/bin/mpd --kill
+
+
+[Install]
+WantedBy=default.target
+Also=mpd.socket
+Also=pulse.service

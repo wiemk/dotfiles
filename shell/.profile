@@ -74,5 +74,8 @@ export SDL_AUDIODRIVER=pulse
 # ABS
 export ABSROOT="$HOME"/dev/build/arch/abs
 
+# systemd --user environment
+systemctl --user import-environment
+
 # EOF
 # vim :set ft=bash ts=4 sw=4 sts=4 et :

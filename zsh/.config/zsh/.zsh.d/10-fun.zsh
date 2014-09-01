@@ -112,13 +112,13 @@ function +pm_sign() { sudo -- sh -c 'pacman-key -r $1 && pacman-key --lsign-key 
 #########################################################################
 #
 # buffer version
-function e() {
+function eb() {
     local editor=vim
     [[ -n $DISPLAY ]] && editor=gvim
     (( $# > 0 )) && $editor --remote-silent "$@" || $editor --remote-silent .
 }
 # tab version
-function et() {
+function e() {
     local editor=vim
     [[ -n $DISPLAY ]] && editor=gvim
     (( $# > 0 )) && $editor --remote-tab-silent "$@" || $editor --remote-tab-silent .
