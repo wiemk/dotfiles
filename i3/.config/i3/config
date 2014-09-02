@@ -22,12 +22,9 @@ workspace_layout tabbed
 # autostarts
 # compton for countering tearing only
 exec_always --no-startup-id compton --config ~/.config/compton/config -b
-# hide mouse cursor after 9 seconds
-exec_always --no-startup-id killall hhpc; hhpc -i9 -- > /dev/null 2>&1 &
-# disable audible bell
-exec --no-startup-id xset b off
-# start .desktop crap, replaces most application starts below
+# start .desktop crap
 exec --no-startup-id dex -ae i3
+# replaced with .desktop files
 #exec --no-startup-id autocutsel -fork
 #exec --no-startup-id autocutsel -selection PRIMARY -fork
 #exec --no-startup-id nm-applet
