@@ -9,14 +9,14 @@ zstyle ':vcs_info:*' actionformat '(%F{9}%b%f%c%u%m %F{14}%a%f) '
 zstyle ':vcs_info:git*+set-message:*' hooks git-stash git-untracked git-aheadbehind git-remotebranch
 
 ### git: show stash existence (%m)
-function +vi-git-stash() {
++vi-git-stash() {
     if [[ -s ${hook_com[base]}/.git/refs/stash ]]; then
         hook_com[misc]+="[%B%F{14}#%b%f]"
     fi
 }
 ### git: Show marker (T) if there are untracked files in repository
 # Make sure you have added staged to your 'formats':  %c
-function +vi-git-untracked() {
++vi-git-untracked() {
     if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
         git status --porcelain | fgrep '??' &> /dev/null ; then
         # This will show the marker if there are any untracked files in repo.
@@ -28,7 +28,7 @@ function +vi-git-untracked() {
 }
 ### git: Show +N/-N when your local branch is ahead-of or behind remote HEAD.
 # Make sure you have added misc to your 'formats':  %m
-function +vi-git-aheadbehind() {
++vi-git-aheadbehind() {
     local ahead behind
     local -a gitstatus
 
@@ -47,7 +47,7 @@ function +vi-git-aheadbehind() {
 
 ### git: Show remote branch name for remote-tracking branches
 # Make sure you have added staged to your 'formats':  %b
-function +vi-git-remotebranch() {
++vi-git-remotebranch() {
     local remote
 
     # Are we on a remote-tracking branch?
@@ -62,5 +62,7 @@ function +vi-git-remotebranch() {
         hook_com[branch]="${hook_com[branch]}(%F{cyan}${remote}%f)"
     fi
 }
+
+#
 # EOF
 # vim :set ts=4 sw=4 sts=4 et :

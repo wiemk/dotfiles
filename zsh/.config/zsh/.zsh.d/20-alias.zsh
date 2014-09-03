@@ -1,30 +1,4 @@
 # .zsh.d/20-alias.zsh
-#########################################################################
-# PACKAGE MANAGEMENT
-#########################################################################
-#
-alias pm_ownedby='pm -Qo'
-alias pm_orphans='pm -Qtd'
-alias pm_listaur='pm -Qmq'
-alias pm_checkinstalled='pm -Qkk'
-alias pm_showlocal='pm -Qi'
-alias pm_showremote='pm -Si'
-alias pm_listfiles='pm -Ql'
-alias pm_explicit='pm -Qet'
-alias pm_listofficial='pm -Qn'
-alias pm_reversedep='pactree -lrud1'
-# privileged
-alias pm_purge='+pm -Rnsc'
-alias pm_adopt='+pm -D --asexplicit'
-alias pm_abandon='+pm -D --asdeps'
-alias pm_up='+pm -Syyu'
-alias pm_purgeorphans='+pm -Rnsc $(pm -Qtdq)'
-
-#########################################################################
-# SYSTEMD
-#########################################################################
-#
-alias s_ls='+s list-units --type=service'
 
 #########################################################################
 # COREUTILS
