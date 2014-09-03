@@ -1,148 +1,40 @@
 # .zsh.d/10-fun.zsh
 #########################################################################
-# PACKAGE MANAGEMENT
-#########################################################################
-#
-function pm_modified() {
-    pacman -Qii $1 | (
-        local i
-        while read -r i
-        do
-            [[ $i =~ '^MODIFIED' ]] && echo $i
-        done
-    )
-}
-
-function pm_nodeps() {
-    local ignoregrp="base base-devel"
-    local ignorepkg=
-    comm -23 <(
-        pacman -Qqt |
-        sort
-    ) <(
-        echo $ignorepkg |
-        tr ' ' '\n' |
-        cat <(pacman -Sqg $ignoregrp) - |
-        sort -u
-    )
-}
-
-function pm_provisions() {
-    expac -S "%n %P" |
-        awk 'NF>1 {
-            for(i=2; i<=NF; i++) {
-                if(t[$i] == "")
-                    t[$i]=""
-                t[$i]=t[$i]" "$1
-            }
-        } END {
-            for(p in t)
-                printf("%44-s :%s\n", p, t[p])
-        }' | sort | less
-}
-
-function +pm_foreignfiles() {
-    # no traps here due to being a interactive shell function
-    # it would persist after being triggered
-    local p=$1
-    local tmp=$(mktemp)
-    (( $# == 0 )) && p="/"
-    sudo find $p \( \
-        -path '/dev' \
-        -o -path '/sys' \
-        -o -path '/run' \
-        -o -path '/tmp' \
-        -o -path '/mnt' \
-        -o -path '/srv' \
-        -o -path '/proc' \
-        -o -path '/boot' \
-        -o -path '/home' \
-        -o -path '/root' \
-        -o -path '/media' \
-        -o -path '/var/lib/pacman' \
-        -o -path '/var/lib/container' \
-        -o -path '/var/cache/pacman' \
-    \)  -prune -o -type f -print > $tmp 2>/dev/null
-    comm -23 <(sort -u $tmp) <(pacman -Qlq | sort -u)
-    command rm -f $tmp
-}
-
-function +pm_foreigndirs() {
-    local p=$1
-    local tmp=$(mktemp)
-    (( $# == 0 )) && p="/"
-    sudo find $p \( \
-        -path '/dev' \
-        -o -path '/sys' \
-        -o -path '/run' \
-        -o -path '/tmp' \
-        -o -path '/mnt' \
-        -o -path '/srv' \
-        -o -path '/proc' \
-        -o -path '/boot' \
-        -o -path '/home' \
-        -o -path '/root' \
-        -o -path '/media' \
-        -o -path '/var/lib/pacman' \
-        -o -path '/var/lib/container' \
-        -o -path '/var/cache/pacman' \
-    \)  -prune -o -type d -print > $tmp 2>/dev/null
-    comm -23 <(sed 's/\([^/]\)$/\1\//' $tmp | sort -u) <(pacman -Qlq | sort -u)
-    command rm -f $tmp
-}
-
-# specific & total size of local packages
-function pm_size() {
-    pacman -Qi "$@" 2>/dev/null |
-        awk -F ": " -v filter="Size" -v pkg="Name" \
-            '$0 ~ pkg {pkgname=$2} $0 ~ filter {gsub(/\..*/,"") ; printf("%6s KiB %s\n", $2, pkgname)}' |
-        sort -u -k3 |
-        tee >(awk '{TOTAL=$1+TOTAL} END {printf("Total : %d KiB\n",TOTAL)}')
-}
-function pm_size2() { expac -Q '%m'| awk '{TOTAL+=$1} END {printf "Installed: %i MiB\n", TOTAL/1024^2}' }
-
-# dependencies of package $1
-function pm_getdeps() { expac -l '\n' %E -S "$@" | sort -u }
-
-# import and sign maintainer key
-function +pm_sign() { sudo -- sh -c 'pacman-key -r $1 && pacman-key --lsign-key $1' }
-
-#########################################################################
 # TEXT MANIPULATION
 #########################################################################
 #
 # buffer version
-function eb() {
+eb() {
     local editor=vim
     [[ -n $DISPLAY ]] && editor=gvim
     (( $# > 0 )) && $editor --remote-silent "$@" || $editor --remote-silent .
 }
 # tab version
-function e() {
+e() {
     local editor=vim
     [[ -n $DISPLAY ]] && editor=gvim
     (( $# > 0 )) && $editor --remote-tab-silent "$@" || $editor --remote-tab-silent .
 }
 #
 # strip whitespaces, newlines and comments from stdin
-function stripall() { sed -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^$/d' -e '/^\#/d' -- }
+stripall() { sed -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^$/d' -e '/^\#/d' -- }
 # strip whitespaces
-function stripwhitespace() { sed -e 's/^[ \t]*//;s/[ \t]*$//' -- }
+stripwhitespace() { sed -e 's/^[ \t]*//;s/[ \t]*$//' -- }
 # strip empty lines
-function stripempty() { sed -e '/^$/d' -- }
+stripempty() { sed -e '/^$/d' -- }
 # strip comments
-function stripcomment() { sed -e '/^\#/d' -- }
+stripcomment() { sed -e '/^\#/d' -- }
 # quick column select with standard whitespace delimeter
-function awp() { awk '{print $'$1'}'; }
+awp() { awk '{print $'$1'}'; }
 # enclose a line in $1
-function enclose() { sed "s/.*/$1&$1/" -- }
+enclose() { sed "s/.*/$1&$1/" -- }
 
 #########################################################################
 # UTILITY & SIMPLIFICATION
 #########################################################################
 #
 # simple extraction of various archive types
-function x() {
+x() {
     if [[ $# -eq 0 ]]; then
         printf '%s\n' "usage: x <archive1> [<archive2> [...]]"
         return 1
@@ -162,7 +54,7 @@ function x() {
     done
 }
 # noglob for sudo
-function ngsudo {
+ngsudo() {
     while [[ $# > 0 ]]; do
         case "$1" in
         command) shift ; break ;;
@@ -177,7 +69,7 @@ function ngsudo {
     fi
 }
 # simple and quick HTTP Server
-function sweb {
+sweb() {
     local -i port=8080
     local host=0.0.0.0
     if (( $# > 0 )); then
@@ -191,7 +83,7 @@ function sweb {
 }
 
 # use systemd resolver
-function shost {
+shost() {
     local cmd='/usr/lib/systemd/systemd-resolve-host'
     if [[ -x $cmd ]]; then
         $cmd "$@"
@@ -199,19 +91,16 @@ function shost {
         echo "$cmd not found."
     fi
 }
-# shortcuts
-#function ukill() { ps x -o  "%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
-function cd() { builtin cd "$@" && ls -- }
-function +() { sudo "$@" }
-function -() { builtin cd .. }
-function @() { cat "$@" }
-function p() { $PAGER "$@" }
-function pm() { pacman "$@" }
-function +pm() { sudo pacman "$@" }
-function s() { systemctl "$@" }
-function +s() { sudo systemctl "$@" }
-function su() { systemctl --user "$@" }
-function ?() { run-help "$1" }
 
+# shortcuts
+#ukill() { ps x -o  "%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
+cd() { builtin cd "$@" && ls -- }
++() { sudo "$@" }
+-() { builtin cd .. }
+@() { cat "$@" }
+p() { $PAGER "$@" }
+?() { run-help "$1" }
+
+#
 # EOF
 # vim :set ts=4 sw=4 sts=4 et :
