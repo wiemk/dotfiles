@@ -16,6 +16,8 @@
     br = branch
     bra = branch -vv
     c = commit -m 'temporary commit - do not push'
+    cl = log --graph --pretty=format:'%an: %s%C(yellow)%d%Creset %Cgreen(%cr)%Creset' --date=relative
+    cls = log --pretty=format:'%an (%ae): %C(yellow)%s%Creset' --shortstat
     cim = commit -m
     co = checkout
     di = diff
@@ -23,8 +25,11 @@
     empty = !git init && git commit --allow-empty -m Initial
     export = !touch $(git rev-parse --git-dir)/git-daemon-export-ok
     fa = fetch --all
+    fo = log --pretty=oneline --shortstat --abbrev-commit
     follow = log --oneline --follow --stat --summary --
     fun = "!git fsck | awk '/dangling commit/ {print $3 \"^!\"}' | xargs git log"
+    gg = grep --break --heading -n
+    ia = add -p
     ignored = ls-files --other -i --exclude-standard
     in = log --oneline --decorate ..@{upstream}
     l = log --decorate --graph --oneline --all
@@ -60,7 +65,8 @@
     tip = !git --no-pager log -1 --decorate --abbrev-commit --date=relative --show-signature
     undo = reset --soft HEAD^
     unexport = !rm -v $(git rev-parse --git-dir)/git-daemon-export-ok
-    wdiff = diff --word-diff
+    unpushed = log --stat origin/master..HEAD
+    wdiff = diff -w --word-diff-regex=. --color-words -U
     wipe = reset --hard HEAD
     wshow = show --word-diff
     fpush = push --force-with-lease
