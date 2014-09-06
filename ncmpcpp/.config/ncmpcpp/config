@@ -30,4 +30,5 @@ visualizer_output_name = "Visualisation FIFO"
 visualizer_sync_interval = "30" 
 visualizer_in_stereo = "yes"
 #visualizer_type = "wave" (spectrum/wave)
-visualizer_type = "spectrum"
+visualizer_type = "wave" (spectrum/wave)
+visualizer_look = "·│"

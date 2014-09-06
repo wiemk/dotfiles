@@ -6,19 +6,6 @@ if has("gui_running")
 endif
 set nospell
 
-" nimrod stuff
-fun! JumpToDef()
-  if exists("*GotoDefinition_" . &filetype)
-    call GotoDefinition_{&filetype}()
-  else
-    exe "norm! <C-]>"
-  endif
-endf
-" Jump to tag
-nn <M-g> :call JumpToDef()<cr>
-ino <M-g> <esc>:call JumpToDef()<cr>i
-"
-
 " map  buffer switch to alt+jk
 nnoremap <A-k> :bnext<cr>
 nnoremap <A-j> :bprevious<cr>
@@ -36,8 +23,15 @@ nnoremap gn :ls<cr>:b
 " only useful information in tabs
 set guitablabel=\[%N\]\ %t\ %M 
 "
+" other stuff
 set shell=$SHELL
-
 set cc=120
+
+let g:notes_directories = ['~/doc/notes']
+let g:notes_suffix = '.md'
+
+" open help in new tab
+" cabbrev help tab help
+
 " EOF
 " vim :set ts=4 sw=4 sts=4 et :
