@@ -10,13 +10,13 @@ hwdec=vdpau
 force-window
 #demuxer-thread=yes
 
-# Audio
-ao=pulse
+# Audio, we trust in PulseAudio's timing calculations
+ao=pulse:buffer=native:latency-hacks=no
 
 # Use with flat-volumes in /etc/pulse/daemon.conf
-volume=25
-softvol=yes
-softvol-max=400
+#volume=25
+#softvol=yes
+#softvol-max=400
 
 # Lang
 slang=en,eng
