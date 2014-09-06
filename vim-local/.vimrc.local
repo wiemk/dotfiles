@@ -38,5 +38,6 @@ set guitablabel=\[%N\]\ %t\ %M
 "
 set shell=$SHELL
 
+set cc=120
 " EOF
 " vim :set ts=4 sw=4 sts=4 et :

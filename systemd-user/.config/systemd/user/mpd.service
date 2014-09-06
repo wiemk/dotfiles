@@ -8,7 +8,8 @@ Requires=pulse.service
 [Service]
 Type=forking
 Environment=PULSE_PROP=application.icon_name=sound
-PIDFile=%t/mpd.pid
+PIDFile=%t/mpd/mpd.pid
+ExecStartPre=/usr/bin/mkdir -p %t/mpd
 ExecStart=/usr/bin/mpd
 ExecStop=/usr/bin/mpd --kill
 
@@ -16,4 +17,4 @@ ExecStop=/usr/bin/mpd --kill
 [Install]
 WantedBy=default.target
 Also=mpd.socket
-Also=pulse.service
+#Also=pulse.service
