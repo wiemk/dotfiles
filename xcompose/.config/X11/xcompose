@@ -56,4 +56,15 @@ include "%S/en_US.UTF-8/Compose"
 <Multi_key> <y> <y> : "ȝ" 
 
 <Multi_key> <N> <G> : "Ŋ" # Ni'gh't
-<Multi_key> <n> <g> : "ŋ" 
+<Multi_key> <n> <g> : "ŋ"
+
+<Multi_key> <period> <period>   : "…"   U2026           # HORIZONTAL ELLIPSIS
+<Multi_key> <o> <o>             : "•"   U2022       # BULLET
+<Multi_key> <Left> <Left>       : "←"   leftarrow   # LEFTWARDS ARROW
+<Multi_key> <Up> <Up>           : "↑"   uparrow     # UPWARDS ARROW
+<Multi_key> <Right> <Right>     : "→"   rightarrow  # RIGHTWARDS ARROW
+<Multi_key> <Down> <Down>       : "↓"   downarrow   # DOWNWARDS ARROW
+<Multi_key> <Left> <Right>      : "↔"   U2194           # LEFT RIGHT ARROW (kragen's)
+<Multi_key> <Right> <Left>      : "↔"   U2194           # LEFT RIGHT ARROW (kragen's)
+<Multi_key> <Up> <Down>         : "↕"   U2195           # UP DOWN ARROW (kragen's)
+<Multi_key> <y> <y>             : "☯"   U262F       # YIN YANG
