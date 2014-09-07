@@ -37,7 +37,8 @@ export GPG_AGENT_INFO=${XDG_RUNTIME_DIR:-/run/user/$UID}/keyring/gpg:0:1
 export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:-/run/user/$UID}/keyring/ssh
 
 # other Sockets
-export MPD_HOME=${XDG_RUNTIME_DIR:-/run/user/$UID}/mpd/mpd.control
+export MPD_HOST=${XDG_RUNTIME_DIR:-/run/user/$UID}/mpd/mpd.control
+export MPD_PORT=6600
 
 # XDG
 export GNUPGHOME="$XDG_CONFIG_HOME"/gnupg
