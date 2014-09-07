@@ -18,14 +18,21 @@ systemd-alias() {
         alias scu-$c="systemctl --user $c"
     done
 }
+
 systemd-alias
 
 #
-sc() { systemctl "$@" }
-+sc() { sudo systemctl "$@" }
-alias scu="systemctl --user"
-alias sc-lu='systemctl list-units --type=service'
-alias scu-lu='systemctl --user list-units --type=service'
+sc() { systemctl --system "$@" }
++sc() { sudo systemctl --system "$@" }
+scu() { systemctl --user "$@" }
+
+# journald
+jc() { journalctl --system "$@" }
+jcu() { journalctl --user "$@" }
+
+# no pager
+jcn() { jc --no-pager "$@" }
+jcun() { jcu --no-pager "$@" }
 
 #
 # EOF
