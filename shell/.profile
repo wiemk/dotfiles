@@ -36,6 +36,10 @@ unset pathar
 export GPG_AGENT_INFO=${XDG_RUNTIME_DIR:-/run/user/$UID}/keyring/gpg:0:1
 export SSH_AUTH_SOCK=${XDG_RUNTIME_DIR:-/run/user/$UID}/keyring/ssh
 
+# other Sockets
+export MPD_HOME=${XDG_RUNTIME_DIR:-/run/user/$UID}/mpd/mpd.control
+
+# XDG
 export GNUPGHOME="$XDG_CONFIG_HOME"/gnupg
 export MPV_HOME="$XDG_CONFIG_HOME"/mpv
 export TIGRC_USER="$XDG_CONFIG_HOME"/tigrc

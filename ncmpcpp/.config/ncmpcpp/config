@@ -4,6 +4,7 @@
 ncmpcpp_directory = "~/.config/ncmpcpp"
 lyrics_directory = "~/.local/share/ncmpcpp/lyrics"
 mpd_music_dir = "~/media/audio"
+mpd_host = "/run/user/1000/mpd/mpd.control"
 
 ##### columns settings #####
 song_columns_list_format = "(40)[]{t|f} (8f)[green]{lr} (35)[cyan]{a} (20)[red]{b}"
