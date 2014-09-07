@@ -21,6 +21,9 @@ def_key "h"
 def_key "^"
   jump_to_parent_directory
 
+def_key "U"
+  update_database
+
 def_key "u"
   dummy
 
@@ -29,3 +32,19 @@ def_key "n"
 
 def_key "N"
   previous_found_item
+
+def_key "P"
+  toggle_display_mode
+
+def_key "M"
+#move_selected_items_to
+  dummy
+
+def_key "m"
+  dummy
+#move_sort_order_up
+
+def_key "m"
+  dummy
+#move_selected_items_up
+
