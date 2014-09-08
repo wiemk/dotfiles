@@ -11,20 +11,19 @@ docker-build-arch-devel() {
 }
 
 docker-build-arch-pkgbuild() {
-    docker build --force-rm=true --tag="zeno/arch-devel" ~/dev/system/docker/arch-pkgbuild
+    docker build --force-rm=true --tag="zeno/arch-pkgbuild" ~/dev/system/docker/arch-pkgbuild
 }
 
 docker-update-build-chain() {
     docker rmi -f zeno/arch-devel
     docker rmi -f zeno/arch-pkgbuild
-    docker-build-arch-devel
-    docker-build-arch-pkgbuild
+    docker-build-arch-devel && docker-build-arch-pkgbuild
 }
 
 # Delete all containers
-alias docker-rmall="docker rm $(docker ps -a -q)"
+docker-rmall() { docker rm $(docker ps -a -q) }
 # Delete all images
-alias docker-rmiall="docker rmi $(docker images -q)"
+docker-rmiall() { docker rmi $(docker images -q) }
 
 #
 #
