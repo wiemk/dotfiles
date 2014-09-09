@@ -36,3 +36,9 @@ checkout = git clone 'git@bitbucket.org:zenofx/system.git' 'system'
 
 [dev/thirdparty/github/jwiegley/git-from-the-bottom-up]
 checkout = git clone 'https://github.com/jwiegley/git-from-the-bottom-up.git' 'git-from-the-bottom-up'
+
+[dev/forks/fiche]
+checkout = git clone 'ssh://git@github.com/zenofx/fiche' 'fiche'
+
+[dev/dockerfiles]
+checkout = git clone 'git@bitbucket.org:zenofx/dockerfiles.git' 'dockerfiles'
