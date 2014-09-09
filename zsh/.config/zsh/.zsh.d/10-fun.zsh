@@ -92,6 +92,15 @@ shost() {
     fi
 }
 
+# display images in terminal
+img() {
+    for image in "$@"; do
+        convert -thumbnail $(tput cols) "$image" txt:- |
+            awk -F '[)(,]' '!/^#/{gsub(/ /,"");printf"\033[48;2;"$3";"$4";"$5"m "}'
+            echo -e "\e[0;0m"
+        done
+}
+
 # shortcuts
 #ukill() { ps x -o  "%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
 cd() { builtin cd "$@" && ls -- }
