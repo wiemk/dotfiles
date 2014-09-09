@@ -8,15 +8,15 @@ docker-makepkg() {
     mkdir -p $CACHEDIR
     docker run --rm -v $(pwd):/build -v $CACHEDIR:/pkgcache -v $SCRATCHDIR:/scratch zeno/arch-pkgbuild
     echo "removing $SCRATCHDIR"
-    /bin/rm -rvI $SCRATCHDIR
+    /bin/rm -rvfI $SCRATCHDIR
 }
 
 docker-build-arch-devel() {
-    docker build --force-rm=true --tag="zeno/arch-devel" ~/dev/system/docker/arch-devel
+    docker build --force-rm=true --tag="zeno/arch-devel" ~/dev/dockerfiles/arch-devel
 }
 
 docker-build-arch-pkgbuild() {
-    docker build --force-rm=true --tag="zeno/arch-pkgbuild" ~/dev/system/docker/arch-pkgbuild
+    docker build --force-rm=true --tag="zeno/arch-pkgbuild" ~/dev/dockerfiles/arch-pkgbuild
 }
 
 docker-update-build-chain() {
@@ -25,6 +25,20 @@ docker-update-build-chain() {
     docker-build-arch-devel &&
     docker-build-arch-pkgbuild ||
     echo "Try docker-rmall first or remove the dependant container manually."
+}
+
+docker-trigger-rebuild() {
+    local trigger="$HOME/dev/dockerfiles/$1/trigger"
+    if [[ -e "$trigger" ]]; then
+        read line < "$trigger"
+        if [[ -n "$line" ]]; then
+            curl --data "build=true" -X POST "$line"
+        else
+            echo >&2 "No URL in $trigger found."
+        fi
+    else
+        echo >&2 "No trigger found: $trigger"
+    fi
 }
 
 # Delete all containers

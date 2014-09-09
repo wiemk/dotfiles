@@ -97,8 +97,20 @@ img() {
     for image in "$@"; do
         convert -thumbnail $(tput cols) "$image" txt:- |
             awk -F '[)(,]' '!/^#/{gsub(/ /,"");printf"\033[48;2;"$3";"$4";"$5"m "}'
-            echo -e "\e[0;0m"
-        done
+        echo -e "\e[0;0m"
+    done
+}
+
+# create symbolic link to tmpfs folder
+mktmpfslink() {
+    if [[ -d "$HOME/tmp" ]]; then
+        local folder="$1"
+        [[ -z "$folder" ]] && folder='tmp'
+        local scratch=$(mktemp -d --tmpdir=$HOME/tmp link-XXXX)
+        ln -s "$scratch" "$folder"
+    else
+        echo >&2 "No ~/tmp found."
+    fi
 }
 
 # shortcuts

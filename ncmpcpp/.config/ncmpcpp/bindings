@@ -42,9 +42,3 @@ def_key "M"
 
 def_key "m"
   dummy
-#move_sort_order_up
-
-def_key "m"
-  dummy
-#move_selected_items_up
-

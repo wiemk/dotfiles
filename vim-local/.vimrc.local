@@ -30,7 +30,9 @@ set cc=120
 let g:notes_directories = ['~/doc/notes']
 let g:notes_suffix = '.md'
 
-" open help in new tab
+cabbrev et tabedit
+
+"" open help in new tab
 " cabbrev help tab help
 
 " EOF
