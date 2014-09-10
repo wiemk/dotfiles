@@ -1,5 +1,11 @@
 # ncmpcpp/bindings
 
+def_key "left"
+  seek_backward
+
+def_key "right"
+  seek_forward
+
 def_key "k"
   scroll_up
 

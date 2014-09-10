@@ -225,6 +225,7 @@ for_window [class="^mpv$"] move workspace 2
 for_window [class="Wine"] floating enable
 for_window [class="^Nemo$"] floating enable
 for_window [class="^Firefox$" instance="^Browser$" window_role="^(page-info|Preferences)$"] floating enable
+for_window [class="^Thunderbird$" instance="^Mail$" window_role="^Preferences$"] floating enable
 for_window [class="^File-roller$"] floating enable
 for_window [class="^Gedit$" instance="^gedit$"] floating enable
 for_window [class="^Nvidia-settings$" instance="^nvidia-settings$"] floating enable
