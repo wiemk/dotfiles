@@ -1,32 +1,32 @@
 # .zsh.d/50-docker.zsh
 
+# mount host directories into the build container and build the package
 docker-makepkg() {
     [[ ! -e PKGBUILD ]] && return 1
     local BUILDDIR CACHEDIR
     SCRATCHDIR=$(mktemp -d --tmpdir=$HOME/tmp build-XXXX)
     CACHEDIR=$(pwd)/pkg
     mkdir -p $CACHEDIR
-    docker run --rm -v $(pwd):/build -v $CACHEDIR:/pkgcache -v $SCRATCHDIR:/scratch zeno/arch-pkgbuild
+    docker run --rm -u builder -v $CACHEDIR:/pkgcache -v $(pwd):/home/builder/build -v $SCRATCHDIR:/home/builder/tmp zeno/arch-makepkg
     echo "removing $SCRATCHDIR"
     /bin/rm -rvfI $SCRATCHDIR
 }
 
-docker-build-arch-devel() {
-    docker build --force-rm=true --tag="zeno/arch-devel" ~/dev/dockerfiles/arch-devel
+# build arch-makepkg
+docker-build-arch-makepkg() {
+    docker pull base/archlinux && \
+        docker build --force-rm=true --tag="zeno/arch-makepkg" ~/dev/dockerfiles/arch-makepkg
 }
 
-docker-build-arch-pkgbuild() {
-    docker build --force-rm=true --tag="zeno/arch-pkgbuild" ~/dev/dockerfiles/arch-pkgbuild
-}
-
+# update base/archlinux image and rebuild arch-makepkg
 docker-update-build-chain() {
-    docker rmi -f zeno/arch-devel &&
-    docker rmi -f zeno/arch-pkgbuild &&
-    docker-build-arch-devel &&
-    docker-build-arch-pkgbuild ||
+    docker rmi -f zeno/arch-makepkg
+    docker pull base/archlinux && \
+        docker-build-arch-makepkg || \
     echo "Try docker-rmall first or remove the dependant container manually."
 }
 
+# trigger docker hub image rebuilds via webhook
 docker-trigger-rebuild() {
     local trigger="$HOME/dev/dockerfiles/$1/trigger"
     if [[ -e "$trigger" ]]; then
