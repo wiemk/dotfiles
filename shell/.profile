@@ -79,6 +79,9 @@ export SDL_AUDIODRIVER=pulse
 # ABS
 export ABSROOT="$HOME"/dev/build/arch/abs
 
+# improve Java font rendering
+export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=gasp'
+
 # systemd --user environment would be executed too late,
 # so source ~/.profile with /etc/systemd/system/user@.service
 # overriding /usr/lib/systemd/system/user@.service
