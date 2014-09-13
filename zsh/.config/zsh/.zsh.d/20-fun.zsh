@@ -88,7 +88,8 @@ shost() {
     if [[ -x $cmd ]]; then
         $cmd "$@"
     else
-        echo "$cmd not found."
+        echo >&2 "$cmd not found."
+        return 1
     fi
 }
 
@@ -104,12 +105,27 @@ img() {
 # create symbolic link to tmpfs folder
 mktmpfslink() {
     if [[ -d "$HOME/tmp" ]]; then
-        local folder="$1"
+        local scratch folder="$1"
         [[ -z "$folder" ]] && folder='tmp'
-        local scratch=$(mktemp -d --tmpdir=$HOME/tmp link-XXXX)
+        local scratch=$(mktemp -d --tmpdir="$HOME/tmp" link-XXXX)
         ln -s "$scratch" "$folder"
     else
         echo >&2 "No ~/tmp found."
+        return 1
+    fi
+}
+
+# remove link target and link
+rmtarget() {
+    if [[ -d "$1" ]]; then
+        local folder
+        if folder=$(readlink -f "$1"); then
+            echo >&2 "Going to remove $1 -> $folder"
+            rm -rvfI "$folder" "$1"
+        fi
+    else
+        echo >&2 "$1 not found."
+        return 1
     fi
 }
 
