@@ -7,7 +7,7 @@ docker-makepkg() {
     SCRATCHDIR=$(mktemp -d --tmpdir=$HOME/tmp build-XXXX)
     CACHEDIR=$(pwd)/pkg
     mkdir -p $CACHEDIR
-    docker run --rm -u builder -v $CACHEDIR:/pkgcache -v $(pwd):/home/builder/build -v $SCRATCHDIR:/home/builder/tmp zeno/arch-makepkg
+    docker run --rm -u builder -v $CACHEDIR:/pkgcache -v $(pwd):/home/builder/build -v $SCRATCHDIR:/home/builder/tmp zeno/arch-makepkg:latest
     echo "removing $SCRATCHDIR"
     /bin/rm -rvfI $SCRATCHDIR
 }
