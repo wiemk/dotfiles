@@ -41,7 +41,8 @@ ttrss-flag-star "s"
 ttrss-flag-publish "p"
 
 # podcasts
-max-downloads 3
+max-downloads 1
+#max-download-speed 400
 player "mpv""
 download-path "~/media/podcast/%n"
 podcast-auto-enqueue yes

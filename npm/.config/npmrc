@@ -1,0 +1,6 @@
+; see 'npm config ls -l' for more
+cache = "/home/zeno/tmp/.cache/npm"
+global = false
+init-module = "/home/zeno/.local/share/npm/npm-init.js"
+tmp = "/home/zeno/tmp"
+prefix = "/home/zeno/.local"
