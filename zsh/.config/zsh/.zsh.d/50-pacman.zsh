@@ -105,7 +105,7 @@ pm-size2() { expac -Q '%m'| awk '{TOTAL+=$1} END {printf "Installed: %i MiB\n", 
 pm-getdeps() { expac -l '\n' %E -S "$@" | sort -u }
 
 # import and sign maintainer key
-+pm-sign() { sudo -- sh -c 'pacman-key -r $1 && pacman-key --lsign-key $1' }
++pm-sign() { sudo -- sh -c "pacman-key -r $1 && pacman-key --lsign-key $1" }
 
 pm() { pacman "$@" }
 +pm() { sudo pacman "$@" }

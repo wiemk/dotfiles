@@ -3,7 +3,7 @@
 [Unit]
 Description=PulseAudio Server
 Requires=dbus.socket
-Before=sound.target
+After=sound.target
 
 [Service]
 ExecStart=/usr/bin/pulseaudio

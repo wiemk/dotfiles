@@ -15,6 +15,7 @@ set $mod Mod4
 set $pasink alsa_output.usb-Binary_Audio_UAC1_DAC-01-DAC.analog-stereo
 set $pasource alsa_input.usb-Binary_Audio_UAC1_DAC-01-DAC.analog-stereo
 set $primaryout DVI-I-1
+set $secondaryout DVI-D-0
 
 workspace_auto_back_and_forth yes
 workspace_layout tabbed
@@ -184,6 +185,7 @@ bar {
         mode hide
         hidden_state hide
         status_command i3status
+        strip_workspace_numbers no
         tray_output $primaryout
 }
 
@@ -191,6 +193,10 @@ bar {
 # Make the currently focused window a scratchpad
 bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show
+
+# move workspace
+bindsym $mod+m move workspace to output right
+bindsym $mod+n move workspace to output left
 
 # black background when screen is locked, saves power
 bindsym $mod+shift+w exec --no-startup-id i3lock --color=000000
@@ -211,17 +217,26 @@ bindsym XF86AudioNext exec mpc next
 bindsym XF86AudioPrev exec mpc prev
 
 # workspace reordering
-workspace 2 output DVI-D-0
-workspace 3 output HDMI-0
-assign [class="^mpv$"] workspace → 2
+workspace 1 output $primaryout
+workspace 2 output $primaryout
+workspace 3 output $primaryout
+workspace 4 output $primaryout
+workspace 5 output $primaryout
+workspace 6 output $secondaryout
+workspace 7 output $secondaryout
+workspace 8 output $secondaryout
+workspace 9 output $secondaryout
+workspace 10 output $secondaryout
+
+assign [class="^mpv$"] workspace → 6
 
 # focus latest urgent window
 bindsym $mod+u [urgent="latest"] focus
 
 # window specific settings
-for_window [class="^mpv$"] move workspace 2
+for_window [class="^mpv$"] move workspace 6
 
-# floaties
+# floats
 for_window [class="Wine"] floating enable
 for_window [class="^Nemo$"] floating enable
 for_window [class="^Firefox$" instance="^Browser$" window_role="^(page-info|Preferences)$"] floating enable
@@ -229,6 +244,7 @@ for_window [class="^Thunderbird$" instance="^Mail$" window_role="^Preferences$"]
 for_window [class="^File-roller$"] floating enable
 for_window [class="^Gedit$" instance="^gedit$"] floating enable
 for_window [class="^Nvidia-settings$" instance="^nvidia-settings$"] floating enable
+for_window [window_role="pop-up"] floating enable
 # restore our saved session (i3-save-tree)
 exec --no-startup-id i3-session-restore && notify-send 'session restored'
 

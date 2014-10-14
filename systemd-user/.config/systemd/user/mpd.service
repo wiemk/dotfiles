@@ -2,8 +2,7 @@
 
 [Unit]
 Description=Music Player Daemon
-After=sound.target network.target pulse.service
-Requires=pulse.service
+After=pulseaudio.service
 
 [Service]
 Type=forking
@@ -17,4 +16,3 @@ ExecStop=/usr/bin/mpd --kill
 [Install]
 WantedBy=default.target
 Also=mpd.socket
-#Also=pulse.service

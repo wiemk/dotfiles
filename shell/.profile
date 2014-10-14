@@ -44,7 +44,8 @@ export MPD_PORT=6600
 export GNUPGHOME="$XDG_CONFIG_HOME"/gnupg
 export MPV_HOME="$XDG_CONFIG_HOME"/mpv
 export TIGRC_USER="$XDG_CONFIG_HOME"/tigrc
-
+export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npmrc
+export PIP_CONFIG_FILE=$XDG_CONFIG_HOME/pip/config
 # apparently breaks lightdm
 #export XAUTHORITY="$XDG_RUNTIME_DIR"/X11-authority
 export XCOMPOSEFILE="$XDG_CONFIG_HOME"/X11/xcompose
@@ -57,7 +58,8 @@ export NO_AT_BRIDGE=1
 
 # default applications by env
 export EDITOR='gvim -f'
-export ALTERNATE_EDITOR='vim'
+export SUDO_EDITOR=rvim
+export ALTERNATE_EDITOR=vim
 export PAGER=less
 export LESSHISTFILE="$XDG_CACHE_HOME"/lesshist
 export BROWSER=chromium
@@ -68,13 +70,17 @@ export GTK_IM_MODULE=uim
 export XMODIFIERS=@im=uim
 
 # Disable Mono and Gecko installation and .desktop creation
-export WINEDLLOVERRIDES="winemenubuilder.exe,mscoree,mshtml=d"
+#export WINEDLLOVERRIDES="winemenubuilder.exe,mscoree,mshtml=d"
+export WINEDLLOVERRIDES='winemenubuilder.exe=d'
 export WINEARCH=win32
 export WINEDEBUG=-all
 export WINEPREFIX="$XDG_DATA_HOME"/wine/default
 export GREP_OPTIONS=--color=auto
 export LESS=-R
 export SDL_AUDIODRIVER=pulse
+
+# disable steam runtime
+export STEAM_RUNTIME=0
 
 # ABS
 export ABSROOT="$HOME"/dev/build/arch/abs
