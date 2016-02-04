@@ -25,6 +25,13 @@
 
 #
 # Changelog:
+# 2.6:
+#   * Ignore case in rules when doing case insensitive sorting.
+# 2.5:
+#   * Fix handling unicode buffer names.
+#   * Add hint to set irc.look.server_buffer to independent and buffers.look.indenting to on.
+# 2.4:
+#   * Make script python3 compatible.
 # 2.3:
 #   * Fix sorting items without score last (regressed in 2.2).
 # 2.2:
@@ -44,8 +51,8 @@ import json
 
 SCRIPT_NAME     = 'autosort'
 SCRIPT_AUTHOR   = 'Maarten de Vries <maarten@de-vri.es>'
-SCRIPT_VERSION  = '2.3'
-SCRIPT_LICENSE  = 'GPLv3'
+SCRIPT_VERSION  = '2.6'
+SCRIPT_LICENSE  = 'GPL3'
 SCRIPT_DESC     = 'Automatically or manually keep your buffers sorted and grouped by server.'
 
 
@@ -62,13 +69,13 @@ def parse_int(arg, arg_name = 'argument'):
 	try:
 		return int(arg)
 	except ValueError:
-		raise HumanReadableError('Invalid {}: expected integer, got "{}".'.format(arg_name, arg))
+		raise HumanReadableError('Invalid {0}: expected integer, got "{1}".'.format(arg_name, arg))
 
 
 class Pattern:
 	''' A simple glob-like pattern for matching buffer names. '''
 
-	def __init__(self, pattern):
+	def __init__(self, pattern, case_sensitive):
 		''' Construct a pattern from a string. '''
 		escaped    = False
 		char_class = 0
@@ -107,7 +114,10 @@ class Pattern:
 		if escaped:
 			raise ValueError("unexpected trailing '\\'")
 
-		self.regex   = re.compile('^' + regex + '$')
+		if case_sensitive:
+			self.regex   = re.compile('^' + regex + '$')
+		else:
+			self.regex   = re.compile('^' + regex + '$', flags = re.IGNORECASE)
 		self.pattern = pattern
 
 	def match(self, input):
@@ -130,12 +140,12 @@ class FriendlyList(object):
 
 	def insert(self, index, value):
 		''' Add a rule to the list. '''
-		if not 0 <= index <= len(self): raise HumanReadableError('Index out of range: expected an integer in the range [0, {}], got {}.'.format(len(self), index))
+		if not 0 <= index <= len(self): raise HumanReadableError('Index out of range: expected an integer in the range [0, {0}], got {1}.'.format(len(self), index))
 		self.__data.insert(index, value)
 
 	def pop(self, index):
 		''' Remove a rule from the list and return it. '''
-		if not 0 <= index < len(self): raise HumanReadableError('Index out of range: expected an integer in the range [0, {}), got {}.'.format(len(self), index))
+		if not 0 <= index < len(self): raise HumanReadableError('Index out of range: expected an integer in the range [0, {0}), got {1}.'.format(len(self), index))
 		return self.__data.pop(index)
 
 	def move(self, index_a, index_b):
@@ -150,11 +160,11 @@ class FriendlyList(object):
 		return len(self.__data)
 
 	def __getitem__(self, index):
-		if not 0 <= index < len(self): raise HumanReadableError('Index out of range: expected an integer in the range [0, {}), got {}.'.format(len(self), index))
+		if not 0 <= index < len(self): raise HumanReadableError('Index out of range: expected an integer in the range [0, {0}), got {1}.'.format(len(self), index))
 		return self.__data[index]
 
 	def __setitem__(self, index, value):
-		if not 0 <= index < len(self): raise HumanReadableError('Index out of range: expected an integer in the range [0, {}), got {}.'.format(len(self), index))
+		if not 0 <= index < len(self): raise HumanReadableError('Index out of range: expected an integer in the range [0, {0}), got {1}.'.format(len(self), index))
 		self.__data[index] = value
 
 	def __iter__(self):
@@ -170,7 +180,7 @@ class RuleList(FriendlyList):
 		super(RuleList, self).__init__()
 		for rule in rules: self.append(rule)
 
-	def get_score(self, name, rules):
+	def get_score(self, name):
 		''' Get the sort score of a partial name according to a rule list. '''
 		for rule in self:
 			if rule[0].match(name): return rule[1]
@@ -178,37 +188,37 @@ class RuleList(FriendlyList):
 
 	def encode(self):
 		''' Encode the rules for storage. '''
-		return json.dumps(map(lambda x: (x[0].pattern, x[1]), self))
+		return json.dumps(list(map(lambda x: (x[0].pattern, x[1]), self)))
 
 	@staticmethod
-	def decode(blob):
+	def decode(blob, case_sensitive):
 		''' Parse rules from a string blob. '''
 		result = []
 
 		try:
 			decoded = json.loads(blob)
 		except ValueError:
-			log('Invalid rules: expected JSON encoded list of pairs, got "{}".'.format(blob))
+			log('Invalid rules: expected JSON encoded list of pairs, got "{0}".'.format(blob))
 			return [], 0
 
 		for rule in decoded:
 			# Rules must be a pattern,score pair.
 			if len(rule) != 2:
-				log('Invalid rule: expected (pattern, score), got "{}". Rule ignored.'.format(rule))
+				log('Invalid rule: expected (pattern, score), got "{0}". Rule ignored.'.format(rule))
 				continue
 
 			# Rules must have a valid pattern.
 			try:
-				pattern = Pattern(rule[0])
+				pattern = Pattern(rule[0], case_sensitive)
 			except ValueError as e:
-				log('Invalid pattern: {} in "{}". Rule ignored.'.format(e, rule[0]))
+				log('Invalid pattern: {0} in "{1}". Rule ignored.'.format(e, rule[0]))
 				continue
 
 			# Rules must have a valid score.
 			try:
 				score = int(rule[1])
 			except ValueError as e:
-				log('Invalid score: expected an integer, got "{}". Rule ignored.'.format(score))
+				log('Invalid score: expected an integer, got "{0}". Rule ignored.'.format(score))
 				continue
 
 			result.append((pattern, score))
@@ -216,18 +226,18 @@ class RuleList(FriendlyList):
 		return RuleList(result)
 
 	@staticmethod
-	def parse_rule(arg):
+	def parse_rule(arg, case_sensitive):
 		''' Parse a rule argument. '''
 		arg = arg.strip()
 		match = RuleList.rule_regex.match(arg)
 		if not match:
-			raise HumanReadableError('Invalid rule: expected "<pattern> = <score>", got "{}".'.format(arg))
+			raise HumanReadableError('Invalid rule: expected "<pattern> = <score>", got "{0}".'.format(arg))
 
 		pattern = match.group(1).strip()
 		try:
-			pattern = Pattern(pattern)
+			pattern = Pattern(pattern, case_sensitive)
 		except ValueError as e:
-			raise HumanReadableError('Invalid pattern: {} in "{}".'.format(e, pattern))
+			raise HumanReadableError('Invalid pattern: {0} in "{1}".'.format(e, pattern))
 
 		score   = parse_int(match.group(2), 'score')
 		return (pattern, score)
@@ -239,13 +249,13 @@ def decode_replacements(blob):
 	try:
 		decoded = json.loads(blob)
 	except ValueError:
-		log('Invalid replacement list: expected JSON encoded list of pairs, got "{}".'.format(blob))
+		log('Invalid replacement list: expected JSON encoded list of pairs, got "{0}".'.format(blob))
 		return [], 0
 
 	for replacement in decoded:
 		# Replacements must be a (string, string) pair.
 		if len(replacement) != 2:
-			log('Invalid replacement pattern: expected (pattern, replacement), got "{}". Replacement ignored.'.format(rule))
+			log('Invalid replacement pattern: expected (pattern, replacement), got "{0}". Replacement ignored.'.format(rule))
 			continue
 		result.append(replacement)
 
@@ -294,7 +304,7 @@ class Config:
 		self.__sort_on_config = None
 
 		if not self.config_file:
-			log('Failed to initialize configuration file "{}".'.format(self.filename))
+			log('Failed to initialize configuration file "{0}".'.format(self.filename))
 			return
 
 		self.sorting_section = weechat.config_new_section(self.config_file, 'sorting', False, False, '', '', '', '', '', '', '', '', '', '')
@@ -371,7 +381,7 @@ class Config:
 		replacements_blob   = weechat.config_string(self.__replacements)
 		signals_blob        = weechat.config_string(self.__signals)
 
-		self.rules          = RuleList.decode(rules_blob)
+		self.rules          = RuleList.decode(rules_blob, self.case_sensitive)
 		self.replacements   = decode_replacements(replacements_blob)
 		self.signals        = signals_blob.split()
 		self.sort_on_config = weechat.config_boolean(self.__sort_on_config)
@@ -391,7 +401,7 @@ def pad(sequence, length, padding = None):
 
 
 def log(message, buffer = 'NULL'):
-	weechat.prnt(buffer, 'autosort: {}'.format(message))
+	weechat.prnt(buffer, 'autosort: {0}'.format(message))
 
 
 def get_buffers():
@@ -435,9 +445,9 @@ def buffer_sort_key(rules):
 	def key(buffer):
 		result  = []
 		name    = ''
-		for word in preprocess(buffer, config):
+		for word in preprocess(buffer.decode('utf-8'), config):
 			name += ('.' if name else '') + word
-			result.append((rules.get_score(name, rules), word))
+			result.append((rules.get_score(name), word))
 		return result
 
 	return key
@@ -446,14 +456,14 @@ def buffer_sort_key(rules):
 def apply_buffer_order(buffers):
 	''' Sort the buffers in weechat according to the order in the input list.  '''
 	for i, buffer in enumerate(buffers):
-		weechat.command('', '/buffer swap {} {}'.format(buffer, i + 1))
+		weechat.command('', '/buffer swap {0} {1}'.format(buffer, i + 1))
 
 
 def split_args(args, expected, optional = 0):
 	''' Split an argument string in the desired number of arguments. '''
 	split = args.split(' ', expected - 1)
 	if (len(split) < expected):
-		raise HumanReadableError('Expected at least {} arguments, got {}.'.format(expected, len(split)))
+		raise HumanReadableError('Expected at least {0} arguments, got {1}.'.format(expected, len(split)))
 	return split[:-1] + pad(split[-1].split(' ', optional), optional + 1, '')
 
 
@@ -468,7 +478,7 @@ def command_rule_list(buffer, command, args):
 	''' Show the list of sorting rules. '''
 	output = 'Sorting rules:\n'
 	for i, rule in enumerate(config.rules):
-		output += '    {}: {} = {}\n'.format(i, rule[0].pattern, rule[1])
+		output += '    {0}: {1} = {2}\n'.format(i, rule[0].pattern, rule[1])
 	if not len(config.rules):
 		output += '    No sorting rules configured.\n'
 	log(output, buffer)
@@ -478,7 +488,7 @@ def command_rule_list(buffer, command, args):
 
 def command_rule_add(buffer, command, args):
 	''' Add a rule to the rule list. '''
-	rule = RuleList.parse_rule(args)
+	rule = RuleList.parse_rule(args, config.case_sensitive)
 
 	config.rules.append(rule)
 	config.save_rules()
@@ -491,7 +501,7 @@ def command_rule_insert(buffer, command, args):
 	''' Insert a rule at the desired position in the rule list. '''
 	index, rule = split_args(args, 2)
 	index = parse_int(index, 'index')
-	rule  = RuleList.parse_rule(rule)
+	rule  = RuleList.parse_rule(rule, config.case_sensitive)
 
 	config.rules.insert(index, rule)
 	config.save_rules()
@@ -503,7 +513,7 @@ def command_rule_update(buffer, command, args):
 	''' Update a rule in the rule list. '''
 	index, rule = split_args(args, 2)
 	index = parse_int(index, 'index')
-	rule  = RuleList.parse_rule(rule)
+	rule  = RuleList.parse_rule(rule, config.case_sensitive)
 
 	config.rules[index] = rule
 	config.save_rules()
@@ -550,7 +560,7 @@ def command_replacement_list(buffer, command, args):
 	''' Show the list of sorting rules. '''
 	output = 'Replacement patterns:\n'
 	for i, pattern in enumerate(config.replacements):
-		output += '    {}: {} -> {}\n'.format(i, pattern[0], pattern[1])
+		output += '    {0}: {1} -> {2}\n'.format(i, pattern[0], pattern[1])
 	if not len(config.replacements):
 		output += '    No replacement patterns configured.'
 	log(output, buffer)
@@ -643,7 +653,7 @@ def call_command(buffer, command, args, subcommands):
 	elif callable(child):
 		return child(buffer, command, tail)
 
-	log('{}: command not found'.format(' '.join(command)))
+	log('{0}: command not found'.format(' '.join(command)))
 	return weechat.WEECHAT_RC_ERROR
 
 
@@ -706,6 +716,8 @@ def on_autosort_command(data, buffer, args):
 
 
 command_description = r'''
+NOTE: For the best effect, you may want to consider setting the option irc.look.server_buffer to independent and buffers.look.indenting to on.
+
 # Commands
 
 ## Miscellaneous
