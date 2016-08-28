@@ -1,17 +1,22 @@
 call plug#begin('~/.config/nvim/plugged')
 "Plug 'Raimondi/delimitMate'
 "Plug 'jiangmiao/auto-pairs'
-Plug 'flazz/vim-colorschemes'
 "Plug 'chriskempson/base16-vim'
 "Plug 'tpope/vim-fugitive'
 "Plug 'matze/vim-move'
 "Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 "Plug 'fatih/vim-go', { 'for': 'go' }
+Plug 'flazz/vim-colorschemes'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 call plug#end()
 
-filetype off                  " required
+" fzf
+set rtp+=~/.fzf
+let g:fzf_prefer_tmux = 1
 
-let base16colorspace=256  " Access colors present in 256 colorspace
+
+filetype off                  " required
 
 filetype plugin indent on    " required
 syntax enable
