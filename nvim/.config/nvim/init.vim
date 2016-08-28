@@ -9,8 +9,17 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'flazz/vim-colorschemes'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 call plug#end()
 
+" deoplete
+if has('python3')
+    " let g:deoplete#enable_at_startup = 1
+    call deoplete#enable()
+    let g:deoplete#enable_smart_case = 1
+"    imap <C-@> <C-Space>
+    autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+endif
 " fzf
 set rtp+=~/.fzf
 let g:fzf_prefer_tmux = 1
@@ -63,3 +72,12 @@ set noswapfile
 :command Wq wq
 :command W w
 :command Q q
+
+" autocomplete http://stackoverflow.com/a/510571
+" we use deoplete for now
+"inoremap <expr> <C-Space> pumvisible() \|\| &omnifunc == '' ?
+"\ "\<lt>C-n>" :
+"\ "\<lt>C-x>\<lt>C-o><c-r>=pumvisible() ?" .
+"\ "\"\\<lt>c-n>\\<lt>c-p>\\<lt>c-n>\" :" .
+"\ "\" \\<lt>bs>\\<lt>C-n>\"\<CR>"
+"imap <C-@> <C-Space>
