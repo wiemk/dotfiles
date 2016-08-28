@@ -111,7 +111,10 @@
 [init]
     templateDir = ~/.config/git/template
 [merge]
+    tool = vimdiff
     conflictStyle = diff3
+[mergetool "vimdiff"]
+    cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
 [pack]
     writebitmaps = true
 [push]
