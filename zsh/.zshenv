@@ -1,3 +1,0 @@
-# ~/.zshenv
-
-ZDOTDIR=~/.config/zsh

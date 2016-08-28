@@ -1,3 +1,0 @@
-player=mpv --no-terminal --profile=live
-default-stream=source,best,high,medium
-retry-open=3
