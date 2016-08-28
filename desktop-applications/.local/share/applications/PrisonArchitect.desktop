@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=PrisonArchitect
-Name[de]=PrisonArchitect
-Exec=PULSE_LATENCY_MSEC=20 ~/opt/prison/prisonarchitect-alpha24c-linux/PrisonArchitect.x86_64 &>/dev/null
-Icon=PrisonArchitect
-Terminal=false
-Type=Application
-Categories=Game;
-StartupNotify=true
