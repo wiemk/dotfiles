@@ -10,6 +10,8 @@ Plug 'flazz/vim-colorschemes'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 call plug#end()
 
 " deoplete
@@ -20,18 +22,21 @@ if has('python3')
 "	 imap <C-@> <C-Space>
 	autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 endif
+
 " fzf
 set rtp+=~/.fzf
 let g:fzf_prefer_tmux = 1
 
+" vim-airline
+let g:airline#extension#tabline#enabled = 1
 
-filetype off				" required
 
-filetype plugin indent on	" required
+filetype off
+filetype plugin indent on
+filetype indent on
 syntax enable
 set background=dark
 hi Normal ctermbg=none
-filetype indent on
 
 " Color Scheme
 color monokai-chris
@@ -55,14 +60,21 @@ set title
 
 " http://stackoverflow.com/a/2159997
 " display indentation guides
-set list listchars=tab:❘-,trail:·,extends:»,precedes:«,nbsp:×
+set list listchars=tab:→\ ,trail:·,extends:»,precedes:«,nbsp:×
+
+" dangerous stuff below
 " convert spaces to tabs when reading file
 autocmd! bufreadpost * set noexpandtab | retab! 4
 " convert tabs to spaces before writing file
 " autocmd! bufwritepre * set expandtab | retab! 4
 " convert spaces to tabs after writing file (to show guides again)
 autocmd! bufwritepost * set noexpandtab | retab! 4
+" strip trailing whitespaces
+autocmd! bufwritepre * %s/\s\+$//e
 
+set wrap
+set linebreak
+set showbreak=>\ \ \
 
 "Highlight search results
 set hlsearch
