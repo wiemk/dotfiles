@@ -14,20 +14,20 @@ call plug#end()
 
 " deoplete
 if has('python3')
-    " let g:deoplete#enable_at_startup = 1
-    call deoplete#enable()
-    let g:deoplete#enable_smart_case = 1
-"    imap <C-@> <C-Space>
-    autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+	" let g:deoplete#enable_at_startup = 1
+	call deoplete#enable()
+	let g:deoplete#enable_smart_case = 1
+"	 imap <C-@> <C-Space>
+	autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 endif
 " fzf
 set rtp+=~/.fzf
 let g:fzf_prefer_tmux = 1
 
 
-filetype off                  " required
+filetype off				" required
 
-filetype plugin indent on    " required
+filetype plugin indent on	" required
 syntax enable
 set background=dark
 hi Normal ctermbg=none
@@ -40,12 +40,29 @@ color monokai-chris
 map <F8> :!g++ % && ./a.out <CR>
 
 " Setting Tab and indent Widths
-set tabstop=4 softtabstop=0 expandtab shiftwidth=4
+" tabs
+set tabstop=4
+set shiftwidth=4
+set softtabstop=0
+set noexpandtab
+set copyindent
+set preserveindent
 set smarttab
-set expandtab
-set title
 set autoindent
 set smartindent
+
+set title
+
+" http://stackoverflow.com/a/2159997
+" display indentation guides
+set list listchars=tab:❘-,trail:·,extends:»,precedes:«,nbsp:×
+" convert spaces to tabs when reading file
+autocmd! bufreadpost * set noexpandtab | retab! 4
+" convert tabs to spaces before writing file
+" autocmd! bufwritepre * set expandtab | retab! 4
+" convert spaces to tabs after writing file (to show guides again)
+autocmd! bufwritepost * set noexpandtab | retab! 4
+
 
 "Highlight search results
 set hlsearch
