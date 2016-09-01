@@ -150,4 +150,7 @@ call append(line("$"), l:modeline)
 endfunction
 nnoremap <silent> <Leader>ml :call AppendModeline()<CR>
 
+" strip comments
+nnoremap <silent> <Leader>sc :%g/\v^(#\|$)/d<CR>
+
 " vim: set ts=4 sw=4 sts=0 tw=78 noet :
