@@ -14,6 +14,9 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 call plug#end()
 
+" vim-plug
+command! PU PlugUpdate | PlugUpgrade
+
 " deoplete
 if has('python3')
 	" let g:deoplete#enable_at_startup = 1
