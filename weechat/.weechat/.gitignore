@@ -1,5 +1,6 @@
 logs/
 xfer/
 *.log
+*.weechatlog
 script/
 *_fifo_*
