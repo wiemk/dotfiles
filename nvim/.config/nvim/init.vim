@@ -152,5 +152,7 @@ nnoremap <silent> <Leader>ml :call AppendModeline()<CR>
 
 " strip comments
 nnoremap <silent> <Leader>sc :%g/\v^(#\|$)/d<CR>
+" replace word below cursor with x
+nnoremap <Leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
 
 " vim: set ts=4 sw=4 sts=0 tw=78 noet :
