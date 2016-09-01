@@ -17,6 +17,9 @@ call plug#end()
 " vim-plug
 command! PU PlugUpdate | PlugUpgrade
 
+" vim-move
+let g:move_key_modifier = 'M'
+
 " deoplete
 if has('python3')
 	" let g:deoplete#enable_at_startup = 1
