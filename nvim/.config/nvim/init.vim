@@ -104,9 +104,13 @@ set wrap
 set linebreak
 set showbreak=>\ \ \
 
-"Highlight search results
+" Highlight search results
 set hlsearch
-"Show current Position
+" make searching case insensitive
+set ignorecase
+" unless captial letters
+set smartcase
+" Show current Position
 set ruler
 " Better Search settings
 set incsearch
@@ -156,9 +160,30 @@ nnoremap <silent> <Leader>ml :call AppendModeline()<CR>
 " strip comments
 nnoremap <silent> <Leader>sc :%g/\v^(#\|$)/d<CR>
 " replace word below cursor with x
-nnoremap <Leader>s :%s/\<<C-r><C-w>\>//g<Left><Left>
+nnoremap <Leader>src :%s/\<<C-r><C-w>\>//g<Left><Left>
+" Search and Replace
+nnoremap <Leader>s :%s//g<Left><Left>
 
 " use sudo for saving
 cnoremap sudow w !sudo tee % > /dev/null
+
+" Relative numbering
+function! NumberToggle()
+  if(&relativenumber == 1)
+	set nornu
+	set number
+  else
+	set rnu
+  endif
+endfunction
+
+" Toggle between normal and relative numbering.
+nnoremap <leader>r :call NumberToggle()<cr>
+
+" Use <C-L> to clear the highlighting of :set hlsearch.
+if maparg('<C-L>', 'n') ==# ''
+  nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
+endif
+
 
 " vim: set ts=4 sw=4 sts=0 tw=78 noet :
