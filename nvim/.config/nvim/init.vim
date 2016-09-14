@@ -14,40 +14,12 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 call plug#end()
 
-" vim-plug
-command! PU PlugUpdate | PlugUpgrade
-
-" vim-move
-let g:move_key_modifier = 'M'
-
-" deoplete
-if has('python3')
-	" let g:deoplete#enable_at_startup = 1
-	call deoplete#enable()
-	let g:deoplete#enable_smart_case = 1
-"	 imap <C-@> <C-Space>
-	autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
-endif
-
-" delimitMate
-" seems bugged
-" let delimitMate_expand_cr = 1
-
-" fzf
-set rtp+=~/.fzf
-let g:fzf_prefer_tmux = 1
-
-" vim-airline
-set laststatus=2
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#left_sep = ' '
-let g:airline#extensions#tabline#left_alt_sep = '|'
-
+" vim
+let mapleader = ","
 filetype off
 syntax enable
 set background=dark
 hi Normal ctermbg=none
-let mapleader = ","
 
 " Color Scheme
 color monokai-chris
@@ -134,17 +106,49 @@ set noswapfile
 :command W w
 :command Q q
 
+" vim-plug
+command! PU PlugUpdate | PlugUpgrade
+
+" fzf
+set rtp+=~/.fzf
+let g:fzf_prefer_tmux = 1
+
+" Mapping selecting mappings
+nmap <leader><tab> <plug>(fzf-maps-n)
+xmap <leader><tab> <plug>(fzf-maps-x)
+omap <leader><tab> <plug>(fzf-maps-o)
+" Insert mode completion
+imap <c-x><c-k> <plug>(fzf-complete-word)
+imap <c-x><c-f> <plug>(fzf-complete-path)
+imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+imap <c-x><c-l> <plug>(fzf-complete-line)
+" Advanced customization using autoload functions
+inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'left': '15%'})
+
+" vim-move
+let g:move_key_modifier = 'M'
+
+" deoplete
+if has('python3')
+	" let g:deoplete#enable_at_startup = 1
+	call deoplete#enable()
+	let g:deoplete#enable_smart_case = 1
+"	 imap <C-@> <C-Space>
+	autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+endif
+
+" delimitMate
+" seems bugged
+" let delimitMate_expand_cr = 1
+
+" vim-airline
+set laststatus=2
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+
 " use F13 as Esc replacement when in insertmode
 :imap <F13> <Esc>
-
-" autocomplete http://stackoverflow.com/a/510571
-" we use deoplete for now
-"inoremap <expr> <C-Space> pumvisible() \|\| &omnifunc == '' ?
-"\ "\<lt>C-n>" :
-"\ "\<lt>C-x>\<lt>C-o><c-r>=pumvisible() ?" .
-"\ "\"\\<lt>c-n>\\<lt>c-p>\\<lt>c-n>\" :" .
-"\ "\" \\<lt>bs>\\<lt>C-n>\"\<CR>"
-"imap <C-@> <C-Space>
 
 " Append modeline after last line in buffer.
 " " Use substitute() instead of printf() to handle '%%s' modeline in LaTeX
@@ -184,6 +188,4 @@ nnoremap <leader>r :call NumberToggle()<cr>
 if maparg('<C-L>', 'n') ==# ''
   nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
 endif
-
-
 " vim: set ts=4 sw=4 sts=0 tw=78 noet :
