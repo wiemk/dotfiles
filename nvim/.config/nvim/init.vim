@@ -78,6 +78,15 @@ highlight CursorLine cterm=bold ctermbg=NONE ctermfg=NONE guibg=NONE guifg=NONE
 set nobackup
 set nowb
 set noswapfile
+" minimum values (http://stackoverflow.com/q/22336553)
+set winwidth=84
+set winheight=5
+set winminheight=5
+set winheight=30
+
+" resizing
+nnoremap <silent> + :exe "resize " . (winheight(0) * 5/4)<CR>
+nnoremap <silent> - :exe "resize " . (winheight(0) * 1/2)<CR>
 
 " Common typos
 :command WQ wq
