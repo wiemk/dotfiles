@@ -1,19 +1,20 @@
 call plug#begin('~/.config/nvim/plugged')
-Plug 'Raimondi/delimitMate'
-Plug 'jiangmiao/auto-pairs'
+Plug 'flazz/vim-colorschemes'
 Plug 'tpope/vim-fugitive'
 Plug 'matze/vim-move'
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-Plug 'flazz/vim-colorschemes'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'Raimondi/delimitMate'
+Plug 'jiangmiao/auto-pairs'
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 call plug#end()
 
 " vim
 let mapleader = ","
+
 filetype off
 syntax enable
 set background=dark
@@ -25,7 +26,7 @@ color monokai-chris
 " Mapping f8 for c++ compiling and executing
 " map <F8> :!g++ % && ./a.out <CR>
 
-" Setting Tab and indent Widths
+" Setting Tab and indent widths
 " tabs
 set tabstop=4
 set shiftwidth=4
@@ -95,18 +96,11 @@ nnoremap <Tab> :bnext<CR>
 nnoremap <S-Tab> :bprevious<CR>
 
 " use F13 as Esc replacement when in insertmode
-:imap <F13> <Esc>
+imap <F13> <Esc>
 
-" Append modeline after last line in buffer.
-" " Use substitute() instead of printf() to handle '%%s' modeline in LaTeX
-" " files.
-function! AppendModeline()
-  let l:modeline = printf(" vim: set ts=%d sw=%d sts=%d tw=%d %set :",
-		  \ &tabstop, &shiftwidth, &softtabstop, &textwidth, &expandtab ? '' : 'no')
-			let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
-call append(line("$"), l:modeline)
-endfunction
-nnoremap <silent> <Leader>ml :call AppendModeline()<CR>
+" terminal mode
+tnoremap <Esc> <C-\><C-n>
+tnoremap <F13> <C-\><C-n>
 
 " strip comments
 nnoremap <silent> <Leader>sc :%g/\v^(#\|$)/d<CR>
@@ -114,9 +108,17 @@ nnoremap <silent> <Leader>sc :%g/\v^(#\|$)/d<CR>
 nnoremap <Leader>src :%s/\<<C-r><C-w>\>//g<Left><Left>
 " Search and Replace
 nnoremap <Leader>s :%s//g<Left><Left>
+" Append modeline after last line in buffer.
 
-" use sudo for saving
-cnoremap sudow w !sudo tee % > /dev/null
+" arbitrary functions and mappings
+function! AppendModeline()
+  let l:modeline = printf(" vim: set ts=%d sw=%d sts=%d tw=%d %set :",
+		  \ &tabstop, &shiftwidth, &softtabstop, &textwidth, &expandtab ? '' : 'no')
+			let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
+call append(line("$"), l:modeline)
+endfunction
+
+nnoremap <silent> <Leader>ml :call AppendModeline()<CR>
 
 " Relative numbering
 function! NumberToggle()
@@ -128,28 +130,40 @@ function! NumberToggle()
   endif
 endfunction
 
+" execute arg and restore windowview
+function! KeepEx(arg)
+  let l:winview = winsaveview()
+  execute a:arg
+  call winrestview(l:winview)
+endfunction
+
+" strip whitespaces and convert indent spaces to tabs, restore cursor position
+function! StripTrailingWhitespace()
+		"http://stackoverflow.com/a/7496085
+		call KeepEx('%s/\s\+$//e | set noexpandtab | retab! | $put _ | $;?\(^\s*$\)\@!?+1,$d')
+endfunction
+
+" use sudo for saving
+cnoremap sudow w !sudo tee % > /dev/null
+
 " Toggle between normal and relative numbering.
-nnoremap <leader>r :call NumberToggle()<cr>
+nnoremap <leader>r :call NumberToggle()<CR>
 
 " Use <C-L> to clear the highlighting of :set hlsearch.
 if maparg('<C-x><C-L>', 'n') ==# ''
   nnoremap <silent> <C-x><C-l> :nohlsearch<CR><C-L>
 endif
 
-" autocmd
-" for all text files set tw to 78
-autocmd FileType text setlocal textwidth=78
-" dangerous and silly stuff below
-" convert spaces to tabs when reading file
-autocmd! BufReadPost * set noexpandtab | retab! 4
-" convert tabs to spaces before writing file
-" autocmd! bufwritepre * set expandtab | retab! 4
-" convert spaces to tabs after writing file (to show guides again)
-autocmd! BufWritePost * set noexpandtab | retab! 4
-" strip trailing whitespaces
-autocmd! BufWritePre * %s/\s\+$//e
-" http://stackoverflow.com/a/7496085
-autocmd! BufWritePre * $put _ | $;?\(^\s*$\)\@!?+1,$d
+augroup formatting
+	autocmd!
+	" for all text files set tw to 78
+	autocmd FileType text setlocal textwidth=78
+	" convert spaces to tabs when reading file
+	autocmd BufReadPost * if (&readonly == 0) | set noexpandtab | retab! | endif
+	autocmd BufWritePre * if(&readonly == 0) | call StripTrailingWhitespace() | endif
+augroup end
+
+nnoremap <silent> <Leader>sw :call StripTrailingWhitespace()<CR>
 
 " vim-plug
 command! PU PlugUpdate | PlugUpgrade
@@ -157,7 +171,7 @@ command! PU PlugUpdate | PlugUpgrade
 " NERDTree
 nmap <silent> <Leader>n :NERDTreeToggle<CR>
 " close buffer without messing up layout
-nnoremap <leader>q :bp<cr>:bd #<cr>
+nnoremap <leader>q :bp<CR>:bd #<CR>
 let g:NERDTreeShowHidden = 1
 
 " fzf
@@ -182,7 +196,7 @@ if has('python3')
 	" let g:deoplete#enable_at_startup = 1
 	call deoplete#enable()
 	let g:deoplete#enable_smart_case = 1
-	autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+	autocmd! InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 endif
 
 " delimitMate
