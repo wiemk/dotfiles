@@ -106,6 +106,7 @@ nnoremap <S-Tab> :bprevious<CR>
 
 " use F13 as Esc replacement when in insertmode
 imap <F13> <Esc>
+vmap <F13> <Esc>
 
 " terminal mode
 tnoremap <Esc> <C-\><C-n>
