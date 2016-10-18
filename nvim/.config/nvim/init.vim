@@ -2,7 +2,7 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'flazz/vim-colorschemes'
 Plug 'tpope/vim-fugitive'
 Plug 'matze/vim-move'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -187,6 +187,21 @@ let g:NERDTreeShowHidden = 1
 " fzf
 set rtp+=~/.fzf
 let g:fzf_prefer_tmux = 1
+let g:fzf_colors =
+\ { 'fg':	   ['fg', 'Normal'],
+  \ 'bg':	   ['bg', 'Normal'],
+  \ 'hl':	   ['fg', 'Comment'],
+  \ 'fg+':	   ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':	   ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':	   ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+let g:fzf_layout = { 'down': '~40%' }
+let g:fzf_history_dir = '~/.local/share/fzf-history'
 
 " Mapping selecting mappings
 nmap <leader><tab> <plug>(fzf-maps-n)
@@ -197,6 +212,9 @@ imap <c-x><c-k> <plug>(fzf-complete-word)
 imap <c-x><c-f> <plug>(fzf-complete-path)
 imap <c-x><c-j> <plug>(fzf-complete-file-ag)
 imap <c-x><c-l> <plug>(fzf-complete-line)
+
+nmap <leader>f :Files<CR>
+nmap <leader>b :Buffers<CR>
 
 " vim-move
 let g:move_key_modifier = 'M'
