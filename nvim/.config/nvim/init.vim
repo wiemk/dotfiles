@@ -216,18 +216,18 @@ let g:NERDTreeChDirMode = 2
 set rtp+=~/.fzf
 let g:fzf_prefer_tmux = 1
 let g:fzf_colors =
-\ { 'fg':	   ['fg', 'Normal'],
-  \ 'bg':	   ['bg', 'Normal'],
-  \ 'hl':	   ['fg', 'Comment'],
-  \ 'fg+':	   ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':	   ['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':	   ['fg', 'Statement'],
-  \ 'info':    ['fg', 'PreProc'],
-  \ 'prompt':  ['fg', 'Conditional'],
-  \ 'pointer': ['fg', 'Exception'],
-  \ 'marker':  ['fg', 'Keyword'],
-  \ 'spinner': ['fg', 'Label'],
-  \ 'header':  ['fg', 'Comment'] }
+\ { 'fg':		['fg', 'Normal'],
+  \ 'bg':		['bg', 'Normal'],
+  \ 'hl':		['fg', 'Comment'],
+  \ 'fg+':		['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':		['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':		['fg', 'Statement'],
+  \ 'info':		['fg', 'PreProc'],
+  \ 'prompt':	['fg', 'Conditional'],
+  \ 'pointer':	['fg', 'Exception'],
+  \ 'marker':	['fg', 'Keyword'],
+  \ 'spinner':	['fg', 'Label'],
+  \ 'header':	['fg', 'Comment'] }
 let g:fzf_layout = { 'down': '~40%' }
 let g:fzf_history_dir = '~/.local/share/fzf-history'
 
