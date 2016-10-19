@@ -8,7 +8,9 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'Raimondi/delimitMate'
 Plug 'jiangmiao/auto-pairs'
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+if has('nvim')
+	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+endif
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 call plug#end()
 
@@ -66,7 +68,9 @@ set ruler
 " Better Search settings
 set incsearch
 " Set Encoding
-set encoding=utf8
+if !has('nvim')
+	set encoding=utf8
+endif
 " For Line numbers
 set number
 " Show matching braces
@@ -89,10 +93,15 @@ nnoremap <silent> + :exe "resize " . (winheight(0) * 5/4)<CR>
 nnoremap <silent> - :exe "resize " . (winheight(0) * 1/2)<CR>
 
 " Common typos
-:command WQ wq
-:command Wq wq
-:command W w
-:command Q q
+:command! WQ wq
+:command! Wq wq
+:command! W w
+:command! Q q
+
+" Edit/View files relative to current directory
+cnoremap %% <C-R>=expand('%:h').'/'<cr>
+map <leader>e :edit %%
+map <leader>v :view %%
 
 " tabs
 nnoremap <Leader>. :tabn<CR>
@@ -109,8 +118,15 @@ imap <F13> <Esc>
 vmap <F13> <Esc>
 
 " terminal mode
-tnoremap <Esc> <C-\><C-n>
-tnoremap <F13> <C-\><C-n>
+if has('nvim')
+	tmap <Esc> <C-\><C-n>
+	tmap <F13> <C-\><C-n>
+endif
+
+" use a POSIX compatible shell
+if &shell == "/usr/bin/fish"
+	set shell=/usr/bin/bash
+endif
 
 " strip comments
 nnoremap <silent> <Leader>sc :%g/\v^(#\|$)/d<CR>
@@ -173,6 +189,13 @@ augroup formatting
 	autocmd BufWritePre * if(&readonly == 0) | call StripTrailingWhitespace() | endif
 augroup end
 
+" autoreload config file on save
+augroup vimrc
+	autocmd!
+	autocmd BufWritePost init.vim source %
+	autocmd BufWritePost .vimrc source %
+augroup end
+
 nnoremap <silent> <Leader>sw :call StripTrailingWhitespace()<CR>
 
 " vim-plug
@@ -182,7 +205,12 @@ command! PU PlugUpdate | PlugUpgrade
 nmap <silent> <Leader>n :NERDTreeToggle<CR>
 " close buffer without messing up layout
 nnoremap <leader>q :bp<CR>:bd #<CR>
+let g:NERDTreeChristmasTree = 1
 let g:NERDTreeShowHidden = 1
+let g:NERDTreeHijackNetrw = 1
+let g:NERDTreeQuitOnOpen = 1
+let g:NERDTreeDirArrows = 1
+let g:NERDTreeChDirMode = 2
 
 " fzf
 set rtp+=~/.fzf
@@ -220,7 +248,7 @@ nmap <leader>b :Buffers<CR>
 let g:move_key_modifier = 'M'
 
 " deoplete
-if has('python3')
+if has('nvim') && has('python3')
 	" let g:deoplete#enable_at_startup = 1
 	call deoplete#enable()
 	let g:deoplete#enable_smart_case = 1
