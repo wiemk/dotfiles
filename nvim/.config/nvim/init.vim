@@ -1,14 +1,28 @@
-call plug#begin('~/.config/nvim/plugged')
+if has('unix')
+	if has('nvim')
+		" neovim
+		let s:config_path='~/.config/nvim/plugged'
+	else
+		" vim
+		let s:config_path='~/.vim/plugged'
+	endif
+" we blatantly assume windows and vim
+else
+	let s:config_path='~/vimfiles/plugged'
+endif
+call plug#begin(s:config_path)
 Plug 'flazz/vim-colorschemes'
 Plug 'tpope/vim-fugitive'
 Plug 'matze/vim-move'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
-Plug 'junegunn/fzf.vim'
+if has('unix')
+	Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
+	Plug 'junegunn/fzf.vim'
+endif
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'Raimondi/delimitMate'
 Plug 'jiangmiao/auto-pairs'
-if has('nvim')
+if has('nvim') && has('python3')
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 endif
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
@@ -34,7 +48,6 @@ set tabstop=4
 set shiftwidth=4
 set softtabstop=0
 set noexpandtab
-set smarttab
 " indentation
 filetype plugin indent on
 filetype indent on
@@ -52,25 +65,16 @@ set modeline
 " http://stackoverflow.com/a/2159997
 " display indentation guides
 set list listchars=tab:→\ ,trail:·,extends:»,precedes:«,nbsp:×
-
+" line breaks
 set wrap
 set linebreak
 set showbreak=>\ \ \
-
-" Highlight search results
-set hlsearch
 " make searching case insensitive
-" set ignorecase
+set ignorecase
 " unless captial letters
 set smartcase
 " Show current Position
 set ruler
-" Better Search settings
-set incsearch
-" Set Encoding
-if !has('nvim')
-	set encoding=utf8
-endif
 " For Line numbers
 set number
 " Show matching braces
@@ -87,6 +91,31 @@ set winwidth=84
 set winheight=5
 set winminheight=5
 set winheight=30
+" some options not set automatically in vim
+if !has('nvim')
+	set autoread
+	set backspace=indent,eol,start
+	set complete=.,w,b,u,t
+	set display=lastline
+	set encoding=utf8
+	set formatoptions=tcqj
+	set history=10000
+	set hlsearch
+	set incsearch
+	set langnoremap
+	set laststatus=2
+	set mouse=a
+	set nocompatible
+	set nrformats=bin,hex
+	set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winsize
+	set smarttab
+	set tabpagemax=50
+	set tags=./tags;,tags
+	set ttyfast
+	set viminfo=!,'100,<50,s10,h
+	set wildmenu
+endif
+
 
 " resizing
 nnoremap <silent> + :exe "resize " . (winheight(0) * 5/4)<CR>
@@ -163,6 +192,14 @@ function! KeepEx(arg)
   call winrestview(l:winview)
 endfunction
 
+" don't pollute namespace with global variables if plugin isn't loaded
+function! IsPlugActive(arg)
+	if(index(g:plugs_order, a:arg) >= 0)
+		return 1
+	endif
+	return 0
+endfunction
+
 " strip whitespaces and convert indent spaces to tabs, restore cursor position
 function! StripTrailingWhitespace()
 		"http://stackoverflow.com/a/7496085
@@ -213,42 +250,44 @@ let g:NERDTreeDirArrows = 1
 let g:NERDTreeChDirMode = 2
 
 " fzf
-set rtp+=~/.fzf
-let g:fzf_prefer_tmux = 1
-let g:fzf_colors =
-\ { 'fg':		['fg', 'Normal'],
-  \ 'bg':		['bg', 'Normal'],
-  \ 'hl':		['fg', 'Comment'],
-  \ 'fg+':		['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-  \ 'bg+':		['bg', 'CursorLine', 'CursorColumn'],
-  \ 'hl+':		['fg', 'Statement'],
-  \ 'info':		['fg', 'PreProc'],
-  \ 'prompt':	['fg', 'Conditional'],
-  \ 'pointer':	['fg', 'Exception'],
-  \ 'marker':	['fg', 'Keyword'],
-  \ 'spinner':	['fg', 'Label'],
-  \ 'header':	['fg', 'Comment'] }
-let g:fzf_layout = { 'down': '~40%' }
-let g:fzf_history_dir = '~/.local/share/fzf-history'
+if(IsPlugActive('fzf'))
+	set rtp+=~/.fzf
+	let g:fzf_prefer_tmux = 0
+	let g:fzf_colors =
+	\ { 'fg':		['fg', 'Normal'],
+	  \ 'bg':		['bg', 'Normal'],
+	  \ 'hl':		['fg', 'Comment'],
+	  \ 'fg+':		['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+	  \ 'bg+':		['bg', 'CursorLine', 'CursorColumn'],
+	  \ 'hl+':		['fg', 'Statement'],
+	  \ 'info':		['fg', 'PreProc'],
+	  \ 'prompt':	['fg', 'Conditional'],
+	  \ 'pointer':	['fg', 'Exception'],
+	  \ 'marker':	['fg', 'Keyword'],
+	  \ 'spinner':	['fg', 'Label'],
+	  \ 'header':	['fg', 'Comment'] }
+	let g:fzf_layout = { 'down': '~40%' }
+	let g:fzf_history_dir = '~/.local/share/fzf-history'
 
-" Mapping selecting mappings
-nmap <leader><tab> <plug>(fzf-maps-n)
-xmap <leader><tab> <plug>(fzf-maps-x)
-omap <leader><tab> <plug>(fzf-maps-o)
-" Insert mode completion
-imap <c-x><c-k> <plug>(fzf-complete-word)
-imap <c-x><c-f> <plug>(fzf-complete-path)
-imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-imap <c-x><c-l> <plug>(fzf-complete-line)
+	" Mapping selecting mappings
+	nmap <leader><tab> <plug>(fzf-maps-n)
+	xmap <leader><tab> <plug>(fzf-maps-x)
+	omap <leader><tab> <plug>(fzf-maps-o)
+	" Insert mode completion
+	imap <c-x><c-k> <plug>(fzf-complete-word)
+	imap <c-x><c-f> <plug>(fzf-complete-path)
+	imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+	imap <c-x><c-l> <plug>(fzf-complete-line)
 
-nmap <leader>f :Files<CR>
-nmap <leader>b :Buffers<CR>
+	nmap <leader>f :Files<CR>
+	nmap <leader>b :Buffers<CR>
+endif
 
 " vim-move
 let g:move_key_modifier = 'M'
 
 " deoplete
-if has('nvim') && has('python3')
+if(IsPlugActive('deoplete.nvim'))
 	" let g:deoplete#enable_at_startup = 1
 	call deoplete#enable()
 	let g:deoplete#enable_smart_case = 1
@@ -260,7 +299,6 @@ endif
 " let delimitMate_expand_cr = 1
 
 " vim-airline
-set laststatus=2
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
