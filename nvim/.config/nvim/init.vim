@@ -31,11 +31,11 @@ Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 call plug#end()
 
 if has('gui_running')
-	set guifont=Meslo\ LG\ M:h10
-	if &guifont != 'Meslo LG M:h10'
-		set guifont=Consolas:h10
-			if &guifont != 'Consolas:h10'
-				set guifont=DejaVu\ Sans\ Mono:h10
+	set guifont=Meslo\ LG\ M:h9
+	if &guifont != 'Meslo LG M:h9'
+		set guifont=Consolas:h9
+			if &guifont != 'Consolas:h9'
+			set guifont=DejaVu\ Sans\ Mono:h9
 			endif
 	endif
 	" remove clutter
@@ -85,7 +85,10 @@ set title
 set modeline
 " http://stackoverflow.com/a/2159997
 " display indentation guides
-set list listchars=tab:▸\ ,trail:·,precedes:←,extends:→,eol:↲,nbsp:␣
+set list listchars=eol:¬,tab:\▸\ ,trail:~,extends:>,precedes:<
+"Invisible character colors
+highlight NonText guifg=#4a4a59
+highlight SpecialKey guifg=#4a4a59
 " line breaks
 set wrap
 set linebreak
