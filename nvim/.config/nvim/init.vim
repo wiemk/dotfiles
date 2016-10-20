@@ -46,6 +46,7 @@ if has('gui_running')
 	set guioptions-=l " no scrollbar on the left
 	set guioptions-=b " no scrollbar on the bottom
 	set guioptions=aiA
+	set guicursor+=a:blinkon0
 	set mouse=a
 endif
 
