@@ -1,3 +1,5 @@
+" vim windows fix
+scriptencoding utf-8
 if has('unix')
 	if has('nvim')
 		" neovim
@@ -45,7 +47,7 @@ if has('gui_running')
 	set guioptions-=l " no scrollbar on the left
 	set guioptions-=b " no scrollbar on the bottom
 	set guioptions=aiA
-	set mouse=adif
+	set mouse=a
 endif
 
 " vim
