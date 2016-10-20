@@ -39,7 +39,6 @@ if has('gui_running')
 			endif
 	endif
 	" remove clutter
-
 	set guioptions-=T " no toolbar
 	set guioptions-=m " no menus
 	set guioptions-=r " no scrollbar on the right
@@ -138,7 +137,6 @@ if !has('nvim')
 	set wildmenu
 endif
 
-
 " resizing
 nnoremap <silent> + :exe "resize " . (winheight(0) * 5/4)<CR>
 nnoremap <silent> - :exe "resize " . (winheight(0) * 1/2)<CR>
@@ -164,7 +162,7 @@ nnoremap <Leader>w :tabclose<CR>
 nnoremap <Tab> :bnext<CR>
 nnoremap <S-Tab> :bprevious<CR>
 
-" use F13 as Esc replacement when in insertmode
+" use F13 as Esc replacement when in insert mode
 imap <F13> <Esc>
 vmap <F13> <Esc>
 
@@ -207,7 +205,7 @@ function! NumberToggle()
   endif
 endfunction
 
-" execute arg and restore windowview
+" execute arg and restore window view
 function! KeepEx(arg)
   let l:winview = winsaveview()
   execute a:arg
