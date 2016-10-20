@@ -28,6 +28,26 @@ endif
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 call plug#end()
 
+if has('gui_running')
+	set guifont=Meslo\ LG\ M:h10
+	if &guifont != 'Meslo LG M:h10'
+		set guifont=Consolas:h10
+			if &guifont != 'Consolas:h10'
+				set guifont=DejaVu\ Sans\ Mono:h10
+			endif
+	endif
+	" remove clutter
+
+	set guioptions-=T " no toolbar
+	set guioptions-=m " no menus
+	set guioptions-=r " no scrollbar on the right
+	set guioptions-=R " no scrollbar on the right
+	set guioptions-=l " no scrollbar on the left
+	set guioptions-=b " no scrollbar on the bottom
+	set guioptions=aiA
+	set mouse=adif
+endif
+
 " vim
 let mapleader = ","
 
@@ -64,7 +84,7 @@ set title
 set modeline
 " http://stackoverflow.com/a/2159997
 " display indentation guides
-set list listchars=tab:→\ ,trail:·,extends:»,precedes:«,nbsp:×
+set list listchars=tab:▸\ ,trail:·,precedes:←,extends:→,eol:↲,nbsp:␣
 " line breaks
 set wrap
 set linebreak
