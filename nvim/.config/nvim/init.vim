@@ -86,7 +86,7 @@ set title
 set modeline
 " http://stackoverflow.com/a/2159997
 " display indentation guides
-set list listchars=eol:¬,tab:\▸\ ,trail:~,extends:>,precedes:<
+set list listchars=eol:¬,tab:\^\ ,trail:~,extends:>,precedes:<
 "Invisible character colors
 highlight NonText guifg=#4a4a59
 highlight SpecialKey guifg=#4a4a59
@@ -255,6 +255,7 @@ augroup vimrc
 	autocmd!
 	autocmd BufWritePost init.vim source %
 	autocmd BufWritePost .vimrc source %
+	autocmd BufWritePost _vimrc source %
 augroup end
 
 nnoremap <silent> <Leader>sw :call StripTrailingWhitespace()<CR>
