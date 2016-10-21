@@ -1,6 +1,5 @@
 scriptencoding utf-8
 let s:use_fzf=0
-
 " Environment
 if has('nvim')
 	" neovim
@@ -208,29 +207,29 @@ nnoremap <Leader>s :%s//g<Left><Left>
 
 " arbitrary functions and mappings
 function! AppendModeline()
-  let l:modeline = printf(" vim: set ts=%d sw=%d sts=%d tw=%d %set :",
-		  \ &tabstop, &shiftwidth, &softtabstop, &textwidth, &expandtab ? '' : 'no')
-			let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
-call append(line("$"), l:modeline)
+	let l:modeline = printf(" vim: set ts=%d sw=%d sts=%d tw=%d %set :",
+				\ &tabstop, &shiftwidth, &softtabstop, &textwidth, &expandtab ? '' : 'no')
+	let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
+	call append(line("$"), l:modeline)
 endfunction
 
 nnoremap <silent> <Leader>ml :call AppendModeline()<CR>
 
 " Relative numbering
 function! NumberToggle()
-  if(&relativenumber == 1)
-	set nornu
-	set number
-  else
-	set rnu
-  endif
+	if(&relativenumber == 1)
+		set nornu
+		set number
+	else
+		set rnu
+	endif
 endfunction
 
 " execute arg and restore window view
 function! KeepEx(arg)
-  let l:winview = winsaveview()
-  execute a:arg
-  call winrestview(l:winview)
+	let l:winview = winsaveview()
+	execute a:arg
+	call winrestview(l:winview)
 endfunction
 
 " don't pollute namespace with global variables if plugin isn't loaded
@@ -243,8 +242,8 @@ endfunction
 
 " strip whitespaces and convert indent spaces to tabs, restore cursor position
 function! StripTrailingWhitespace()
-		"http://stackoverflow.com/a/7496085
-		call KeepEx('%s/\s\+$//e | set noexpandtab | retab! | $put _ | $;?\(^\s*$\)\@!?+1,$d')
+	"http://stackoverflow.com/a/7496085
+	call KeepEx('%s/\s\+$//e | set noexpandtab | retab! | $put _ | $;?\(^\s*$\)\@!?+1,$d')
 endfunction
 
 " use sudo for saving
@@ -255,7 +254,7 @@ nnoremap <leader>r :call NumberToggle()<CR>
 
 " Use <C-L> to clear the highlighting of :set hlsearch.
 if maparg('<C-x><C-L>', 'n') ==# ''
-  nnoremap <silent> <C-x><C-l> :nohlsearch<CR><C-L>
+	nnoremap <silent> <C-x><C-l> :nohlsearch<CR><C-L>
 endif
 
 augroup formatting
@@ -293,9 +292,10 @@ let g:NERDTreeDirArrows = 1
 let g:NERDTreeChDirMode = 2
 
 if(IsPlugActive('ctrlp.vim'))
-"	let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
+	"	let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
 	let g:ctrlp_clear_cache_on_exit = 0
-"	let g:ctrlp_working_path_mode = 0
+	let g:ctrlp_show_hidden = 1
+	"	let g:ctrlp_working_path_mode = 0
 	if has('unix') && executable('ag')
 		let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 	endif
@@ -311,18 +311,18 @@ if(IsPlugActive('fzf'))
 	set rtp+=~/.fzf
 	let g:fzf_prefer_tmux = 0
 	let g:fzf_colors =
-	\ { 'fg':		['fg', 'Normal'],
-	  \ 'bg':		['bg', 'Normal'],
-	  \ 'hl':		['fg', 'Comment'],
-	  \ 'fg+':		['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-	  \ 'bg+':		['bg', 'CursorLine', 'CursorColumn'],
-	  \ 'hl+':		['fg', 'Statement'],
-	  \ 'info':		['fg', 'PreProc'],
-	  \ 'prompt':	['fg', 'Conditional'],
-	  \ 'pointer':	['fg', 'Exception'],
-	  \ 'marker':	['fg', 'Keyword'],
-	  \ 'spinner':	['fg', 'Label'],
-	  \ 'header':	['fg', 'Comment'] }
+				\ { 'fg':		['fg', 'Normal'],
+				\ 'bg':		['bg', 'Normal'],
+				\ 'hl':		['fg', 'Comment'],
+				\ 'fg+':		['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+				\ 'bg+':		['bg', 'CursorLine', 'CursorColumn'],
+				\ 'hl+':		['fg', 'Statement'],
+				\ 'info':		['fg', 'PreProc'],
+				\ 'prompt':	['fg', 'Conditional'],
+				\ 'pointer':	['fg', 'Exception'],
+				\ 'marker':	['fg', 'Keyword'],
+				\ 'spinner':	['fg', 'Label'],
+				\ 'header':	['fg', 'Comment'] }
 	let g:fzf_layout = { 'down': '~40%' }
 	let g:fzf_history_dir = '~/.local/share/fzf-history'
 
