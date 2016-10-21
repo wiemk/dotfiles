@@ -1,24 +1,65 @@
-" vim windows fix
 scriptencoding utf-8
-if has('unix')
-	if has('nvim')
-		" neovim
-		let s:config_path='~/.config/nvim/plugged'
-	else
-		" vim
-		let s:config_path='~/.vim/plugged'
-	endif
-" we blatantly assume windows and vim
+let s:use_fzf=0
+
+" Environment
+if has('nvim')
+	" neovim
+	let s:plug_path='~/.config/nvim/plugged'
 else
-	let s:config_path='~/vimfiles/plugged'
+	" neovim defaults, set explicitly in vim
+	" make sure to export VIMINIT=
+	" let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC
+	set autoread
+	set backspace=indent,eol,start
+	set complete=.,w,b,u,t
+	set display=lastline
+	set encoding=utf8
+	set formatoptions=tcqj
+	set history=10000
+	set hlsearch
+	set incsearch
+	set langnoremap
+	set laststatus=2
+	set mouse=a
+	set nocompatible
+	set nrformats=bin,hex
+	set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winsize
+	set smarttab
+	set tabpagemax=50
+	set tags=./tags;,tags
+	set ttyfast
+	set wildmenu
+	set viminfo=!,'100,<50,s10,h
+	" vim Environment, for simplicity we expect properly set XDG vars
+	if exists("$XDG_CACHE_HOME") && exists("$XDG_CONFIG_HOME")
+		if !isdirectory($XDG_CACHE_HOME . '/vim')
+			call mkdir($XDG_CACHE_HOME . '/vim', "p")
+		endif
+		let s:plug_path="$XDG_CONFIG_HOME/vim/plugged"
+		set directory=$XDG_CACHE_HOME/vim
+		set backupdir=$XDG_CACHE_HOME/vim
+		set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
+		set runtimepath=$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/after,$VIM,$VIMRUNTIME
+		let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc"
+	else
+		" no XDG paths set, set only the most necessary paths
+		if has('unix')
+			let s:config_path='~/.vim/plugged'
+		else "has('win32')
+			let s:config_path='~/vimfiles/plugged'
+		endif
+	endif
 endif
-call plug#begin(s:config_path)
+
+call plug#begin(s:plug_path)
 Plug 'flazz/vim-colorschemes'
 Plug 'tpope/vim-fugitive'
 Plug 'matze/vim-move'
-if has('unix')
+if has('unix') && s:use_fzf==1
 	Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 	Plug 'junegunn/fzf.vim'
+else
+	Plug 'ctrlpvim/ctrlp.vim', { 'on': ['CtrlP', 'CtrlPBuffer', 'CtrlPMixed', 'CtrlPMRU'] }
 endif
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -31,12 +72,12 @@ Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 call plug#end()
 
 if has('gui_running')
-	set guifont=Meslo\ LG\ M:h9
+	if !has('unix')
+		set renderoptions=type:directx
+	endif
+	silent!	set guifont=Meslo\ LG\ M:h9
 	if &guifont != 'Meslo LG M:h9'
-		set guifont=Consolas:h9
-			if &guifont != 'Consolas:h9'
-			set guifont=DejaVu\ Sans\ Mono:h9
-			endif
+		silent! set guifont=DejaVu\ Sans\ Mono:h10
 	endif
 	" remove clutter
 	set guioptions-=T " no toolbar
@@ -116,30 +157,6 @@ set winwidth=84
 set winheight=5
 set winminheight=5
 set winheight=30
-" some options not set automatically in vim
-if !has('nvim')
-	set autoread
-	set backspace=indent,eol,start
-	set complete=.,w,b,u,t
-	set display=lastline
-	set encoding=utf8
-	set formatoptions=tcqj
-	set history=10000
-	set hlsearch
-	set incsearch
-	set langnoremap
-	set laststatus=2
-	set mouse=a
-	set nocompatible
-	set nrformats=bin,hex
-	set sessionoptions=blank,buffers,curdir,folds,help,tabpages,winsize
-	set smarttab
-	set tabpagemax=50
-	set tags=./tags;,tags
-	set ttyfast
-	set viminfo=!,'100,<50,s10,h
-	set wildmenu
-endif
 
 " resizing
 nnoremap <silent> + :exe "resize " . (winheight(0) * 5/4)<CR>
@@ -256,6 +273,7 @@ augroup vimrc
 	autocmd BufWritePost init.vim source %
 	autocmd BufWritePost .vimrc source %
 	autocmd BufWritePost _vimrc source %
+	autocmd BufWritePost vimrc source %
 augroup end
 
 nnoremap <silent> <Leader>sw :call StripTrailingWhitespace()<CR>
@@ -273,6 +291,21 @@ let g:NERDTreeHijackNetrw = 1
 let g:NERDTreeQuitOnOpen = 1
 let g:NERDTreeDirArrows = 1
 let g:NERDTreeChDirMode = 2
+
+if(IsPlugActive('ctrlp.vim'))
+"	let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
+	let g:ctrlp_clear_cache_on_exit = 0
+"	let g:ctrlp_working_path_mode = 0
+	if has('unix') && executable('ag')
+		echo "foo"
+		let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+	endif
+
+	nnoremap <leader>f :CtrlP<CR>
+	nnoremap <leader>b :CtrlPBuffer<CR>
+	nnoremap <leader>a :CtrlPMixed<CR>
+	nnoremap <leader>m :CtrlPMRU<CR>
+endif
 
 " fzf
 if(IsPlugActive('fzf'))
