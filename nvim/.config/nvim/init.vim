@@ -71,6 +71,7 @@ Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 call plug#end()
 
 if has('gui_running')
+	set lines=50 columns=200
 	if !has('unix')
 		set renderoptions=type:directx
 	endif
