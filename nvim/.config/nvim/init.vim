@@ -297,7 +297,6 @@ if(IsPlugActive('ctrlp.vim'))
 	let g:ctrlp_clear_cache_on_exit = 0
 "	let g:ctrlp_working_path_mode = 0
 	if has('unix') && executable('ag')
-		echo "foo"
 		let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 	endif
 
