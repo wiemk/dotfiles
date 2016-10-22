@@ -85,17 +85,17 @@ function! s:has_vimproc() abort
 	return s:_has_vimproc
 endfunction
 
-" special win32 build
-if has('win32') && !s:has_vimproc() "!exists(':VimProcBang')
-	let s:plugin_contrib = fnamemodify(v:progpath, ':h') . '\plugins\vimproc'
-	if isdirectory(s:plugin_contrib)
-		let g:vimproc#download_windows_dll = 0
-		let &rtp .= ','.s:plugin_contrib
-	else
-		let g:vimproc#download_windows_dll = 1
-	endif
-endif
-let s:completion_provider = 0
+" manually managed vimproc, replaced with vim-plug
+"if has('win32') && !s:has_vimproc() "!exists(':VimProcBang')
+"	let s:plugin_contrib = fnamemodify(v:progpath, ':h') . '\plugins\vimproc'
+"	if isdirectory(s:plugin_contrib)
+"		let g:vimproc#download_windows_dll = 0
+"		let &rtp .= ','.s:plugin_contrib
+"	else
+"		let g:vimproc#download_windows_dll = 1
+"	endif
+"endif
+"let s:completion_provider = 0
 
 """ PLUGIN LOADING
 call plug#begin(s:plug_path)
@@ -114,14 +114,17 @@ else
 	Plug 'ctrlpvim/ctrlp.vim', { 'on': ['CtrlP', 'CtrlPBuffer', 'CtrlPMixed', 'CtrlPMRU'] }
 endif
 
-if has('unix') && !has('nvim')
-	" build manually
+if has('win32')
+	let g:vimproc_path = expand(fnamemodify(v:progpath, ':h')
+				\ . '\plugins\vimproc')
+	if(isdirectory(g:vimproc_path))
+		Plug g:vimproc_path
+	else
+		let g:vimproc#download_windows_dll = 1
+		Plug 'Shougo/vimproc.vim'
+	endif
+elseif has('unix') && !has('nvim')
 	Plug 'Shougo/vimproc.vim', { 'do' : 'make' }
-endif
-
-if has('win32') && g:vimproc#download_windows_dll
-	" win32, do not build manually, try downloading the dll
-	Plug 'Shougo/vimproc.vim'
 endif
 
 if has('nvim')
@@ -433,6 +436,9 @@ if(s:is_plug_active('neocomplete.vim'))
 	"	let g:neocomplete#enable_auto_select = 0
 	let g:neocomplete#enable_fuzzy_completion = 1
 	let g:neocomplete#enable_auto_delimiter = 1
+	if s:is_plug_active('vimproc')
+		let g:neocomplete#use_vimproc = 1
+	endif
 	"	" Define keyword.
 	if !exists('g:neocomplete#keyword_patterns')
 		let g:neocomplete#keyword_patterns = {}
