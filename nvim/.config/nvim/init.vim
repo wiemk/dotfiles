@@ -114,7 +114,7 @@ else
 	Plug 'ctrlpvim/ctrlp.vim', { 'on': ['CtrlP', 'CtrlPBuffer', 'CtrlPMixed', 'CtrlPMRU'] }
 endif
 
-if has('unix')
+if has('unix') && has('nvim')
 	" build manually
 	Plug 'Shougo/vimproc.vim', { 'do' : 'make' }
 endif
