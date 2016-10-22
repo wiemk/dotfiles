@@ -29,6 +29,15 @@ else
 	set ttyfast
 	set wildmenu
 	set viminfo=!,'100,<50,s10,h
+
+	" XDG Base Directory
+	"let $XDG_DATA_HOME =
+	"			\ exists('$XDG_DATA_HOME')	 ? $XDG_DATA_HOME	: ($HOME . '/.local/share')
+	"let $XDG_CACHE_HOME =
+	"			\ exists('$XDG_CACHE_HOME')  ? $XDG_CACHE_HOME	: ($HOME . '/.cache')
+	"let $XDG_CONFIG_HOME =
+	"			\ exists('$XDG_CONFIG_HOME') ? $XDG_CONFIG_HOME : ($HOME . '/.config')
+
 	" vim Environment, for simplicity we expect properly set XDG vars
 	if exists("$XDG_CACHE_HOME") && exists("$XDG_CONFIG_HOME")
 		if !isdirectory($XDG_CACHE_HOME . '/vim')
@@ -58,18 +67,31 @@ function! s:is_plug_active(arg)
 	return 0
 endfunction
 
+" Check vimproc
+function! s:has_vimproc() abort
+	if !exists('s:_has_vimproc')
+		try
+		call vimproc#version()
+			let s:_has_vimproc = 1
+		catch
+			let s:_has_vimproc = 0
+		endtry
+	endif
+	return s:_has_vimproc
+endfunction
+
 " special win32 build
-if has('win32') && !exists(':VimProcBang')
-	let s:plugin_contrib=fnamemodify(v:progpath, ':h') . '\plugins\vimproc'
+if has('win32') && !s:has_vimproc() "!exists(':VimProcBang')
+	let s:plugin_contrib = fnamemodify(v:progpath, ':h') . '\plugins\vimproc'
 	if isdirectory(s:plugin_contrib)
-		"although the following doesn't append to rtp if the path already
-		"exists, the other variant seems more elegant for now
-		"exe 'set rtp+=' . expand('~/.this/is/a/path)'
 		let &rtp .= ','.s:plugin_contrib
+	else
+		let g:vimproc#download_windows_dll = 1
 	endif
 endif
+let s:completion_provider = 0
 
-let s:completion_provider=0
+""" PLUGIN LOADING
 call plug#begin(s:plug_path)
 Plug 'flazz/vim-colorschemes'
 Plug 'tpope/vim-fugitive'
@@ -79,12 +101,23 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'jiangmiao/auto-pairs'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 
-if has('unix') && s:use_fzf==1
+if has('unix') && s:use_fzf
 	Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 	Plug 'junegunn/fzf.vim'
 else
 	Plug 'ctrlpvim/ctrlp.vim', { 'on': ['CtrlP', 'CtrlPBuffer', 'CtrlPMixed', 'CtrlPMRU'] }
 endif
+
+if has('unix')
+	" build manually
+	Plug 'Shougo/vimproc.vim', { 'do' : 'make' }
+endif
+
+if has('win32') && g:vimproc#download_windows_dll
+	" win32, do not build manually, try downloading the dll
+	Plug 'Shougo/vimproc.vim'
+endif
+
 if has('nvim')
 	if has('python3')
 		let s:completion_provider=1
@@ -101,6 +134,7 @@ if s:completion_provider == 1
 endif
 
 call plug#end()
+""" END LOADING
 
 if has('gui_running')
 	set lines=50 columns=200
@@ -134,6 +168,9 @@ hi Normal ctermbg=none
 " Color Scheme
 color monokai-chris
 
+" language
+language english
+language time german
 " Mapping f8 for c++ compiling and executing
 " map <F8> :!g++ % && ./a.out <CR>
 
@@ -390,10 +427,10 @@ if(s:is_plug_active('neocomplete.vim'))
 	let g:neocomplete#enable_smart_case = 1
 	let g:neocomplete#min_keyword_length = 1
 	let g:neocomplete#sources#syntax#min_keyword_length = 3
-"	let g:neocomplete#enable_auto_select = 0
+	"	let g:neocomplete#enable_auto_select = 0
 	let g:neocomplete#enable_fuzzy_completion = 1
 	let g:neocomplete#enable_auto_delimiter = 1
-"	" Define keyword.
+	"	" Define keyword.
 	if !exists('g:neocomplete#keyword_patterns')
 		let g:neocomplete#keyword_patterns = {}
 	endif
