@@ -1,4 +1,8 @@
 ﻿scriptencoding utf-8
+if v:version < 704 | finish | endif
+if &term == 'win32'
+	set termencoding=cp932
+endif
 
 " Variables:
 let s:use_fzf = 0
@@ -22,7 +26,7 @@ endif
 " Environment:
 if has('nvim')
 	" neovim
-	let s:plug_path = '~/.config/nvim/plugged'
+	let s:plug_path = $XDG_CONFIG_HOME . '/nvim/plugged'
 else
 	" neovim defaults, set explicitly in vim
 	" make sure to export VIMINIT=
@@ -106,11 +110,13 @@ endfunction
 
 """ PLUGIN LOADING
 call plug#begin(s:plug_path)
-Plug 'flazz/vim-colorschemes'
+"Plug 'flazz/vim-colorschemes'
+"Plug 'vim-airline/vim-airline-themes'
+Plug 'chriskempson/base16-vim'
+Plug 'mhartington/oceanic-next'
+Plug 'vim-airline/vim-airline'
 Plug 'tpope/vim-fugitive'
 Plug 'matze/vim-move'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
 Plug 'jiangmiao/auto-pairs'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 
@@ -154,7 +160,6 @@ call plug#end()
 """ END LOADING
 
 if has('gui_running')
-	set lines=50 columns=200
 	if !has('unix')
 		set renderoptions=type:directx
 	endif
@@ -184,13 +189,54 @@ hi Normal ctermbg=none
 " UTG-8 bom
 set bomb
 " Color Scheme
-color monokai-chris
+if has('nvim')
+	if has("termguicolors")
+		set termguicolors
+	endif
+else
+	"set t_Co=256
+endif
+
+" ensure that the highlight group gets created and
+" is not cleared by future colorscheme commands
+autocmd ColorScheme * highlight extra_white_space ctermbg=red guibg=red
+if &term != 'win32'
+	colorscheme OceanicNext
+	" enable italics, disabled by default
+	let g:oceanic_next_terminal_italic = 1
+	" enable bold, disabled by default
+	let g:oceanic_next_terminal_bold = 1
+else
+	" force 16 colors in cmd
+	set t_Co=16
+	colorscheme base16-atelier-dune
+endif
+
+" http://vim.wikia.com/wiki/Highlight_unwanted_spaces
+highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+augroup WhitespaceMatch
+	" Remove ALL autocommands for the WhitespaceMatch group.
+	autocmd!
+	autocmd BufWinEnter * let w:whitespace_match_number =
+				\ matchadd('ExtraWhitespace', '\s\+$')
+	autocmd InsertEnter * call s:ToggleWhitespaceMatch('i')
+	autocmd InsertLeave * call s:ToggleWhitespaceMatch('n')
+augroup end
+function! s:ToggleWhitespaceMatch(mode)
+	let pattern = (a:mode == 'i') ? '\s\+\%#\@<!$' : '\s\+$'
+	if exists('w:whitespace_match_number')
+		call matchdelete(w:whitespace_match_number)
+		call matchadd('ExtraWhitespace', pattern, 10, w:whitespace_match_number)
+	else
+		" Something went wrong, try to be graceful.
+		let w:whitespace_match_number =  matchadd('ExtraWhitespace', pattern)
+	endif
+endfunction
 
 " Mapping f8 for c++ compiling and executing
 " map <F8> :!g++ % && ./a.out <CR>
 
 " Setting Tab and indent widths
-" tabs
 set tabstop=4
 set shiftwidth=4
 set softtabstop=0
@@ -243,10 +289,22 @@ set winminheight=5
 set winheight=30
 " allow switching buffers without saving
 set hidden
+" Timeout
+set timeoutlen=3000
+set ttimeoutlen=10
+set updatetime=1000
+" only redraw when something was typed
+set lazyredraw
+" Conceal
+set conceallevel=2
+set concealcursor=nc
+" folds
+set foldlevelstart=99
 
 " resizing
 nnoremap <silent> + :exe "resize " . (winheight(0) * 5/4)<CR>
 nnoremap <silent> - :exe "resize " . (winheight(0) * 1/2)<CR>
+nnoremap <silent><leader>y :set lines=50 columns=200<CR>
 
 " Common typos
 :command! WQ wq
@@ -285,11 +343,11 @@ if &shell == "/usr/bin/fish"
 endif
 
 " strip comments
-nnoremap <silent> <Leader>sc :%g/\v^(#\|$)/d<CR>
+nnoremap <silent> <leader>sc :%g/\v^(#\|$)/d<CR>
 " replace word below cursor with x
-nnoremap <Leader>src :%s/\<<C-r><C-w>\>//g<Left><Left>
+nnoremap <leader>src :%s/\<<C-r><C-w>\>//g<Left><Left>
 " Search and Replace
-nnoremap <Leader>s :%s//g<Left><Left>
+nnoremap <leader>s :%s//g<Left><Left>
 " Append modeline after last line in buffer.
 
 " arbitrary functions and mappings
@@ -300,7 +358,7 @@ function! AppendModeline()
 	call append(line("$"), l:modeline)
 endfunction
 
-nnoremap <silent> <Leader>ml :call AppendModeline()<CR>
+nnoremap <silent> <leader>ml :call AppendModeline()<CR>
 
 " Relative numbering
 function! NumberToggle()
@@ -320,7 +378,7 @@ function! s:keep_ex(arg)
 endfunction
 
 " strip whitespaces and convert indent spaces to tabs, restore cursor position
-function! StripTrailingWhitespace()
+function! s:strip_trailing_whitespaces()
 	"http://stackoverflow.com/a/7496085
 	call s:keep_ex('%s/\s\+$//e | set noexpandtab | retab! | $put _ | $;?\(^\s*$\)\@!?+1,$d')
 endfunction
@@ -345,7 +403,7 @@ augroup formatting
 	autocmd FileType text setlocal textwidth=78
 	" convert spaces to tabs when reading file
 	autocmd BufReadPost * if (&readonly == 0) | set noexpandtab | retab! | endif
-	autocmd BufWritePre * if(&readonly == 0) | call StripTrailingWhitespace() | endif
+	autocmd BufWritePre * if(&readonly == 0) | call s:strip_trailing_whitespaces() | endif
 augroup end
 
 " autoreload config file on save
@@ -357,7 +415,7 @@ augroup vimrc
 	autocmd BufWritePost vimrc source %
 augroup end
 
-nnoremap <silent> <Leader>sw :call StripTrailingWhitespace()<CR>
+nnoremap <silent> <Leader>sw :call s:strip_trailing_whitespaces()<CR>
 
 " vim-plug
 command! PU PlugUpdate | PlugUpgrade
@@ -375,12 +433,20 @@ let g:NERDTreeChDirMode = 2
 
 if(s:is_plug_active('ctrlp.vim'))
 	"	let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
+	let g:ctrlp_use_caching = 1
 	let g:ctrlp_clear_cache_on_exit = 0
 	let g:ctrlp_show_hidden = 1
 	"	let g:ctrlp_working_path_mode = 0
 	if has('unix') && executable('ag')
 		let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 	endif
+	let g:ctrlp_extensions = [
+				\ 'mixed',
+				\ 'dir',
+				\ 'quickfix',
+				\ 'undo',
+				\ 'changes'
+				\]
 
 	nnoremap <leader>f :CtrlP<CR>
 	nnoremap <leader>b :CtrlPBuffer<CR>
@@ -433,6 +499,9 @@ execute 'nmap' '<' . g:move_key_modifier . '-Up>' '<Plug>MoveLineUp'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
+if s:is_plug_active('oceanic-next')
+	let g:airline_theme='oceanicnext'
+endif
 
 " neocomplete
 if(s:is_plug_active('neocomplete.vim'))
