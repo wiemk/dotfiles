@@ -50,24 +50,56 @@ else
 	endif
 endif
 
+" don't pollute namespace with global variables if plugin isn't loaded
+function! s:is_plug_active(arg)
+	if(index(g:plugs_order, a:arg) >= 0)
+		return 1
+	endif
+	return 0
+endfunction
+
+" special win32 build
+if has('win32') && !exists(':VimProcBang')
+	let s:plugin_contrib=fnamemodify(v:progpath, ':h') . '\plugins\vimproc'
+	if isdirectory(s:plugin_contrib)
+		"although the following doesn't append to rtp if the path already
+		"exists, the other variant seems more elegant for now
+		"exe 'set rtp+=' . expand('~/.this/is/a/path)'
+		let &rtp .= ','.s:plugin_contrib
+	endif
+endif
+
+let s:completion_provider=0
 call plug#begin(s:plug_path)
 Plug 'flazz/vim-colorschemes'
 Plug 'tpope/vim-fugitive'
 Plug 'matze/vim-move'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'jiangmiao/auto-pairs'
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+
 if has('unix') && s:use_fzf==1
 	Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 	Plug 'junegunn/fzf.vim'
 else
 	Plug 'ctrlpvim/ctrlp.vim', { 'on': ['CtrlP', 'CtrlPBuffer', 'CtrlPMixed', 'CtrlPMRU'] }
 endif
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'Raimondi/delimitMate'
-Plug 'jiangmiao/auto-pairs'
-if has('nvim') && has('python3')
-	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+if has('nvim')
+	if has('python3')
+		let s:completion_provider=1
+		Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+	endif
+else
+	if has('lua')
+		let s:completion_provider=1
+		Plug 'Shougo/neocomplete.vim'
+	endif
 endif
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+if s:completion_provider == 1
+	Plug 'Shougo/neco-vim'
+endif
+
 call plug#end()
 
 if has('gui_running')
@@ -227,24 +259,16 @@ function! NumberToggle()
 endfunction
 
 " execute arg and restore window view
-function! KeepEx(arg)
+function! s:keep_ex(arg)
 	let l:winview = winsaveview()
 	execute a:arg
 	call winrestview(l:winview)
 endfunction
 
-" don't pollute namespace with global variables if plugin isn't loaded
-function! IsPlugActive(arg)
-	if(index(g:plugs_order, a:arg) >= 0)
-		return 1
-	endif
-	return 0
-endfunction
-
 " strip whitespaces and convert indent spaces to tabs, restore cursor position
 function! StripTrailingWhitespace()
 	"http://stackoverflow.com/a/7496085
-	call KeepEx('%s/\s\+$//e | set noexpandtab | retab! | $put _ | $;?\(^\s*$\)\@!?+1,$d')
+	call s:keep_ex('%s/\s\+$//e | set noexpandtab | retab! | $put _ | $;?\(^\s*$\)\@!?+1,$d')
 endfunction
 
 " use sudo for saving
@@ -292,7 +316,7 @@ let g:NERDTreeQuitOnOpen = 1
 let g:NERDTreeDirArrows = 1
 let g:NERDTreeChDirMode = 2
 
-if(IsPlugActive('ctrlp.vim'))
+if(s:is_plug_active('ctrlp.vim'))
 	"	let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
 	let g:ctrlp_clear_cache_on_exit = 0
 	let g:ctrlp_show_hidden = 1
@@ -308,7 +332,7 @@ if(IsPlugActive('ctrlp.vim'))
 endif
 
 " fzf
-if(IsPlugActive('fzf'))
+if(s:is_plug_active('fzf'))
 	set rtp+=~/.fzf
 	let g:fzf_prefer_tmux = 0
 	let g:fzf_colors =
@@ -344,20 +368,60 @@ endif
 " vim-move
 let g:move_key_modifier = 'M'
 
-" deoplete
-if(IsPlugActive('deoplete.nvim'))
-	" let g:deoplete#enable_at_startup = 1
-	call deoplete#enable()
-	let g:deoplete#enable_smart_case = 1
-	autocmd! InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
-endif
-
-" delimitMate
-" seems bugged
-" let delimitMate_expand_cr = 1
-
 " vim-airline
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
+
+" neocomplete
+if(s:is_plug_active('neocomplete.vim'))
+	let g:neocomplete#enable_at_startup = 1
+	" increases screen flicker
+	let g:neocomplete#enable_refresh_always = 0
+	let g:neocomplete#max_list = 30
+	let g:neocomplete#enable_auto_select = 1
+	let g:neocomplete#enable_smart_case = 1
+	let g:neocomplete#min_keyword_length = 1
+	let g:neocomplete#sources#syntax#min_keyword_length = 3
+"	let g:neocomplete#enable_auto_select = 0
+	let g:neocomplete#enable_fuzzy_completion = 1
+	let g:neocomplete#enable_auto_delimiter = 1
+"	" Define keyword.
+	if !exists('g:neocomplete#keyword_patterns')
+		let g:neocomplete#keyword_patterns = {}
+	endif
+	let g:neocomplete#keyword_patterns._ = '\h\k*(\?'
+	if !exists('g:neocomplete#sources#omni#input_patterns')
+		let g:neocomplete#sources#omni#input_patterns = {}
+	endif
+	inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+endif
+
+if(s:is_plug_active('auto-pairs'))
+	if(s:is_plug_active('neocomplete.vim') || s:is_plug_active('deoplete.nvim'))
+		let g:AutoPairsMapCR = 0
+		imap <expr><CR> pumvisible() ?	"\<C-y>" :	"\<CR>\<Plug>AutoPairsReturn"
+	endif
+endif
+
+" deoplete
+if(s:is_plug_active('deoplete.nvim'))
+	let g:deoplete#enable_at_startup = 1
+	let g:deoplete#enable_refresh_always = 0
+	let g:deoplete#max_list = 30
+	let g:deoplete#enable_auto_select = 1
+
+	if !exists('g:deoplete#keyword_patterns')
+		let g:deoplete#keyword_patterns = {}
+	endif
+	let g:deoplete#keyword_patterns._ = '[a-zA-Z_]\k*\(?'
+	" call deoplete#enable()
+	let g:deoplete#enable_smart_case = 1
+	if !exists('g:deoplete#omni#input_patterns')
+		let g:deoplete#omni#input_patterns = {}
+	endif
+	inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+	" close window after completion
+	autocmd! InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+endif
 " vim: set ts=4 sw=4 sts=0 tw=78 noet :
