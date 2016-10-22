@@ -276,6 +276,9 @@ cnoremap sudow w !sudo tee % > /dev/null
 
 " Toggle between normal and relative numbering.
 nnoremap <leader>r :call NumberToggle()<CR>
+nnoremap <leader>cc :set number!<CR>
+" Toggle whitespace characters
+nnoremap <leader>ll :set list!<CR>
 
 " Use <C-L> to clear the highlighting of :set hlsearch.
 if maparg('<C-x><C-L>', 'n') ==# ''
@@ -367,6 +370,10 @@ endif
 
 " vim-move
 let g:move_key_modifier = 'M'
+execute 'vmap' '<' . g:move_key_modifier . '-Down>' '<Plug>MoveBlockDown'
+execute 'vmap' '<' . g:move_key_modifier . '-Up>' '<Plug>MoveBlockUp'
+execute 'nmap' '<' . g:move_key_modifier . '-Down>' '<Plug>MoveLineDown'
+execute 'nmap' '<' . g:move_key_modifier . '-Up>' '<Plug>MoveLineUp'
 
 " vim-airline
 let g:airline#extensions#tabline#enabled = 1
@@ -397,13 +404,6 @@ if(s:is_plug_active('neocomplete.vim'))
 	inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 endif
 
-if(s:is_plug_active('auto-pairs'))
-	if(s:is_plug_active('neocomplete.vim') || s:is_plug_active('deoplete.nvim'))
-		let g:AutoPairsMapCR = 0
-		imap <expr><CR> pumvisible() ?	"\<C-y>" :	"\<CR>\<Plug>AutoPairsReturn"
-	endif
-endif
-
 " deoplete
 if(s:is_plug_active('deoplete.nvim'))
 	let g:deoplete#enable_at_startup = 1
@@ -424,4 +424,14 @@ if(s:is_plug_active('deoplete.nvim'))
 	" close window after completion
 	autocmd! InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 endif
+
+" auto-pairs
+if(s:is_plug_active('auto-pairs'))
+	if(s:is_plug_active('neocomplete.vim') || s:is_plug_active('deoplete.nvim'))
+		let g:AutoPairsMapCR = 0
+		imap <expr><CR> pumvisible() ?	"\<C-y>" :	"\<CR>\<Plug>AutoPairsReturn"
+	endif
+endif
+
+"EOF
 " vim: set ts=4 sw=4 sts=0 tw=78 noet :
