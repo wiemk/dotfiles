@@ -1,6 +1,25 @@
-scriptencoding utf-8
+﻿scriptencoding utf-8
+
+" Variables:
 let s:use_fzf = 0
-" Environment
+let s:ignore_ft = [
+			\ 'gitcommit', 'gitrebase', 'hgcommit']
+
+" XDG Base Directory
+let $XDG_DATA_HOME =
+			\ exists('$XDG_DATA_HOME') ? $XDG_DATA_HOME
+			\ : ($HOME . '/.local/share')
+let $XDG_CACHE_HOME =
+			\ exists('$XDG_CACHE_HOME') ? $XDG_CACHE_HOME
+			\ : ($HOME . '/.cache')
+let $XDG_CONFIG_HOME =
+			\ exists('$XDG_CONFIG_HOME') ? $XDG_CONFIG_HOME
+			\ : ($HOME . '/.config')
+if !isdirectory($XDG_CACHE_HOME . '/vim')
+	call mkdir($XDG_CACHE_HOME . '/vim', "p")
+endif
+
+" Environment:
 if has('nvim')
 	" neovim
 	let s:plug_path = '~/.config/nvim/plugged'
@@ -35,34 +54,22 @@ else
 	set wildmenu
 	set viminfo=!,'100,<50,s10,h
 
-	" XDG Base Directory
-	"let $XDG_DATA_HOME =
-	"			\ exists('$XDG_DATA_HOME')	 ? $XDG_DATA_HOME	: ($HOME . '/.local/share')
-	"let $XDG_CACHE_HOME =
-	"			\ exists('$XDG_CACHE_HOME')  ? $XDG_CACHE_HOME	: ($HOME . '/.cache')
-	"let $XDG_CONFIG_HOME =
-	"			\ exists('$XDG_CONFIG_HOME') ? $XDG_CONFIG_HOME : ($HOME . '/.config')
-
-	" vim Environment, for simplicity we expect properly set XDG vars
-	if exists("$XDG_CACHE_HOME") && exists("$XDG_CONFIG_HOME")
-		if !isdirectory($XDG_CACHE_HOME . '/vim')
-			call mkdir($XDG_CACHE_HOME . '/vim', "p")
-		endif
-		let s:plug_path = "$XDG_CONFIG_HOME/vim/plugged"
-		set directory=$XDG_CACHE_HOME/vim
-		set backupdir=$XDG_CACHE_HOME/vim
-		set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
-		set runtimepath=$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/after,$VIM,$VIMRUNTIME
-		let $MYVIMRC = "$XDG_CONFIG_HOME/vim/vimrc"
-	else
-		" no XDG paths set, set only the most necessary paths
-		if has('unix')
-			let s:config_path = '~/.vim/plugged'
-		else "has('win32')
-			let s:config_path = '~/vimfiles/plugged'
-		endif
-	endif
+	set directory=$XDG_CACHE_HOME/vim
+	set backupdir=$XDG_CACHE_HOME/vim
+	set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
+	set runtimepath=$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/after,$VIM,$VIMRUNTIME
+	let $MYVIMRC = "$XDG_CONFIG_HOME/vim/vimrc"
+	let s:plug_path = $XDG_CONFIG_HOME . '/vim/plugged'
 endif
+
+" Undo file
+set undofile
+set undodir^=$XDG_CACHE_HOME/vimundo
+if !isdirectory($XDG_CACHE_HOME . '/vimundo')
+	call mkdir($XDG_CACHE_HOME . '/vimundo', 'p')
+endif
+autocmd! BufWritePre *
+			\ let &undofile = index(s:ignore_ft, &filetype) < 0
 
 " don't pollute namespace with global variables if plugin isn't loaded
 function! s:is_plug_active(arg)
@@ -76,7 +83,7 @@ endfunction
 function! s:has_vimproc() abort
 	if !exists('s:_has_vimproc')
 		try
-		call vimproc#version()
+			call vimproc#version()
 			let s:_has_vimproc = 1
 		catch
 			let s:_has_vimproc = 0
@@ -174,7 +181,8 @@ filetype off
 syntax enable
 set background=dark
 hi Normal ctermbg=none
-
+" UTG-8 bom
+set bomb
 " Color Scheme
 color monokai-chris
 
@@ -233,6 +241,8 @@ set winwidth=84
 set winheight=5
 set winminheight=5
 set winheight=30
+" allow switching buffers without saving
+set hidden
 
 " resizing
 nnoremap <silent> + :exe "resize " . (winheight(0) * 5/4)<CR>
