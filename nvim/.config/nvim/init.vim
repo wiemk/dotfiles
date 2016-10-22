@@ -8,6 +8,11 @@ else
 	" neovim defaults, set explicitly in vim
 	" make sure to export VIMINIT=
 	" let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC
+	" language
+	if has('win32')
+		language english
+		language time german
+	endif
 	set autoread
 	set backspace=indent,eol,start
 	set complete=.,w,b,u,t
@@ -84,6 +89,7 @@ endfunction
 if has('win32') && !s:has_vimproc() "!exists(':VimProcBang')
 	let s:plugin_contrib = fnamemodify(v:progpath, ':h') . '\plugins\vimproc'
 	if isdirectory(s:plugin_contrib)
+		let g:vimproc#download_windows_dll = 0
 		let &rtp .= ','.s:plugin_contrib
 	else
 		let g:vimproc#download_windows_dll = 1
@@ -168,9 +174,6 @@ hi Normal ctermbg=none
 " Color Scheme
 color monokai-chris
 
-" language
-language english
-language time german
 " Mapping f8 for c++ compiling and executing
 " map <F8> :!g++ % && ./a.out <CR>
 
