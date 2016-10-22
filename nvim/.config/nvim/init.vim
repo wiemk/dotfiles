@@ -1,9 +1,9 @@
 scriptencoding utf-8
-let s:use_fzf=0
+let s:use_fzf = 0
 " Environment
 if has('nvim')
 	" neovim
-	let s:plug_path='~/.config/nvim/plugged'
+	let s:plug_path = '~/.config/nvim/plugged'
 else
 	" neovim defaults, set explicitly in vim
 	" make sure to export VIMINIT=
@@ -48,18 +48,18 @@ else
 		if !isdirectory($XDG_CACHE_HOME . '/vim')
 			call mkdir($XDG_CACHE_HOME . '/vim', "p")
 		endif
-		let s:plug_path="$XDG_CONFIG_HOME/vim/plugged"
+		let s:plug_path = "$XDG_CONFIG_HOME/vim/plugged"
 		set directory=$XDG_CACHE_HOME/vim
 		set backupdir=$XDG_CACHE_HOME/vim
 		set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
 		set runtimepath=$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/after,$VIM,$VIMRUNTIME
-		let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc"
+		let $MYVIMRC = "$XDG_CONFIG_HOME/vim/vimrc"
 	else
 		" no XDG paths set, set only the most necessary paths
 		if has('unix')
-			let s:config_path='~/.vim/plugged'
+			let s:config_path = '~/.vim/plugged'
 		else "has('win32')
-			let s:config_path='~/vimfiles/plugged'
+			let s:config_path = '~/vimfiles/plugged'
 		endif
 	endif
 endif
@@ -127,18 +127,19 @@ elseif has('unix') && !has('nvim')
 	Plug 'Shougo/vimproc.vim', { 'do' : 'make' }
 endif
 
+let s:completion_provider = 0
 if has('nvim')
 	if has('python3')
-		let s:completion_provider=1
+		let s:completion_provider = 1
 		Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 	endif
 else
 	if has('lua')
-		let s:completion_provider=1
+		let s:completion_provider = 1
 		Plug 'Shougo/neocomplete.vim'
 	endif
 endif
-if s:completion_provider == 1
+if s:completion_provider
 	Plug 'Shougo/neco-vim'
 endif
 
