@@ -34,7 +34,7 @@ else
 	" make sure to export VIMINIT=
 	" let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC
 	" language
-	if has('win32')
+	if (has('win32') && !has('nvim'))
 		language english
 		language time german
 	endif
@@ -162,7 +162,7 @@ call plug#end()
 """ END LOADING
 
 if has('gui_running')
-	if !has('unix')
+	if (!has('unix') && !has('nvim'))
 		set renderoptions=type:directx
 	endif
 	silent!	set guifont=Meslo\ LG\ M:h9
@@ -349,10 +349,9 @@ if has('nvim')
 endif
 
 " use a POSIX compatible shell
-if &shell == "/usr/bin/fish"
+if(!has('nvim') && &shell == "/usr/bin/fish")
 	set shell=/usr/bin/bash
 endif
-
 " strip comments
 nnoremap <silent> <leader>sc :%g/\v^(#\|$)/d<CR>
 " replace word below cursor with x
