@@ -1,4 +1,6 @@
 ﻿scriptencoding utf-8
+" seems to break some plugins
+" set noshellslash
 if v:version < 704 | finish | endif
 if &term == 'win32'
 	set termencoding=cp932
@@ -199,7 +201,12 @@ endif
 
 " ensure that the highlight group gets created and
 " is not cleared by future colorscheme commands
-autocmd ColorScheme * highlight extra_white_space ctermbg=red guibg=red
+augroup ColorScheme
+	autocmd!
+	autocmd ColorScheme * highlight ExceedingColumnWidth ctermbg=darkgreen guibg=darkgreen
+	autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+augroup end
+
 if &term != 'win32'
 	colorscheme OceanicNext
 	" enable italics, disabled by default
@@ -212,8 +219,11 @@ else
 	colorscheme base16-atelier-dune
 endif
 
-" http://vim.wikia.com/wiki/Highlight_unwanted_spaces
+" http://superuser.com/a/771555
+highlight ExceedingColumnWidth ctermbg=darkgreen guibg=darkgreen
+call matchadd('ExceedingColumnWidth', '\%79v', 100)
 highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+" http://vim.wikia.com/wiki/Highlight_unwanted_spaces
 augroup WhitespaceMatch
 	" Remove ALL autocommands for the WhitespaceMatch group.
 	autocmd!
@@ -253,6 +263,7 @@ set preserveindent
 " copy indent from previous line
 set autoindent
 set title
+setlocal colorcolumn=78
 " can be dangerous but I like modelines
 set modeline
 " http://stackoverflow.com/a/2159997
@@ -378,9 +389,10 @@ function! s:keep_ex(arg)
 endfunction
 
 " strip whitespaces and convert indent spaces to tabs, restore cursor position
-function! s:strip_trailing_whitespaces()
+function! StripTrailingWhitespaces()
 	"http://stackoverflow.com/a/7496085
-	call s:keep_ex('%s/\s\+$//e | set noexpandtab | retab! | $put _ | $;?\(^\s*$\)\@!?+1,$d')
+	call s:keep_ex('%s/\s\+$//e | set noexpandtab | retab! | $put _'
+				\. ' | $;?\(^\s*$\)\@!?+1,$d')
 endfunction
 
 " use sudo for saving
@@ -393,7 +405,7 @@ nnoremap <leader>cc :set number!<CR>
 nnoremap <leader>ll :set list!<CR>
 
 " Use <C-L> to clear the highlighting of :set hlsearch.
-if maparg('<C-x><C-L>', 'n') ==# ''
+if maparg('<C-x><C-l>', 'n') ==# ''
 	nnoremap <silent> <C-x><C-l> :nohlsearch<CR><C-L>
 endif
 
@@ -403,25 +415,26 @@ augroup formatting
 	autocmd FileType text setlocal textwidth=78
 	" convert spaces to tabs when reading file
 	autocmd BufReadPost * if (&readonly == 0) | set noexpandtab | retab! | endif
-	autocmd BufWritePre * if(&readonly == 0) | call s:strip_trailing_whitespaces() | endif
+	autocmd BufWritePre * if(&readonly == 0) | call StripTrailingWhitespaces() | endif
 augroup end
 
-" autoreload config file on save
+" source vim configuration upon save
+" let s:my_vimrc = fnamemodify($MYVIMRC, ":t")
 augroup vimrc
 	autocmd!
-	autocmd BufWritePost init.vim source %
-	autocmd BufWritePost .vimrc source %
-	autocmd BufWritePost _vimrc source %
-	autocmd BufWritePost vimrc source %
+	execute 'autocmd BufWritePost ' . $MYVIMRC . ' source % | redraw
+				\ | echom "Reloaded " . expand("%:p")'
+	execute 'autocmd BufWritePost ' . $MYGVIMR . ' if has("gui_running")
+				\ | so	% | redraw | echom "Reloaded " . expand("%:p") | endif'
 augroup end
 
-nnoremap <silent> <Leader>sw :call s:strip_trailing_whitespaces()<CR>
+nnoremap <silent> <leader>sw :call StripTrailingWhitespaces()<CR>
 
 " vim-plug
 command! PU PlugUpdate | PlugUpgrade
 
 " NERDTree
-nmap <silent> <Leader>n :NERDTreeToggle<CR>
+nmap <silent> <leader>n :NERDTreeToggle<CR>
 " close buffer without messing up layout
 nnoremap <leader>q :bp<CR>:bd #<CR>
 let g:NERDTreeChristmasTree = 1
@@ -558,6 +571,5 @@ if(s:is_plug_active('auto-pairs'))
 		imap <expr><CR> pumvisible() ?	"\<C-y>" :	"\<CR>\<Plug>AutoPairsReturn"
 	endif
 endif
-
 "EOF
 " vim: set ts=4 sw=4 sts=0 tw=78 noet :
