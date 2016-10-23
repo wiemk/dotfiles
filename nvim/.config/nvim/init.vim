@@ -6,12 +6,14 @@ if &term == 'win32'
 	set termencoding=cp932
 endif
 
-" Variables:
+" Variables {{{
+let g:text_width = 100
 let s:use_fzf = 0
 let s:ignore_ft = [
 			\ 'gitcommit', 'gitrebase', 'hgcommit']
+"}}}
 
-" XDG Base Directory
+" Environment and default otpions {{{
 let $XDG_DATA_HOME =
 			\ exists('$XDG_DATA_HOME') ? $XDG_DATA_HOME
 			\ : ($HOME . '/.local/share')
@@ -25,7 +27,6 @@ if !isdirectory($XDG_CACHE_HOME . '/vim')
 	call mkdir($XDG_CACHE_HOME . '/vim', "p")
 endif
 
-" Environment:
 if has('nvim')
 	" neovim
 	let s:plug_path = $XDG_CONFIG_HOME . '/nvim/plugged'
@@ -67,8 +68,9 @@ else
 	let $MYVIMRC = "$XDG_CONFIG_HOME/vim/vimrc"
 	let s:plug_path = $XDG_CONFIG_HOME . '/vim/plugged'
 endif
+"}}}
 
-" Undo file
+" Undo file {{{
 set undofile
 set undodir^=$XDG_CACHE_HOME/vimundo
 if !isdirectory($XDG_CACHE_HOME . '/vimundo')
@@ -76,6 +78,15 @@ if !isdirectory($XDG_CACHE_HOME . '/vimundo')
 endif
 autocmd! BufWritePre *
 			\ let &undofile = index(s:ignore_ft, &filetype) < 0
+"}}}
+
+" utility functions {{{
+" execute arg and restore window view
+function! s:keep_ex(arg)
+	let l:winview = winsaveview()
+	execute a:arg
+	call winrestview(l:winview)
+endfunction
 
 " don't pollute namespace with global variables if plugin isn't loaded
 function! s:is_plug_active(arg)
@@ -97,7 +108,9 @@ function! s:has_vimproc() abort
 	endif
 	return s:_has_vimproc
 endfunction
+"}}}
 
+"vimproc without vim-plug {{{
 " manually managed vimproc, replaced with vim-plug
 "if has('win32') && !s:has_vimproc() "!exists(':VimProcBang')
 "	let s:plugin_contrib = fnamemodify(v:progpath, ':h') . '\plugins\vimproc'
@@ -109,8 +122,9 @@ endfunction
 "	endif
 "endif
 "let s:completion_provider = 0
+"}}}
 
-""" PLUGIN LOADING
+"vim-plug {{{
 call plug#begin(s:plug_path)
 "Plug 'flazz/vim-colorschemes'
 "Plug 'vim-airline/vim-airline-themes'
@@ -159,8 +173,10 @@ if s:completion_provider
 endif
 
 call plug#end()
-""" END LOADING
 
+command! PU PlugUpdate | PlugUpgrade
+"}}}
+"gvim options {{{
 if has('gui_running')
 	if (!has('unix') && !has('nvim'))
 		set renderoptions=type:directx
@@ -180,17 +196,26 @@ if has('gui_running')
 	set guicursor+=a:blinkon0
 	set mouse=a
 endif
-
-" vim
+"}}}
 let mapleader = ","
-
+" UTG-8 bom
+set bomb
 filetype off
 syntax enable
 set background=dark
-hi Normal ctermbg=none
-" UTG-8 bom
-set bomb
-" Color Scheme
+highlight Normal ctermbg=none
+
+" colorscheme and style {{{
+
+"info {{{
+" ensure that the highlight group gets created and
+" is not cleared by future colorscheme commands
+"augroup ColorScheme
+"	autocmd!
+"	autocmd ColorScheme * highlight CursorLine cterm=bold ctermbg=NONE ctermfg=NONE gui=bold guibg=NONE guifg=NONE
+"augroup end
+"}}}
+
 if has('nvim')
 	if has("termguicolors")
 		set termguicolors
@@ -198,15 +223,6 @@ if has('nvim')
 else
 	"set t_Co=256
 endif
-
-" ensure that the highlight group gets created and
-" is not cleared by future colorscheme commands
-augroup ColorScheme
-	autocmd!
-	autocmd ColorScheme * highlight ExceedingColumnWidth ctermbg=darkgreen guibg=darkgreen
-	autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
-augroup end
-
 if &term != 'win32'
 	colorscheme OceanicNext
 	" enable italics, disabled by default
@@ -218,35 +234,56 @@ else
 	set t_Co=16
 	colorscheme base16-atelier-dune
 endif
+highlight CursorLine cterm=bold gui=bold
 
+" http://stackoverflow.com/a/2159997
+" display indentation guides
+set list listchars=eol:¬,tab:\^\ ,trail:~,extends:>,precedes:<
+"Invisible character colors
+highlight NonText guifg=#4a4a59
+highlight SpecialKey guifg=#4a4a59
+"}}}
+
+" colorcolumn alternative {{{
 " http://superuser.com/a/771555
-highlight ExceedingColumnWidth ctermbg=darkgreen guibg=darkgreen
-call matchadd('ExceedingColumnWidth', '\%79v', 100)
-highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+" highlight ExceedingColumnWidth ctermbg=darkgreen guibg=darkgreen
+"call matchadd('ExceedingColumnWidth', '\%79v', 100)
+"}}}
+
+" highlight whitespaces {{{
 " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
+highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
 augroup WhitespaceMatch
-	" Remove ALL autocommands for the WhitespaceMatch group.
 	autocmd!
-	autocmd BufWinEnter * let w:whitespace_match_number =
-				\ matchadd('ExtraWhitespace', '\s\+$')
+	autocmd BufWinEnter * call s:ToggleWhitespaceMatch('n')
+	autocmd BufWinLeave * call s:ToggleWhitespaceMatch('c')
 	autocmd InsertEnter * call s:ToggleWhitespaceMatch('i')
 	autocmd InsertLeave * call s:ToggleWhitespaceMatch('n')
 augroup end
-function! s:ToggleWhitespaceMatch(mode)
-	let pattern = (a:mode == 'i') ? '\s\+\%#\@<!$' : '\s\+$'
-	if exists('w:whitespace_match_number')
-		call matchdelete(w:whitespace_match_number)
-		call matchadd('ExtraWhitespace', pattern, 10, w:whitespace_match_number)
-	else
-		" Something went wrong, try to be graceful.
-		let w:whitespace_match_number =  matchadd('ExtraWhitespace', pattern)
-	endif
-endfunction
 
+function! s:ToggleWhitespaceMatch(mode)
+	if a:mode == 'i'
+		let l:pattern = [ '[^\t]\zs\t\+', '\s\+$\| \+\ze\t' ]
+	elseif a:mode == 'n'
+		let l:pattern = [ '\s\+$' ]
+	else
+		let l:pattern = []
+		let w:ws_id = []
+	endif
+	if(!exists('w:ws_id'))
+		let w:ws_id = []
+	endif
+	if(!empty(w:ws_id))
+		call map(w:ws_id, 'matchdelete(v:val)')
+		unlet w:ws_id[:]
+	endif
+	call map(l:pattern, 'add(w:ws_id, matchadd("ExtraWhitespace", v:val, 10))')
+endfunction
+"}}}
 " Mapping f8 for c++ compiling and executing
 " map <F8> :!g++ % && ./a.out <CR>
 
-" Setting Tab and indent widths
+" tabs and indentation {{{
 set tabstop=4
 set shiftwidth=4
 set softtabstop=0
@@ -262,20 +299,28 @@ set copyindent
 set preserveindent
 " copy indent from previous line
 set autoindent
+"}}}
+"
 set title
-setlocal colorcolumn=78
 " can be dangerous but I like modelines
 set modeline
-" http://stackoverflow.com/a/2159997
-" display indentation guides
-set list listchars=eol:¬,tab:\^\ ,trail:~,extends:>,precedes:<
-"Invisible character colors
-highlight NonText guifg=#4a4a59
-highlight SpecialKey guifg=#4a4a59
-" line breaks
+
+" linebreaks and linewrap {{{
+" line widths, let the user decide what textwidth he prefers
+" and derive everything else from it
+" set colorcolumn to textwidth + 1 in current buffer
+setlocal colorcolumn=+1
+" wrap around visually without modifying the buffer
 set wrap
 set linebreak
 set showbreak=>\ \ \
+set wrapmargin=0
+" don't let vim repeatedly reformat the line while we are typing but show some
+" initial effort to break the line
+set formatoptions+=l
+"set formatoptions-=t
+"}}}
+"
 " make searching case insensitive
 set ignorecase
 " unless captial letters
@@ -288,7 +333,6 @@ set number
 set showmatch
 " Highlighting current line
 set cursorline
-highlight CursorLine cterm=bold ctermbg=NONE ctermfg=NONE guibg=NONE guifg=NONE
 " Set No backups
 set nobackup
 set nowb
@@ -309,10 +353,17 @@ set lazyredraw
 " Conceal
 set conceallevel=2
 set concealcursor=nc
-" folds
-set foldlevelstart=99
 
-" resizing
+" folds
+"set foldlevel=1
+set foldmethod=marker
+set foldlevelstart=0
+
+augroup FoldMarkers
+	autocmd!
+	"autocmd FileType vim setlocal foldmethod=marker foldmarker={{{,}}}
+augroup end
+
 nnoremap <silent> + :exe "resize " . (winheight(0) * 5/4)<CR>
 nnoremap <silent> - :exe "resize " . (winheight(0) * 1/2)<CR>
 nnoremap <silent><leader>y :set lines=50 columns=200<CR>
@@ -329,10 +380,10 @@ map <leader>e :edit %%
 map <leader>v :view %%
 
 " tabs
-nnoremap <Leader>. :tabn<CR>
-nnoremap <Leader>, :tabp<CR>
+nnoremap <leader>. :tabn<CR>
+nnoremap <leader>, :tabp<CR>
 nnoremap <leader>t :tabnew<CR>
-nnoremap <Leader>w :tabclose<CR>
+nnoremap <leader>w :tabclose<CR>
 
 " buffers
 nnoremap <Tab> :bnext<CR>
@@ -380,13 +431,6 @@ function! NumberToggle()
 	endif
 endfunction
 
-" execute arg and restore window view
-function! s:keep_ex(arg)
-	let l:winview = winsaveview()
-	execute a:arg
-	call winrestview(l:winview)
-endfunction
-
 " strip whitespaces and convert indent spaces to tabs, restore cursor position
 function! StripTrailingWhitespaces()
 	"http://stackoverflow.com/a/7496085
@@ -424,15 +468,12 @@ augroup vimrc
 	execute 'autocmd BufWritePost ' . $MYVIMRC . ' source % | redraw
 				\ | echom "Reloaded " . expand("%:p")'
 	execute 'autocmd BufWritePost ' . $MYGVIMR . ' if has("gui_running")
-				\ | so	% | redraw | echom "Reloaded " . expand("%:p") | endif'
+				\ | source % | redraw | echom "Reloaded " . expand("%:p") | endif'
 augroup end
 
 nnoremap <silent> <leader>sw :call StripTrailingWhitespaces()<CR>
 
-" vim-plug
-command! PU PlugUpdate | PlugUpgrade
-
-" NERDTree
+"NERDTree {{{
 nmap <silent> <leader>n :NERDTreeToggle<CR>
 " close buffer without messing up layout
 nnoremap <leader>q :bp<CR>:bd #<CR>
@@ -442,7 +483,8 @@ let g:NERDTreeHijackNetrw = 1
 let g:NERDTreeQuitOnOpen = 1
 let g:NERDTreeDirArrows = 1
 let g:NERDTreeChDirMode = 2
-
+"}}}
+"ctrlp {{{
 if(s:is_plug_active('ctrlp.vim'))
 	"	let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
 	let g:ctrlp_use_caching = 1
@@ -465,8 +507,8 @@ if(s:is_plug_active('ctrlp.vim'))
 	nnoremap <leader>a :CtrlPMixed<CR>
 	nnoremap <leader>m :CtrlPMRU<CR>
 endif
-
-" fzf
+"}}}
+"fzf {{{
 if(s:is_plug_active('fzf'))
 	set rtp+=~/.fzf
 	let g:fzf_prefer_tmux = 0
@@ -499,23 +541,23 @@ if(s:is_plug_active('fzf'))
 	nmap <leader>f :Files<CR>
 	nmap <leader>b :Buffers<CR>
 endif
-
-" vim-move
+"}}}
+"vim-move {{{
 let g:move_key_modifier = 'M'
 execute 'vmap' '<' . g:move_key_modifier . '-Down>' '<Plug>MoveBlockDown'
 execute 'vmap' '<' . g:move_key_modifier . '-Up>' '<Plug>MoveBlockUp'
 execute 'nmap' '<' . g:move_key_modifier . '-Down>' '<Plug>MoveLineDown'
 execute 'nmap' '<' . g:move_key_modifier . '-Up>' '<Plug>MoveLineUp'
-
-" vim-airline
+"}}}
+"vim-airline {{{
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 if s:is_plug_active('oceanic-next')
 	let g:airline_theme='oceanicnext'
 endif
-
-" neocomplete
+"}}}
+"neocomplete {{{
 if(s:is_plug_active('neocomplete.vim'))
 	let g:neocomplete#enable_at_startup = 1
 	" increases screen flicker
@@ -541,8 +583,8 @@ if(s:is_plug_active('neocomplete.vim'))
 	endif
 	inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 endif
-
-" deoplete
+"}}}
+"deoplete {{{
 if(s:is_plug_active('deoplete.nvim'))
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#enable_refresh_always = 0
@@ -570,5 +612,5 @@ if(s:is_plug_active('auto-pairs'))
 		imap <expr><CR> pumvisible() ?	"\<C-y>" :	"\<CR>\<Plug>AutoPairsReturn"
 	endif
 endif
-"EOF
+"}}}
 " vim: set ts=4 sw=4 sts=0 tw=78 noet :
