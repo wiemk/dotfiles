@@ -12,7 +12,6 @@ let s:use_fzf = 0
 let s:ignore_ft = [
 			\ 'gitcommit', 'gitrebase', 'hgcommit']
 "}}}
-
 " Environment and default otpions {{{
 let $XDG_DATA_HOME =
 			\ exists('$XDG_DATA_HOME') ? $XDG_DATA_HOME
@@ -28,7 +27,6 @@ if !isdirectory($XDG_CACHE_HOME . '/vim')
 endif
 
 if has('nvim')
-	" neovim
 	let s:plug_path = $XDG_CONFIG_HOME . '/nvim/plugged'
 else
 	" neovim defaults, set explicitly in vim
@@ -69,7 +67,6 @@ else
 	let s:plug_path = $XDG_CONFIG_HOME . '/vim/plugged'
 endif
 "}}}
-
 " Undo file {{{
 set undofile
 set undodir^=$XDG_CACHE_HOME/vimundo
@@ -79,7 +76,6 @@ endif
 autocmd! BufWritePre *
 			\ let &undofile = index(s:ignore_ft, &filetype) < 0
 "}}}
-
 " utility functions {{{
 " execute arg and restore window view
 function! s:keep_ex(arg)
@@ -109,8 +105,7 @@ function! s:has_vimproc() abort
 	return s:_has_vimproc
 endfunction
 "}}}
-
-"vimproc without vim-plug {{{
+" vimproc without vim-plug {{{
 " manually managed vimproc, replaced with vim-plug
 "if has('win32') && !s:has_vimproc() "!exists(':VimProcBang')
 "	let s:plugin_contrib = fnamemodify(v:progpath, ':h') . '\plugins\vimproc'
@@ -123,8 +118,7 @@ endfunction
 "endif
 "let s:completion_provider = 0
 "}}}
-
-"vim-plug {{{
+" vim-plug {{{
 call plug#begin(s:plug_path)
 "Plug 'flazz/vim-colorschemes'
 "Plug 'vim-airline/vim-airline-themes'
@@ -176,7 +170,7 @@ call plug#end()
 
 command! PU PlugUpdate | PlugUpgrade
 "}}}
-"gvim options {{{
+" gvim options {{{
 if has('gui_running')
 	if (!has('unix') && !has('nvim'))
 		set renderoptions=type:directx
@@ -206,8 +200,7 @@ set background=dark
 highlight Normal ctermbg=none
 
 " colorscheme and style {{{
-
-"info {{{
+" info {{{
 " ensure that the highlight group gets created and
 " is not cleared by future colorscheme commands
 "augroup ColorScheme
@@ -234,6 +227,7 @@ else
 	set t_Co=16
 	colorscheme base16-atelier-dune
 endif
+"set cursorcolumn
 highlight CursorLine cterm=bold gui=bold
 
 " http://stackoverflow.com/a/2159997
@@ -243,22 +237,19 @@ set list listchars=eol:¬,tab:\^\ ,trail:~,extends:>,precedes:<
 highlight NonText guifg=#4a4a59
 highlight SpecialKey guifg=#4a4a59
 "}}}
-
 " colorcolumn alternative {{{
 " http://superuser.com/a/771555
 " highlight ExceedingColumnWidth ctermbg=darkgreen guibg=darkgreen
 "call matchadd('ExceedingColumnWidth', '\%79v', 100)
 "}}}
-
 " highlight whitespaces {{{
 " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
 highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
 augroup WhitespaceMatch
 	autocmd!
-	autocmd BufWinEnter * call s:ToggleWhitespaceMatch('n')
+	autocmd BufWinEnter,InsertLeave * call s:ToggleWhitespaceMatch('n')
 	autocmd BufWinLeave * call s:ToggleWhitespaceMatch('c')
 	autocmd InsertEnter * call s:ToggleWhitespaceMatch('i')
-	autocmd InsertLeave * call s:ToggleWhitespaceMatch('n')
 augroup end
 
 function! s:ToggleWhitespaceMatch(mode)
@@ -279,10 +270,8 @@ function! s:ToggleWhitespaceMatch(mode)
 	endif
 	call map(l:pattern, 'add(w:ws_id, matchadd("ExtraWhitespace", v:val, 10))')
 endfunction
-"}}}
-" Mapping f8 for c++ compiling and executing
-" map <F8> :!g++ % && ./a.out <CR>
 
+"}}}
 " tabs and indentation {{{
 set tabstop=4
 set shiftwidth=4
@@ -300,9 +289,23 @@ set preserveindent
 " copy indent from previous line
 set autoindent
 "}}}
-"
+
+" message
+set shortmess+=a
+set confirm
 set title
-" can be dangerous but I like modelines
+
+" beep
+set errorbells
+set novisualbell
+set t_vb=
+
+" Timeout
+set timeoutlen=3000
+set ttimeoutlen=10
+set updatetime=1000
+
+set showfulltag
 set modeline
 
 " linebreaks and linewrap {{{
@@ -320,7 +323,7 @@ set wrapmargin=0
 set formatoptions+=l
 "set formatoptions-=t
 "}}}
-"
+
 " make searching case insensitive
 set ignorecase
 " unless captial letters
@@ -344,10 +347,6 @@ set winminheight=5
 set winheight=30
 " allow switching buffers without saving
 set hidden
-" Timeout
-set timeoutlen=3000
-set ttimeoutlen=10
-set updatetime=1000
 " only redraw when something was typed
 set lazyredraw
 " Conceal
@@ -359,20 +358,38 @@ set concealcursor=nc
 set foldmethod=marker
 set foldlevelstart=0
 
+" info {{{
 augroup FoldMarkers
 	autocmd!
-	"autocmd FileType vim setlocal foldmethod=marker foldmarker={{{,}}}
+	autocmd FileType vim setlocal foldmethod=marker foldmarker={{{,}}}
 augroup end
+"}}}
+" help mappings {{{
+function! s:help_mappings()
+	nmap <buffer> <CR> <C-]>
+	nmap <buffer> <BS> <C-T>
+	nmap <buffer> o /''[a-z]\{2,\}''<CR>
+	nmap <buffer> O ?''[a-z]\{2,\}''<CR>
+	nmap <buffer> s /\|\S\+\|<CR>
+	nmap <buffer> S ?\|\S\+\|<CR>
+endfunction
+
+augroup HelpKeys
+	autocmd!
+	autocmd FileType help :call s:help_mappings()
+augroup end
+"}}}
 
 nnoremap <silent> + :exe "resize " . (winheight(0) * 5/4)<CR>
 nnoremap <silent> - :exe "resize " . (winheight(0) * 1/2)<CR>
 nnoremap <silent><leader>y :set lines=50 columns=200<CR>
 
 " Common typos
-:command! WQ wq
-:command! Wq wq
-:command! W w
-:command! Q q
+cabbr WQ wq
+cabbr Wq wq
+cabbr wQ wq
+cabbr W w
+cabbr Q q
 
 " Edit/View files relative to current directory
 cnoremap %% <C-R>=expand('%:h').'/'<cr>
@@ -421,7 +438,7 @@ endfunction
 
 nnoremap <silent> <leader>ml :call AppendModeline()<CR>
 
-" Relative numbering
+" relative numbering
 function! NumberToggle()
 	if(&relativenumber == 1)
 		set nornu
@@ -447,7 +464,7 @@ nnoremap <leader>cc :set number!<CR>
 " Toggle whitespace characters
 nnoremap <leader>ll :set list!<CR>
 
-" Use <C-L> to clear the highlighting of :set hlsearch.
+" use <C-L> to clear the highlighting of :set hlsearch.
 if maparg('<C-x><C-l>', 'n') ==# ''
 	nnoremap <silent> <C-x><C-l> :nohlsearch<CR><C-L>
 endif
@@ -473,7 +490,7 @@ augroup end
 
 nnoremap <silent> <leader>sw :call StripTrailingWhitespaces()<CR>
 
-"NERDTree {{{
+" NERDTree {{{
 nmap <silent> <leader>n :NERDTreeToggle<CR>
 " close buffer without messing up layout
 nnoremap <leader>q :bp<CR>:bd #<CR>
@@ -484,7 +501,7 @@ let g:NERDTreeQuitOnOpen = 1
 let g:NERDTreeDirArrows = 1
 let g:NERDTreeChDirMode = 2
 "}}}
-"ctrlp {{{
+" ctrlp {{{
 if(s:is_plug_active('ctrlp.vim'))
 	"	let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
 	let g:ctrlp_use_caching = 1
@@ -508,7 +525,7 @@ if(s:is_plug_active('ctrlp.vim'))
 	nnoremap <leader>m :CtrlPMRU<CR>
 endif
 "}}}
-"fzf {{{
+" fzf {{{
 if(s:is_plug_active('fzf'))
 	set rtp+=~/.fzf
 	let g:fzf_prefer_tmux = 0
@@ -542,14 +559,14 @@ if(s:is_plug_active('fzf'))
 	nmap <leader>b :Buffers<CR>
 endif
 "}}}
-"vim-move {{{
+" vim-move {{{
 let g:move_key_modifier = 'M'
 execute 'vmap' '<' . g:move_key_modifier . '-Down>' '<Plug>MoveBlockDown'
 execute 'vmap' '<' . g:move_key_modifier . '-Up>' '<Plug>MoveBlockUp'
 execute 'nmap' '<' . g:move_key_modifier . '-Down>' '<Plug>MoveLineDown'
 execute 'nmap' '<' . g:move_key_modifier . '-Up>' '<Plug>MoveLineUp'
 "}}}
-"vim-airline {{{
+" vim-airline {{{
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
@@ -557,7 +574,7 @@ if s:is_plug_active('oceanic-next')
 	let g:airline_theme='oceanicnext'
 endif
 "}}}
-"neocomplete {{{
+" neocomplete {{{
 if(s:is_plug_active('neocomplete.vim'))
 	let g:neocomplete#enable_at_startup = 1
 	" increases screen flicker
@@ -584,7 +601,7 @@ if(s:is_plug_active('neocomplete.vim'))
 	inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 endif
 "}}}
-"deoplete {{{
+" deoplete {{{
 if(s:is_plug_active('deoplete.nvim'))
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#enable_refresh_always = 0
@@ -604,8 +621,8 @@ if(s:is_plug_active('deoplete.nvim'))
 	" close window after completion
 	autocmd! InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 endif
-
-" auto-pairs
+"}}}
+" auto-pairs {{{
 if(s:is_plug_active('auto-pairs'))
 	if(s:is_plug_active('neocomplete.vim') || s:is_plug_active('deoplete.nvim'))
 		let g:AutoPairsMapCR = 0
