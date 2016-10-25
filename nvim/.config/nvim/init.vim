@@ -8,11 +8,17 @@ endif
 
 " Variables {{{
 let g:text_width = 100
-let s:use_fzf = 0
+let s:use_fzf = 1
 let s:ignore_ft = [
 			\ 'gitcommit', 'gitrebase', 'hgcommit']
 "}}}
 " Environment and default otpions {{{
+" make sure to export VIMINIT=
+" let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC
+if !exists('$HOME') && has('win32')
+	let $HOME = $LOCALAPPDATA
+endif
+
 let $XDG_DATA_HOME =
 			\ exists('$XDG_DATA_HOME') ? $XDG_DATA_HOME
 			\ : ($HOME . '/.local/share')
@@ -29,14 +35,11 @@ endif
 if has('nvim')
 	let s:plug_path = $XDG_CONFIG_HOME . '/nvim/plugged'
 else
-	" neovim defaults, set explicitly in vim
-	" make sure to export VIMINIT=
-	" let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC
-	" language
 	if (has('win32') && !has('nvim'))
 		language english
 		language time german
 	endif
+	" neovim defaults, set explicitly in vim
 	set autoread
 	set backspace=indent,eol,start
 	set complete=.,w,b,u,t
@@ -67,7 +70,126 @@ else
 	let s:plug_path = $XDG_CONFIG_HOME . '/vim/plugged'
 endif
 "}}}
-" Undo file {{{
+" vim-plug {{{
+call plug#begin(s:plug_path)
+"Plug 'flazz/vim-colorschemes'
+"Plug 'vim-airline/vim-airline-themes'
+Plug 'chriskempson/base16-vim'
+Plug 'mhartington/oceanic-next'
+Plug 'vim-airline/vim-airline'
+Plug 'tpope/vim-fugitive'
+Plug 'matze/vim-move'
+Plug 'jiangmiao/auto-pairs'
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+
+" fzf doesn't compile unter windows for now
+if has('unix') && s:use_fzf
+	Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
+	Plug 'junegunn/fzf.vim'
+else
+	Plug 'ctrlpvim/ctrlp.vim', { 'on': ['CtrlP', 'CtrlPBuffer', 'CtrlPMixed', 'CtrlPMRU'] }
+endif
+
+if has('win32')
+	let g:vimproc_path = expand(fnamemodify(v:progpath, ':h')
+				\ . '\plugins\vimproc')
+	if(isdirectory(g:vimproc_path))
+		Plug g:vimproc_path
+	else
+		let g:vimproc#download_windows_dll = 1
+		Plug 'Shougo/vimproc.vim'
+	endif
+elseif has('unix') && !has('nvim')
+	Plug 'Shougo/vimproc.vim', { 'do' : 'make' }
+endif
+
+let s:completion_provider = 0
+if has('nvim')
+	if has('python3')
+		let s:completion_provider = 1
+		Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+	endif
+else
+	if has('lua')
+		let s:completion_provider = 1
+		Plug 'Shougo/neocomplete.vim'
+	endif
+endif
+if s:completion_provider
+	Plug 'Shougo/neco-vim'
+endif
+
+call plug#end()
+
+command! PU PlugUpdate | PlugUpgrade
+"}}}
+" general settings {{{
+let mapleader = ","
+" UTG-8 bom
+set bomb
+filetype off
+syntax enable
+set background=dark
+highlight Normal ctermbg=none
+
+" message
+set shortmess+=a
+set confirm
+set title
+
+" beep
+set errorbells
+set novisualbell
+set t_vb=
+
+" Timeout
+set timeoutlen=3000
+set ttimeoutlen=10
+set updatetime=1000
+
+set showfulltag
+set modeline
+
+" make searching case insensitive
+set ignorecase
+" unless captial letters
+set smartcase
+" Show current Position
+set ruler
+" For Line numbers
+set number
+" Show matching braces
+set showmatch
+" Highlighting current line
+set cursorline
+" Set No backups
+set nobackup
+set nowb
+set noswapfile
+" minimum values (http://stackoverflow.com/q/22336553)
+set winwidth=84
+set winheight=5
+set winminheight=5
+set winheight=30
+" allow switching buffers without saving
+set hidden
+" only redraw when something was typed
+set lazyredraw
+" Conceal
+set conceallevel=2
+set concealcursor=nc
+
+" folds
+"set foldlevel=1
+set foldmethod=marker
+set foldlevelstart=0
+
+" use a POSIX compatible shell
+if(!has('nvim') && &shell == "/usr/bin/fish")
+	set shell=/usr/bin/bash
+endif
+"}}}
+" undo file {{{
 set undofile
 set undodir^=$XDG_CACHE_HOME/vimundo
 if !isdirectory($XDG_CACHE_HOME . '/vimundo')
@@ -118,58 +240,6 @@ endfunction
 "endif
 "let s:completion_provider = 0
 "}}}
-" vim-plug {{{
-call plug#begin(s:plug_path)
-"Plug 'flazz/vim-colorschemes'
-"Plug 'vim-airline/vim-airline-themes'
-Plug 'chriskempson/base16-vim'
-Plug 'mhartington/oceanic-next'
-Plug 'vim-airline/vim-airline'
-Plug 'tpope/vim-fugitive'
-Plug 'matze/vim-move'
-Plug 'jiangmiao/auto-pairs'
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
-
-if has('unix') && s:use_fzf
-	Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
-	Plug 'junegunn/fzf.vim'
-else
-	Plug 'ctrlpvim/ctrlp.vim', { 'on': ['CtrlP', 'CtrlPBuffer', 'CtrlPMixed', 'CtrlPMRU'] }
-endif
-
-if has('win32')
-	let g:vimproc_path = expand(fnamemodify(v:progpath, ':h')
-				\ . '\plugins\vimproc')
-	if(isdirectory(g:vimproc_path))
-		Plug g:vimproc_path
-	else
-		let g:vimproc#download_windows_dll = 1
-		Plug 'Shougo/vimproc.vim'
-	endif
-elseif has('unix') && !has('nvim')
-	Plug 'Shougo/vimproc.vim', { 'do' : 'make' }
-endif
-
-let s:completion_provider = 0
-if has('nvim')
-	if has('python3')
-		let s:completion_provider = 1
-		Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-	endif
-else
-	if has('lua')
-		let s:completion_provider = 1
-		Plug 'Shougo/neocomplete.vim'
-	endif
-endif
-if s:completion_provider
-	Plug 'Shougo/neco-vim'
-endif
-
-call plug#end()
-
-command! PU PlugUpdate | PlugUpgrade
-"}}}
 " gvim options {{{
 if has('gui_running')
 	if (!has('unix') && !has('nvim'))
@@ -191,14 +261,6 @@ if has('gui_running')
 	set mouse=a
 endif
 "}}}
-let mapleader = ","
-" UTG-8 bom
-set bomb
-filetype off
-syntax enable
-set background=dark
-highlight Normal ctermbg=none
-
 " colorscheme and style {{{
 " info {{{
 " ensure that the highlight group gets created and
@@ -289,25 +351,6 @@ set preserveindent
 " copy indent from previous line
 set autoindent
 "}}}
-
-" message
-set shortmess+=a
-set confirm
-set title
-
-" beep
-set errorbells
-set novisualbell
-set t_vb=
-
-" Timeout
-set timeoutlen=3000
-set ttimeoutlen=10
-set updatetime=1000
-
-set showfulltag
-set modeline
-
 " linebreaks and linewrap {{{
 " line widths, let the user decide what textwidth he prefers
 " and derive everything else from it
@@ -323,41 +366,6 @@ set wrapmargin=0
 set formatoptions+=l
 "set formatoptions-=t
 "}}}
-
-" make searching case insensitive
-set ignorecase
-" unless captial letters
-set smartcase
-" Show current Position
-set ruler
-" For Line numbers
-set number
-" Show matching braces
-set showmatch
-" Highlighting current line
-set cursorline
-" Set No backups
-set nobackup
-set nowb
-set noswapfile
-" minimum values (http://stackoverflow.com/q/22336553)
-set winwidth=84
-set winheight=5
-set winminheight=5
-set winheight=30
-" allow switching buffers without saving
-set hidden
-" only redraw when something was typed
-set lazyredraw
-" Conceal
-set conceallevel=2
-set concealcursor=nc
-
-" folds
-"set foldlevel=1
-set foldmethod=marker
-set foldlevelstart=0
-
 " info {{{
 augroup FoldMarkers
 	autocmd!
@@ -379,7 +387,7 @@ augroup HelpKeys
 	autocmd FileType help :call s:help_mappings()
 augroup end
 "}}}
-
+" various mappings {{{
 nnoremap <silent> + :exe "resize " . (winheight(0) * 5/4)<CR>
 nnoremap <silent> - :exe "resize " . (winheight(0) * 1/2)<CR>
 nnoremap <silent><leader>y :set lines=50 columns=200<CR>
@@ -416,26 +424,33 @@ if has('nvim')
 	tmap <F13> <C-\><C-n>
 endif
 
-" use a POSIX compatible shell
-if(!has('nvim') && &shell == "/usr/bin/fish")
-	set shell=/usr/bin/bash
+" use <C-L> to clear the highlighting of :set hlsearch.
+if maparg('<C-x><C-l>', 'n') ==# ''
+	nnoremap <silent> <C-x><C-l> :nohlsearch<CR><C-L>
 endif
+
 " strip comments
 nnoremap <silent> <leader>sc :%g/\v^(#\|$)/d<CR>
 " replace word below cursor with x
 nnoremap <leader>src :%s/\<<C-r><C-w>\>//g<Left><Left>
 " Search and Replace
 nnoremap <leader>s :%s//g<Left><Left>
-" Append modeline after last line in buffer.
 
-" arbitrary functions and mappings
+" use sudo for saving
+cnoremap sudow w !sudo tee % > /dev/null
+
+nnoremap <leader>cc :set number!<CR>
+" Toggle whitespace characters
+nnoremap <leader>ll :set list!<CR>
+"}}}
+" mapped functions & autocommands {{{
 function! AppendModeline()
 	let l:modeline = printf(" vim: set ts=%d sw=%d sts=%d tw=%d %set :",
 				\ &tabstop, &shiftwidth, &softtabstop, &textwidth, &expandtab ? '' : 'no')
 	let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
 	call append(line("$"), l:modeline)
 endfunction
-
+" Append modeline after last line in buffer.
 nnoremap <silent> <leader>ml :call AppendModeline()<CR>
 
 " relative numbering
@@ -447,6 +462,8 @@ function! NumberToggle()
 		set rnu
 	endif
 endfunction
+" Toggle between normal and relative numbering.
+nnoremap <leader>r :call NumberToggle()<CR>
 
 " strip whitespaces and convert indent spaces to tabs, restore cursor position
 function! StripTrailingWhitespaces()
@@ -454,20 +471,7 @@ function! StripTrailingWhitespaces()
 	call s:keep_ex('%s/\s\+$//e | set noexpandtab | retab! | $put _'
 				\. ' | $;?\(^\s*$\)\@!?+1,$d')
 endfunction
-
-" use sudo for saving
-cnoremap sudow w !sudo tee % > /dev/null
-
-" Toggle between normal and relative numbering.
-nnoremap <leader>r :call NumberToggle()<CR>
-nnoremap <leader>cc :set number!<CR>
-" Toggle whitespace characters
-nnoremap <leader>ll :set list!<CR>
-
-" use <C-L> to clear the highlighting of :set hlsearch.
-if maparg('<C-x><C-l>', 'n') ==# ''
-	nnoremap <silent> <C-x><C-l> :nohlsearch<CR><C-L>
-endif
+nnoremap <silent> <leader>sw :call StripTrailingWhitespaces()<CR>
 
 augroup formatting
 	autocmd!
@@ -487,9 +491,8 @@ augroup vimrc
 	execute 'autocmd BufWritePost ' . $MYGVIMR . ' if has("gui_running")
 				\ | source % | redraw | echom "Reloaded " . expand("%:p") | endif'
 augroup end
-
-nnoremap <silent> <leader>sw :call StripTrailingWhitespaces()<CR>
-
+"}}}
+" plugins: {{{
 " NERDTree {{{
 nmap <silent> <leader>n :NERDTreeToggle<CR>
 " close buffer without messing up layout
@@ -629,5 +632,6 @@ if(s:is_plug_active('auto-pairs'))
 		imap <expr><CR> pumvisible() ?	"\<C-y>" :	"\<CR>\<Plug>AutoPairsReturn"
 	endif
 endif
+"}}}
 "}}}
 " vim: set ts=4 sw=4 sts=0 tw=78 noet :
