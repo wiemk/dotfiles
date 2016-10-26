@@ -81,6 +81,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'matze/vim-move'
 Plug 'jiangmiao/auto-pairs'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'airblade/vim-gitgutter'
 
 " fzf doesn't compile unter windows for now
 if has('unix') && s:use_fzf
@@ -124,7 +125,7 @@ call plug#end()
 command! PU PlugUpdate | PlugUpgrade
 "}}}
 " general settings {{{
-let mapleader = ","
+let mapleader = "\<Space>"
 " UTG-8 bom
 set bomb
 filetype off
@@ -183,6 +184,12 @@ set concealcursor=nc
 "set foldlevel=1
 set foldmethod=marker
 set foldlevelstart=0
+
+" ClipBoard
+set clipboard=unnamed
+if has('unnamedplus')
+  set clipboard^=unnamedplus
+endif
 
 " use a POSIX compatible shell
 if(!has('nvim') && &shell == "/usr/bin/fish")
