@@ -72,8 +72,6 @@ endif
 "}}}
 " vim-plug {{{
 call plug#begin(s:plug_path)
-"Plug 'flazz/vim-colorschemes'
-"Plug 'vim-airline/vim-airline-themes'
 Plug 'chriskempson/base16-vim'
 Plug 'mhartington/oceanic-next'
 Plug 'vim-airline/vim-airline'
@@ -126,31 +124,30 @@ command! PU PlugUpdate | PlugUpgrade
 "}}}
 " general settings {{{
 let mapleader = "\<Space>"
+nmap , <Space>
+" change to folder of file in buffer
+set autochdir
 " UTG-8 bom
 set bomb
 filetype off
 syntax enable
 set background=dark
 highlight Normal ctermbg=none
-
 " message
 set shortmess+=a
 set confirm
 set title
-
 " beep
 set errorbells
 set novisualbell
 set t_vb=
-
-" Timeout
+" timeout
 set timeoutlen=3000
 set ttimeoutlen=10
 set updatetime=1000
-
+" modeline
 set showfulltag
 set modeline
-
 " make searching case insensitive
 set ignorecase
 " unless captial letters
@@ -179,16 +176,15 @@ set lazyredraw
 " Conceal
 set conceallevel=2
 set concealcursor=nc
-
 " folds
 "set foldlevel=1
 set foldmethod=marker
 set foldlevelstart=0
 
-" ClipBoard
+" clipBoard
 set clipboard=unnamed
 if has('unnamedplus')
-  set clipboard^=unnamedplus
+	set clipboard^=unnamedplus
 endif
 
 " use a POSIX compatible shell
@@ -286,15 +282,19 @@ else
 	"set t_Co=256
 endif
 if &term != 'win32'
-	colorscheme OceanicNext
-	" enable italics, disabled by default
-	let g:oceanic_next_terminal_italic = 1
-	" enable bold, disabled by default
-	let g:oceanic_next_terminal_bold = 1
+	if s:is_plug_active('oceanic-next')
+		colorscheme OceanicNext
+		" enable italics, disabled by default
+		let g:oceanic_next_terminal_italic = 1
+		" enable bold, disabled by default
+		let g:oceanic_next_terminal_bold = 1
+	endif
 else
 	" force 16 colors in cmd
 	set t_Co=16
-	colorscheme base16-atelier-dune
+	if s:is_plug_active('base16-vim')
+		colorscheme base16-atelier-dune
+	endif
 endif
 "set cursorcolumn
 highlight CursorLine cterm=bold gui=bold
@@ -426,10 +426,10 @@ imap <F13> <Esc>
 vmap <F13> <Esc>
 
 " terminal mode
-if has('nvim')
-	tmap <Esc> <C-\><C-n>
-	tmap <F13> <C-\><C-n>
-endif
+"if has('nvim')
+"	tmap <Esc> <C-\><C-n>
+"	tmap <F13> <C-\><C-n>
+"endif
 
 " use <C-L> to clear the highlighting of :set hlsearch.
 if maparg('<C-x><C-l>', 'n') ==# ''
@@ -500,39 +500,48 @@ augroup vimrc
 augroup end
 "}}}
 " plugins: {{{
-" NERDTree {{{
-nmap <silent> <leader>n :NERDTreeToggle<CR>
-" close buffer without messing up layout
-nnoremap <leader>q :bp<CR>:bd #<CR>
-let g:NERDTreeChristmasTree = 1
-let g:NERDTreeShowHidden = 1
-let g:NERDTreeHijackNetrw = 1
-let g:NERDTreeQuitOnOpen = 1
-let g:NERDTreeDirArrows = 1
-let g:NERDTreeChDirMode = 2
+" vim-gitgutter {{{
+if(s:is_plug_active('vim-gitgutter'))
+	let g:gitgutter_avoid_cmd_prompt_on_windows = 0
+endif
 "}}}
-" ctrlp {{{
-if(s:is_plug_active('ctrlp.vim'))
-	"	let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
-	let g:ctrlp_use_caching = 1
-	let g:ctrlp_clear_cache_on_exit = 0
-	let g:ctrlp_show_hidden = 1
-	"	let g:ctrlp_working_path_mode = 0
-	if has('unix') && executable('ag')
-		let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-	endif
-	let g:ctrlp_extensions = [
-				\ 'mixed',
-				\ 'dir',
-				\ 'quickfix',
-				\ 'undo',
-				\ 'changes'
-				\]
+" NERDTree {{{
+if(s:is_plug_active('nerdtree'))
+	nmap <silent> <leader>n :NERDTreeToggle<CR>
+	" close buffer without messing up layout
+	nnoremap <leader>q :bp<CR>:bd #<CR>
+	let g:NERDTreeChristmasTree = 1
+	let g:NERDTreeShowHidden = 1
+	let g:NERDTreeHijackNetrw = 1
+	let g:NERDTreeQuitOnOpen = 1
+	let g:NERDTreeDirArrows = 1
+	let g:NERDTreeChDirMode = 2
+	"}}}
+	" ctrlp {{{
+	if(s:is_plug_active('ctrlp.vim'))
+		"	let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
+		let g:ctrlp_use_caching = 1
+		let g:ctrlp_clear_cache_on_exit = 0
+		let g:ctrlp_show_hidden = 1
+		"	let g:ctrlp_working_path_mode = 0
+		if(has('unix') && executable('ag'))
+			let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+		elseif(has('win32') && executable('dir'))
+			let g:ctrlp_user_command = 'dir %s /-n /b /s /a-d'
+		endif
+		let g:ctrlp_extensions = [
+					\ 'mixed',
+					\ 'dir',
+					\ 'quickfix',
+					\ 'undo',
+					\ 'changes'
+					\]
 
-	nnoremap <leader>f :CtrlP<CR>
-	nnoremap <leader>b :CtrlPBuffer<CR>
-	nnoremap <leader>a :CtrlPMixed<CR>
-	nnoremap <leader>m :CtrlPMRU<CR>
+		nnoremap <leader>f :CtrlP<CR>
+		nnoremap <leader>b :CtrlPBuffer<CR>
+		nnoremap <leader>a :CtrlPMixed<CR>
+		nnoremap <leader>m :CtrlPMRU<CR>
+	endif
 endif
 "}}}
 " fzf {{{
@@ -554,12 +563,21 @@ if(s:is_plug_active('fzf'))
 				\ 'header':	['fg', 'Comment'] }
 	let g:fzf_layout = { 'down': '~40%' }
 	let g:fzf_history_dir = '~/.local/share/fzf-history'
+	let g:fzf_buffers_jump = 1
 
-	" Mapping selecting mappings
+	" show hidden files
+	if executable('ag')
+		let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git -g ""'
+	elseif executable('find')
+		let $FZF_DEFAULT_COMMAND =
+					\ "find . -path \'.\' -o -type f -print -o -type l -print 2> /dev/null"
+	endif
+
+	" mapping selecting mappings
 	nmap <leader><tab> <plug>(fzf-maps-n)
 	xmap <leader><tab> <plug>(fzf-maps-x)
 	omap <leader><tab> <plug>(fzf-maps-o)
-	" Insert mode completion
+	" insert mode completion
 	imap <c-x><c-k> <plug>(fzf-complete-word)
 	imap <c-x><c-f> <plug>(fzf-complete-path)
 	imap <c-x><c-j> <plug>(fzf-complete-file-ag)
@@ -590,11 +608,12 @@ if(s:is_plug_active('neocomplete.vim'))
 	" increases screen flicker
 	let g:neocomplete#enable_refresh_always = 0
 	let g:neocomplete#max_list = 30
+	" don't select anything automatically
 	let g:neocomplete#enable_auto_select = 1
 	let g:neocomplete#enable_smart_case = 1
 	let g:neocomplete#min_keyword_length = 1
 	let g:neocomplete#sources#syntax#min_keyword_length = 3
-	"	let g:neocomplete#enable_auto_select = 0
+	let g:neocomplete#enable_auto_select = 0
 	let g:neocomplete#enable_fuzzy_completion = 1
 	let g:neocomplete#enable_auto_delimiter = 1
 	if s:is_plug_active('vimproc')
@@ -616,7 +635,8 @@ if(s:is_plug_active('deoplete.nvim'))
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#enable_refresh_always = 0
 	let g:deoplete#max_list = 30
-	let g:deoplete#enable_auto_select = 1
+	" don't select anything automatically
+	let g:deoplete#enable_auto_select = 0
 
 	if !exists('g:deoplete#keyword_patterns')
 		let g:deoplete#keyword_patterns = {}
