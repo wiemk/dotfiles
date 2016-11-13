@@ -1,3 +1,4 @@
 [submodule "gitmodules/vim-plug"]
 	path = gitmodules/vim-plug
 	url = https://github.com/junegunn/vim-plug.git
+	branch = master
