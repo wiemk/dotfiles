@@ -1,4 +1,4 @@
-﻿scriptencoding utf-8
+scriptencoding utf-8
 " seems to break some plugins
 " set noshellslash
 if v:version < 704 | finish | endif
@@ -71,6 +71,15 @@ else
 endif
 "}}}
 " vim-plug {{{
+if has('nvim')
+	" auto install plug if not found
+	if empty(glob('$XDG_CONFIG_HOME/nvim/autoload/plug.vim'))
+		silent !curl -fLo "$XDG_CONFIG_HOME/nvim/autoload/plug.vim" --create-dirs
+					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+		autocmd! VimEnter * PlugInstall | UpdateRemotePlugins
+	endif
+endif
+
 call plug#begin(s:plug_path)
 Plug 'chriskempson/base16-vim'
 Plug 'mhartington/oceanic-next'
@@ -80,6 +89,7 @@ Plug 'matze/vim-move'
 Plug 'jiangmiao/auto-pairs'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'airblade/vim-gitgutter'
+" consider supertab, vim-surround
 
 " fzf doesn't compile unter windows for now
 if has('unix') && s:use_fzf
@@ -128,7 +138,7 @@ nmap , <Space>
 " change to folder of file in buffer
 set autochdir
 " UTG-8 bom
-set bomb
+set nobomb
 filetype off
 syntax enable
 set background=dark
