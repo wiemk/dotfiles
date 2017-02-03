@@ -1,0 +1,68 @@
+# .zsh.d/50-git.zsh
+autoload -Uz vcs_info
+zstyle ':vcs_info:*' enable git
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' stagedstr '[%B%F{green}+%f%b]'
+zstyle ':vcs_info:*' unstagedstr '[%B%F{yellow}*%f%b]'
+zstyle ':vcs_info:*' formats '(%F{9}%b%f%c%u%m) '
+zstyle ':vcs_info:*' actionformat '(%F{9}%b%f%c%u%m %F{14}%a%f) '
+zstyle ':vcs_info:git*+set-message:*' hooks git-stash git-untracked git-aheadbehind git-remotebranch
+
+### git: show stash existence (%m)
++vi-git-stash() {
+    if [[ -s ${hook_com[base]}/.git/refs/stash ]]; then
+        hook_com[misc]+="[%B%F{14}#%b%f]"
+    fi
+}
+### git: Show marker (T) if there are untracked files in repository
+# Make sure you have added staged to your 'formats':  %c
++vi-git-untracked() {
+    if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
+        git status --porcelain | fgrep '??' &> /dev/null ; then
+        # This will show the marker if there are any untracked files in repo.
+        # If instead you want to show the marker only if there are untracked
+        # files in $PWD, use:
+        #[[ -n $(git ls-files --others --exclude-standard) ]] ; then
+        hook_com[unstaged]+='[%B%F{magenta}?%f%b]'
+    fi
+}
+### git: Show +N/-N when your local branch is ahead-of or behind remote HEAD.
+# Make sure you have added misc to your 'formats':  %m
++vi-git-aheadbehind() {
+    local ahead behind
+    local -a gitstatus
+
+    # for git prior to 1.7
+    # ahead=$(git rev-list origin/${hook_com[branch]}..HEAD | wc -l)
+    ahead=$(git rev-list ${hook_com[branch]}@{upstream}..HEAD 2>/dev/null | wc -l | tr -d ' ')
+    (( $ahead )) && gitstatus+=( "[%B%F{blue}+${ahead}%f%b]" )
+
+    # for git prior to 1.7
+    # behind=$(git rev-list HEAD..origin/${hook_com[branch]} | wc -l)
+    behind=$(git rev-list HEAD..${hook_com[branch]}@{upstream} 2>/dev/null | wc -l | tr -d ' ')
+    (( $behind )) && gitstatus+=( "[%B%F{red}-${behind}%f%b]" )
+
+    hook_com[misc]+=${(j::)gitstatus}
+}
+
+### git: Show remote branch name for remote-tracking branches
+# Make sure you have added staged to your 'formats':  %b
++vi-git-remotebranch() {
+    local remote
+
+    # Are we on a remote-tracking branch?
+    remote=${$(git rev-parse --verify ${hook_com[branch]}@{upstream} \
+        --symbolic-full-name 2>/dev/null)/refs\/remotes\/}
+
+    # The first test will show a tracking branch whenever there is one. The
+    # second test, however, will only show the remote branch's name if it
+    # differs from the local one.
+    #if [[ -n ${remote} ]] ; then
+    if [[ -n ${remote} && ${remote#*/} != ${hook_com[branch]} ]] ; then
+        hook_com[branch]="${hook_com[branch]}(%F{cyan}${remote}%f)"
+    fi
+}
+
+#
+# EOF
+# vim :set ts=4 sw=4 sts=4 et :
