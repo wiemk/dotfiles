@@ -93,7 +93,11 @@ Plug 'airblade/vim-gitgutter'
 
 " fzf doesn't compile unter windows for now
 if has('unix') && s:use_fzf
-	Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
+	if executable('fzf')
+		Plug 'junegunn/fzf'
+	else
+		Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
+	endif
 	Plug 'junegunn/fzf.vim'
 else
 	Plug 'ctrlpvim/ctrlp.vim', { 'on': ['CtrlP', 'CtrlPBuffer', 'CtrlPMixed', 'CtrlPMRU'] }
