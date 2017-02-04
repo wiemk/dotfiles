@@ -1,12 +1,13 @@
 # ~/.profile
 # assume bash compatible shell
+# this file must get sourced by a shell specific profile (ZSH: .zprofile, bash: .bash_profile)
 
 # let's be explicit here
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME"/.config}
 if [[ -d "$HOME"/tmp ]]; then
-    XDG_CACHE_HOME="$HOME"/tmp/.cache
+	XDG_CACHE_HOME="$HOME"/tmp/.cache
 else
-    XDG_CACHE_HOME=${XDG_CACHE_HOME:-"$HOME"/.cache}
+	XDG_CACHE_HOME=${XDG_CACHE_HOME:-"$HOME"/.cache}
 fi
 export XDG_CACHE_HOME
 export XDG_DATA_HOME=${XDG_DATA_HOME:-"$HOME"/.local/share}
@@ -16,19 +17,19 @@ pathar=("$XDG_DATA_HOME"/../bin)
 ##
 # PATH handling
 if type realpath >/dev/null 2>&1; then
-    for (( i=0; i < ${#pathar[@]}; i++ )); do
-        pathar[$i]="$(realpath -s "${pathar[$i]}")"
-    done
-    unset i
+	for (( i=0; i < ${#pathar[@]}; i++ )); do
+		pathar[$i]="$(realpath -s "${pathar[$i]}")"
+	done
+	unset i
 fi
 if [[ -n "$ZSH_VERSION" ]]; then
-    emulate zsh -c 'path=($pathar $path)'
+	emulate zsh -c 'path=($pathar $path)'
 else
-    path=("${pathar[@]}" "$PATH")
-    path="$( printf '%s:' "${path[@]%/}" )"
-    path="${path:0:-1}"
-    export PATH="$path"
-    unset path
+	path=("${pathar[@]}" "$PATH")
+	path="$( printf '%s:' "${path[@]%/}" )"
+	path="${path:0:-1}"
+	export PATH="$path"
+	unset path
 fi
 unset pathar
 
@@ -41,11 +42,7 @@ export VISUAL=$EDITOR
 export PAGER='less -M'
 export LESSHISTFILE="$XDG_CACHE_HOME"/lesshist
 
-if [[ -n "$ZSH_VERSION" ]]; then
-	MACHINE=$HOST
-else
-	MACHINE=$HOSTNAME
-fi
+MACHINE=${HOST:-$HOSTNAME}
 if [[ ! -z ${MACHINE+x} ]]; then
-	source ".profile-$MACHINE"
+	source "$HOME/.profile-$MACHINE"
 fi

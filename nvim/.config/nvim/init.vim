@@ -12,7 +12,7 @@ let s:use_fzf = 1
 let s:ignore_ft = [
 			\ 'gitcommit', 'gitrebase', 'hgcommit']
 "}}}
-" Environment and default otpions {{{
+" Environment and default options {{{
 " make sure to export VIMINIT=
 " let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC
 if !exists('$HOME') && has('win32')

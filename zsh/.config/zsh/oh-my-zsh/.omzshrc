@@ -42,12 +42,13 @@ COMPLETION_WAITING_DOTS="true"
 # HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
+ZSH_CUSTOM=$ZDOTDIR/oh-my-zsh
 
 # zsh-autosuggestions 3rd party plugin
-if [[ ! -d $ZSH/custom/plugins/zsh-autosuggestions ]]; then
+if [[ ! -d $ZSH_CUSTOM/plugins/zsh-autosuggestions ]]; then
 	pushd
-	cd $ZSH/custom/plugins
+	mkdir -p $ZSH_CUSTOM/plugins
+	cd $ZSH_CUSTOM/plugins
 	env git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git
 	popd
 fi
