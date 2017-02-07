@@ -1,7 +1,25 @@
 # only sourced when shell is a login shell [[ -o login ]]
 # keep compatibility with other shells and source ~/.profile if available
 
-[[ -r ~/.profile ]] && emulate sh -c 'source ~/.profile'
+if [[ -r $HOME/.profile ]]; then
+	emulate sh -c 'source ~/.profile'
+	#XDG_CONFIG_HOME isn't available here if it's a login shell
+elif [[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/profile/profile" ]]; then
+	emulate sh -c "source ${XDG_CONFIG_HOME:-$HOME/.config}/profile/profile"
+fi
+
+# in case the .profile doesn't set XDG vars, set some sane defaults
+# since they are important
+: ${XDG_CONFIG_HOME:="$HOME/.config"}
+: ${XDG_CACHE_HOME:="$HOME/.cache"}
+: ${XDG_DATA_HOME:="$HOME/.local/share"}
+export XDG_CONFIG_HOME XDG_DATA_HOME XDG_CACHE_HOME
+
+# Ensure that a non-login, non-interactive shell has a defined environment.
+if [[ "$SHLVL" -eq 1 && ! -o LOGIN && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]; then
+		source "${ZDOTDIR:-$HOME}/.zprofile"
+fi
+
 
 # ZSH specific environmental variables and mechanisms
 ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh

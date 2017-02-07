@@ -39,10 +39,15 @@ export EDITOR=nvim
 export SUDO_EDITOR='nvim -Z -u /dev/null'
 export ALTERNATE_EDITOR=vim
 export VISUAL=$EDITOR
-export PAGER='less -M'
+export PAGER='less'
+export LESS='-F -g -i -M -R -S -w -X -z-4'
 export LESSHISTFILE="$XDG_CACHE_HOME"/lesshist
 
 MACHINE=${HOST:-$HOSTNAME}
 if [[ ! -z ${MACHINE+x} ]]; then
-	source "$HOME/.profile-$MACHINE"
+	if [[ -r "${HOME}/.profile-${MACHINE}" ]]; then
+		source "${HOME}/.profile-${MACHINE}"
+	elif [[ -r "${XDG_CONFIG_HOME}/profile/profile-${MACHINE}" ]]; then
+		source "${XDG_CONFIG_HOME}/profile/profile-${MACHINE}"
+	fi
 fi

@@ -1,1 +1,2 @@
 # zenode specific config
+env last -w -n 5
