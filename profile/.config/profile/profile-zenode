@@ -1,2 +1,3 @@
 # zenode specific config
+DOTFILES=$HOME/repos/working/dotfiles
 env last -w -n 5
