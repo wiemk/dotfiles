@@ -17,6 +17,8 @@ export XDG_CONFIG_HOME XDG_DATA_HOME XDG_CACHE_HOME
 
 
 # ZSH specific environmental variables and mechanisms
-ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh
+export ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh
+export ZPLUG_HOME=$XDG_DATA_HOME/zplug
+
 [[ -d $ZSH_CACHE_DIR ]] || mkdir -p $ZSH_CACHE_DIR
 export HISTFILE=$ZSH_CACHE_DIR/zhistory
