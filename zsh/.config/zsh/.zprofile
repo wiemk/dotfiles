@@ -15,11 +15,6 @@ fi
 : ${XDG_DATA_HOME:="$HOME/.local/share"}
 export XDG_CONFIG_HOME XDG_DATA_HOME XDG_CACHE_HOME
 
-# Ensure that a non-login, non-interactive shell has a defined environment.
-if [[ "$SHLVL" -eq 1 && ! -o LOGIN && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]; then
-		source "${ZDOTDIR:-$HOME}/.zprofile"
-fi
-
 
 # ZSH specific environmental variables and mechanisms
 ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh
