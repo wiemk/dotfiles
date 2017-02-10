@@ -1,3 +1,4 @@
+ZPLUG_CACHE_DIR=$ZSH_CACHE_DIR
 # crude, live with it
 if [[ ! -a $ZPLUG_HOME/init.zsh ]]; then
 	env git clone --depth=1 "https://github.com/zplug/zplug" $ZPLUG_HOME
@@ -68,15 +69,15 @@ if ! zplug check --verbose; then
 	fi
 fi
 
-# Then, source plugins and add commands to $PATH
-#zplug load --verbose
-zplug load
-
 # unintrusive modules and functions
 zmodules=(attr stat)
 zfunctions=(zmv zargs)
 for zmodule ("$zmodules[@]") zmodload "zsh/${(z)zmodule}"
 for zfunction ("$zfunctions[@]") autoload -Uz "${(z)zfunction}"
 unset zmodule{s,} zfunction{s,}
+
+# Then, source plugins and add commands to $PATH
+#zplug load --verbose
+zplug load
 
 #EOF
