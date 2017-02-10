@@ -13,7 +13,7 @@ zplug mafredri/zsh-async, from:github
 zplug sindresorhus/pure, use:pure.zsh, from:github, as:theme
 PURE_PROMPT_SYMBOL='>'
 PURE_GIT_UP_ARROW='↑'
-PURE_GIT_DOWN_ARROW='↑'
+PURE_GIT_DOWN_ARROW='↓'
 
 # some prezto settings in order to kickstart zsh
 zplug 'modules/environment', from:prezto
@@ -42,8 +42,11 @@ if (( $+commands[fzf] )); then
 	fi
 fi
 
+# WARNING: this introduces a rather large (300-500ms) delay
+# after every command executed, but it's worth it if you have
+# a large alias database and bad memory
 zplug 'djui/alias-tips'
-export ZSH_PLUGINS_ALIAS_TIPS_TEXT="💡	Try: "
+export ZSH_PLUGINS_ALIAS_TIPS_TEXT='💡	Try: '
 
 # custom enabled functions
 zplug "${ZDOTDIR}/func-enabled", from:local, use:"*.zsh"
