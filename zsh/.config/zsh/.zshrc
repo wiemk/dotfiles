@@ -18,7 +18,11 @@ source "${ZPLUG_HOME}/init.zsh"
 ## plugins
 # prompt theme
 zplug 'mafredri/zsh-async', from:github
-zplug 'sindresorhus/pure', use:pure.zsh, from:github, as:theme
+zplug 'sindresorhus/pure', \
+	use:pure.zsh, \
+	from:github, \
+	at:'fcd942622d39d611419947507b6b004b540d7287', \
+	as:theme
 PURE_PROMPT_SYMBOL='>'
 PURE_GIT_UP_ARROW='↑'
 PURE_GIT_DOWN_ARROW='↓'
@@ -55,8 +59,8 @@ fi
 # WARNING: this introduces a rather large (300-500ms) delay
 # after every command executed, but it's worth it if you have
 # a large alias database and bad memory
-#zplug 'djui/alias-tips'
-#export ZSH_PLUGINS_ALIAS_TIPS_TEXT='💡	Try: '
+zplug 'djui/alias-tips'
+export ZSH_PLUGINS_ALIAS_TIPS_TEXT='💡	Try: '
 
 # custom enabled functions
 zplug "${ZDOTDIR}/func-enabled", from:local, use:"*.zsh"
@@ -94,6 +98,6 @@ unset zmodule{s,} zfunction{s,}
 zplug load
 
 # utility module fix
-whence -w 'less' >/dev/null && unset -f 'less'
+unhash -f 'less' &>/dev/null
 
 #EOF
