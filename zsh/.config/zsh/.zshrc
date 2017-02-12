@@ -17,8 +17,8 @@ source "${ZPLUG_HOME}/init.zsh"
 
 ## plugins
 # prompt theme
-zplug mafredri/zsh-async, from:github
-zplug sindresorhus/pure, use:pure.zsh, from:github, as:theme
+zplug 'mafredri/zsh-async', from:github
+zplug 'sindresorhus/pure', use:pure.zsh, from:github, as:theme
 PURE_PROMPT_SYMBOL='>'
 PURE_GIT_UP_ARROW='↑'
 PURE_GIT_DOWN_ARROW='↓'
@@ -94,6 +94,6 @@ unset zmodule{s,} zfunction{s,}
 zplug load
 
 # utility module fix
-unset -f less
+whence -w 'less' >/dev/null && unset -f 'less'
 
 #EOF
