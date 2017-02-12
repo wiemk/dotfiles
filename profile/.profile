@@ -3,17 +3,17 @@
 # this file must get sourced by a shell specific profile (ZSH: .zprofile, bash: .bash_profile)
 
 # let's be explicit here
-export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME"/.config}
-if [[ -d "$HOME"/tmp ]]; then
-	XDG_CACHE_HOME="$HOME"/tmp/.cache
+export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
+if [[ -d "${HOME}/tmp" ]]; then
+	XDG_CACHE_HOME="${HOME}/tmp/.cache"
 else
-	XDG_CACHE_HOME=${XDG_CACHE_HOME:-"$HOME"/.cache}
+	XDG_CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}
 fi
 export XDG_CACHE_HOME
-export XDG_DATA_HOME=${XDG_DATA_HOME:-"$HOME"/.local/share}
+export XDG_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
 
 # define additional PATH folders here
-pathar=("$XDG_DATA_HOME"/../bin)
+pathar=("${XDG_DATA_HOME}/../bin")
 ##
 # PATH handling
 if type realpath >/dev/null 2>&1; then
@@ -33,7 +33,6 @@ else
 fi
 unset pathar
 
-
 # default applications by env
 export EDITOR=nvim
 export SUDO_EDITOR='nvim -Z -u /dev/null'
@@ -41,7 +40,7 @@ export ALTERNATE_EDITOR=vim
 export VISUAL=$EDITOR
 export PAGER='less'
 export LESS='-F -g -i -M -R -S -w -X -z-4'
-export LESSHISTFILE="$XDG_CACHE_HOME"/lesshist
+export LESSHISTFILE="${XDG_CACHE_HOME}/lesshist"
 
 MACHINE=${HOST:-$HOSTNAME}
 if [[ ! -z ${MACHINE+x} ]]; then
@@ -51,3 +50,4 @@ if [[ ! -z ${MACHINE+x} ]]; then
 		source "${XDG_CONFIG_HOME}/profile/profile-${MACHINE}"
 	fi
 fi
+#EOF
