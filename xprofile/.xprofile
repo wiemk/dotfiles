@@ -1,0 +1,3 @@
+#.xprofile
+[[ -e "${HOME}/.profile" ]] && source "${HOME}/.profile"
+#EOF
