@@ -10,7 +10,6 @@ ZPLUG_CACHE_DIR=$ZSH_CACHE_DIR
 # crude, live with it
 if [[ ! -a $ZPLUG_HOME/init.zsh ]]; then
 	env git clone --depth=1 "https://github.com/zplug/zplug" $ZPLUG_HOME
-	zplug update --self
 fi
 # load zplug
 source "${ZPLUG_HOME}/init.zsh"
@@ -21,13 +20,14 @@ zplug 'mafredri/zsh-async', from:github
 zplug 'sindresorhus/pure', \
 	use:pure.zsh, \
 	from:github, \
-	at:'fcd942622d39d611419947507b6b004b540d7287', \
 	as:theme
 PURE_PROMPT_SYMBOL='>'
 PURE_GIT_UP_ARROW='↑'
 PURE_GIT_DOWN_ARROW='↓'
 
 # some prezto settings in order to kickstart zsh
+# see https://github.com/zplug/zplug/issues/360
+_ZPLUG_PREZTO="zsh-users/prezto"
 zplug 'modules/environment', from:prezto
 zplug 'modules/terminal', from:prezto
 zplug 'modules/editor', from:prezto

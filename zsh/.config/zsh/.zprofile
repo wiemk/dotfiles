@@ -13,12 +13,12 @@ fi
 : ${XDG_CONFIG_HOME:="$HOME/.config"}
 : ${XDG_CACHE_HOME:="$HOME/.cache"}
 : ${XDG_DATA_HOME:="$HOME/.local/share"}
-export XDG_CONFIG_HOME XDG_DATA_HOME XDG_CACHE_HOME
+typeset -gx XDG_CONFIG_HOME XDG_DATA_HOME XDG_CACHE_HOME
 
 
 # ZSH specific environmental variables and mechanisms
-export ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh
-export ZPLUG_HOME=$XDG_DATA_HOME/zplug
+typeset -gx ZSH_CACHE_DIR=$XDG_CACHE_HOME/zsh
+typeset -gx ZPLUG_HOME=$XDG_DATA_HOME/zplug
 
 [[ -d $ZSH_CACHE_DIR ]] || mkdir -p $ZSH_CACHE_DIR
-export HISTFILE=$ZSH_CACHE_DIR/zhistory
+typeset -gx HISTFILE=$ZSH_CACHE_DIR/zhistory
