@@ -51,23 +51,23 @@ if (( $+commands[fzf] )); then
 		zplug '/usr/share/fzf', from:local, use:"*.zsh"
 		#zplug '/usr/bin', from:local, use:'fzf-tmux'
 	else
-		zplug 'junegunn/fzf', use:"shell/*.zsh"
-		zplug 'junegunn/fzf', as:command, use:'bin/fzf-tmux'
+		zplug 'junegunn/fzf', from:github, use:"shell/*.zsh"
+		zplug 'junegunn/fzf', from:github, use:'bin/fzf-tmux', as:command
 	fi
 fi
 
 # WARNING: this introduces a rather large (300-500ms) delay
 # after every command executed, but it's worth it if you have
 # a large alias database and bad memory
-zplug 'djui/alias-tips'
+zplug 'djui/alias-tips', from:github
 export ZSH_PLUGINS_ALIAS_TIPS_TEXT='💡	Try: '
 
 # custom enabled functions
 zplug "${ZDOTDIR}/func-enabled", from:local, use:"*.zsh"
 
-zplug 'zsh-users/zsh-syntax-highlighting', defer:2
+zplug 'zsh-users/zsh-syntax-highlighting', from:github, defer:2
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor root)
-zplug "zsh-users/zsh-history-substring-search", defer:3
+zplug "zsh-users/zsh-history-substring-search", from:github, defer:3
 if zplug check "zsh-users/zsh-history-substring-search"; then
 	zmodload zsh/terminfo
 	[ -n "${terminfo[kcuu1]}" ] && bindkey "${terminfo[kcuu1]}" history-substring-search-up
