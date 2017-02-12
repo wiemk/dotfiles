@@ -1,6 +1,11 @@
-#set -x
-#logfile=~/zsh.log
-#exec > $logfile 2>&1
+# .zshrc
+#
+if [[ ! -z $ZSH_DEBUG ]]; then
+	set -x
+	logfile=~/zsh_debug.log
+	exec > $logfile 2>&1
+fi
+
 ZPLUG_CACHE_DIR=$ZSH_CACHE_DIR
 # crude, live with it
 if [[ ! -a $ZPLUG_HOME/init.zsh ]]; then
@@ -29,6 +34,7 @@ zplug 'modules/utility', from:prezto
 zplug 'modules/completion', from:prezto
 zplug 'modules/git', from:prezto
 zplug 'modules/tmux', from:prezto
+zplug 'modules/command-not-found', from:prezto
 
 zstyle ':prezto:*:*' color 'yes'
 zstyle ':prezto:module:terminal' auto-title 'yes'
