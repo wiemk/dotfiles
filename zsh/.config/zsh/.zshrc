@@ -1,3 +1,6 @@
+#set -x
+#logfile=~/zsh.log
+#exec > $logfile 2>&1
 ZPLUG_CACHE_DIR=$ZSH_CACHE_DIR
 # crude, live with it
 if [[ ! -a $ZPLUG_HOME/init.zsh ]]; then
@@ -21,6 +24,7 @@ zplug 'modules/terminal', from:prezto
 zplug 'modules/editor', from:prezto
 zplug 'modules/history', from:prezto
 zplug 'modules/directory', from:prezto
+# make sure to unset -f less when loading utility
 zplug 'modules/utility', from:prezto
 zplug 'modules/completion', from:prezto
 zplug 'modules/git', from:prezto
@@ -45,8 +49,8 @@ fi
 # WARNING: this introduces a rather large (300-500ms) delay
 # after every command executed, but it's worth it if you have
 # a large alias database and bad memory
-zplug 'djui/alias-tips'
-export ZSH_PLUGINS_ALIAS_TIPS_TEXT='💡	Try: '
+#zplug 'djui/alias-tips'
+#export ZSH_PLUGINS_ALIAS_TIPS_TEXT='💡	Try: '
 
 # custom enabled functions
 zplug "${ZDOTDIR}/func-enabled", from:local, use:"*.zsh"
@@ -82,5 +86,8 @@ unset zmodule{s,} zfunction{s,}
 # Then, source plugins and add commands to $PATH
 #zplug load --verbose
 zplug load
+
+# utility module fix
+unset -f less
 
 #EOF
