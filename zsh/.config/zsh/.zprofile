@@ -5,7 +5,7 @@
 
 # debug
 if [[ -e "${ZDOTDIR}/_debug" ]]; then
-	echo "$(date +%s) .zprofile" >> "${HOME}/zsh_debug.log"
+	echo "$(date +%s): .zprofile" >> "${HOME}/shell_debug.log"
 fi
 
 if [[ -r "${HOME}/.profile" ]]; then
@@ -32,4 +32,6 @@ typeset -gx ZSH_CACHE_DIR ZPLUG_HOME
 : ${HISTFILE:="${ZSH_CACHE_DIR}/zhistory"}
 typeset -gx HISTFILE
 #export ZPROFILE_SOURCED=true
-#EOF
+
+#  vim: set ft=zsh ts=4 sw=4 sts=0 tw=0 noet :
+# EOF

@@ -2,14 +2,6 @@
 # assume bash compatible shell
 # this file must get sourced by a shell specific profile (ZSH: .zprofile, bash: .bash_profile)
 #  you may link this to .xprofile aswell
-
-# let's be explicit here
-
-# debug
-if [[ -e "${ZDOTDIR}/_debug" ]]; then
-	echo "$(date +%s) .profile" >> "${HOME}/zsh_debug.log"
-fi
-
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
 if [[ -d "${HOME}/tmp" ]]; then
 	XDG_CACHE_HOME="${HOME}/tmp/.cache"
@@ -49,13 +41,6 @@ export PAGER='less'
 export LESS='-F -g -i -M -R -S -w -X -z-4'
 export LESSHISTFILE="${XDG_CACHE_HOME}/lesshist"
 
-# maybe these should be in .zprofile, but terminal emulators unter lightdm/i3
-# are not sourcing .zprofile/started as a login shell as it seems
-export ZSH_CACHE_DIR="${XDG_CACHE_HOME}/zsh"
-export ZPLUG_HOME="${XDG_DATA_HOME}/zplug"
-
-[[ -d $ZSH_CACHE_DIR ]] || mkdir -p $ZSH_CACHE_DIR
-
 MACHINE=${HOST:-$HOSTNAME}
 if [[ ! -z ${MACHINE+x} ]]; then
 	if [[ -r "${HOME}/.profile-${MACHINE}" ]]; then
@@ -64,4 +49,13 @@ if [[ ! -z ${MACHINE+x} ]]; then
 		source "${XDG_CONFIG_HOME}/profile/profile-${MACHINE}"
 	fi
 fi
-#EOF
+
+# debug
+if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
+	echo "$(date +%s): .profile" >> "${HOME}/shell_debug.log"
+fi
+
+export PROFILE_SOURCED=true
+
+# vim: set ft=sh ts=4 sw=4 sts=0 tw=0 noet :
+# EOF

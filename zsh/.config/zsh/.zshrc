@@ -1,17 +1,18 @@
 # .zshrc
 #
-# debug
-if [[ -e "${ZDOTDIR}/_debug" ]]; then
-	echo "$(date +%s) .zshrc" >> "${HOME}/zsh_debug.log"
-fi
-
 if [[ ! -z $ZSH_TRACE ]]; then
 	set -x
-	logfile=~/zsh_debug.log
+	logfile="${HOME}/zsh_trace.log"
 	exec > $logfile 2>&1
 fi
 
+# there is a possibility that XDG vars aren't set here
+# (i.e. no ~/.profile, .zprofile not sourced by DM)
+typeset -gx ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+[[ -d $ZSH_CACHE_DIR ]] || mkdir -p $ZSH_CACHE_DIR
+ZPLUG_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zplug"
 ZPLUG_CACHE_DIR=$ZSH_CACHE_DIR
+
 # crude, live with it
 if [[ ! -a $ZPLUG_HOME/init.zsh ]]; then
 	env git clone --depth=1 "https://github.com/zplug/zplug" $ZPLUG_HOME
@@ -105,4 +106,9 @@ zplug load
 # utility module fix
 unhash -f 'less' &>/dev/null
 
-#EOF
+# debug
+if [[ -e "${ZDOTDIR}/_debug" ]]; then
+	echo "$(date +%s): .zshrc" >> "${HOME}/shell_debug.log"
+fi
+#  vim: set ft=zsh ts=4 sw=4 sts=0 tw=0 noet :
+# EOF

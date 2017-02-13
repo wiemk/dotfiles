@@ -1,3 +1,10 @@
-# zenode specific config
+# profile-zenode
 DOTFILES=$HOME/repos/working/dotfiles
 env last -w -n 5
+
+# debug
+if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
+		echo "$(date +%s): profile-zenode" >> "${HOME}/shell_debug.log"
+fi
+
+# EOF

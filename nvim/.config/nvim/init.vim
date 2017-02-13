@@ -466,8 +466,8 @@ nnoremap <leader>ll :set list!<CR>
 "}}}
 " mapped functions & autocommands {{{
 function! AppendModeline()
-	let l:modeline = printf(" vim: set ts=%d sw=%d sts=%d tw=%d %set :",
-				\ &tabstop, &shiftwidth, &softtabstop, &textwidth, &expandtab ? '' : 'no')
+	let l:modeline = printf(" vim: set ft=%s ts=%d sw=%d sts=%d tw=%d %set :",
+				\ &filetype, &tabstop, &shiftwidth, &softtabstop, &textwidth, &expandtab ? '' : 'no')
 	let l:modeline = substitute(&commentstring, "%s", l:modeline, "")
 	call append(line("$"), l:modeline)
 endfunction
