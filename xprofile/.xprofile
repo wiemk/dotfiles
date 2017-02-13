@@ -1,3 +1,7 @@
-#.xprofile
+# .xprofile
+# debug
+if [[ -e "${ZDOTDIR}/_debug" ]]; then
+	echo "$(date +%s) .xprofile" >> "${HOME}/zsh_debug.log"
+fi
 [[ -r "${HOME}/.profile" ]] && source "${HOME}/.profile"
-#EOF
+# EOF

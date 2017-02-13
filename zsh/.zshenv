@@ -4,8 +4,12 @@
 # Finally, if the shell is a login shell, /etc/zsh/zlogin and $ZDOTDIR/.zlogin are read.
 # (a) always, (l) login, (i) interactive
 # .zshenv (a) -> [.profile ->] .zprofile (l) -> .zshrc (i) -> .zlogin (l)
-
 ZDOTDIR=~/.config/zsh
+
+# debug
+if [[ -e "${ZDOTDIR}/_debug" ]]; then
+	echo "$(date +%s) .zshenv" >> "${HOME}/zsh_debug.log"
+fi
 
 # Ensure that a non-login, non-interactive shell has a defined environment.
 if [[ "$SHLVL" -eq 1 && ! -o LOGIN && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]; then

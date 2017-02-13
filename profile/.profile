@@ -4,6 +4,12 @@
 #  you may link this to .xprofile aswell
 
 # let's be explicit here
+
+# debug
+if [[ -e "${ZDOTDIR}/_debug" ]]; then
+	echo "$(date +%s) .profile" >> "${HOME}/zsh_debug.log"
+fi
+
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
 if [[ -d "${HOME}/tmp" ]]; then
 	XDG_CACHE_HOME="${HOME}/tmp/.cache"

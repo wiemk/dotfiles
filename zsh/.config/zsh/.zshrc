@@ -1,6 +1,11 @@
 # .zshrc
 #
-if [[ ! -z $ZSH_DEBUG ]]; then
+# debug
+if [[ -e "${ZDOTDIR}/_debug" ]]; then
+	echo "$(date +%s) .zshrc" >> "${HOME}/zsh_debug.log"
+fi
+
+if [[ ! -z $ZSH_TRACE ]]; then
 	set -x
 	logfile=~/zsh_debug.log
 	exec > $logfile 2>&1

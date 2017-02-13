@@ -2,6 +2,12 @@
 # only sourced when shell is a login shell, [[ -o login ]]
 # keep compatibility with other shells and source ~/.profile if available
 # doesn't get sourced by most display manager (use .xprofile)
+
+# debug
+if [[ -e "${ZDOTDIR}/_debug" ]]; then
+	echo "$(date +%s) .zprofile" >> "${HOME}/zsh_debug.log"
+fi
+
 if [[ -r "${HOME}/.profile" ]]; then
 	emulate sh -c 'source ~/.profile'
 	#XDG_CONFIG_HOME isn't available here if it's a login shell
