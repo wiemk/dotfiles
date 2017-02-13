@@ -20,6 +20,9 @@ fi
 # load zplug
 source "${ZPLUG_HOME}/init.zsh"
 
+# self manage/update zplug
+zplug 'zplug/zplug', hook-build:'zplug --self-manage'
+
 ## plugins
 # prompt theme
 zplug 'mafredri/zsh-async', from:github
