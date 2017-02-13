@@ -71,12 +71,16 @@ else
 endif
 "}}}
 " vim-plug {{{
-if has('nvim') && has('unix') && executable('curl')
+if has('unix') && executable('curl')
 	" auto install plug if not found
-	if empty(glob('$XDG_DATA_HOME/nvim/site/autoload/plug.vim'))
-		!curl -fLo "$XDG_DATA_HOME/nvim/site/autoload/plug.vim" --create-dirs
+	if has('nvim') && empty(glob('$XDG_DATA_HOME/nvim/site/autoload/plug.vim'))
+		silent !curl -fLo "$XDG_DATA_HOME/nvim/site/autoload/plug.vim" --create-dirs
 					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 		autocmd! VimEnter * PlugInstall | UpdateRemotePlugins
+	elseif !has('nvim') && empty(glob('$XDG_DATA_HOME/vim/site/autoload/plug.vim'))
+		silent !curl -fLo "$XDG_DATA_HOME/vim/site/autoload/plug.vim" --create-dirs
+					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+		autocmd! VimEnter * PlugInstall
 	endif
 endif
 
