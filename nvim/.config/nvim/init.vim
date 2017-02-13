@@ -33,7 +33,7 @@ if !isdirectory($XDG_CACHE_HOME . '/vim')
 endif
 
 if has('nvim')
-	let s:plug_path = $XDG_CONFIG_HOME . '/nvim/plugged'
+	let s:plug_path = $XDG_DATA_HOME . '/nvim/plugged'
 else
 	if (has('win32') && !has('nvim'))
 		language english
@@ -65,16 +65,16 @@ else
 	set directory=$XDG_CACHE_HOME/vim
 	set backupdir=$XDG_CACHE_HOME/vim
 	set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
-	set runtimepath=$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/after,$VIM,$VIMRUNTIME
+	set runtimepath=$XDG_DATA_HOME/vim/site,$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/after,$VIM,$VIMRUNTIME
 	let $MYVIMRC = "$XDG_CONFIG_HOME/vim/vimrc"
-	let s:plug_path = $XDG_CONFIG_HOME . '/vim/plugged'
+	let s:plug_path = $XDG_DATA_HOME . '/vim/plugged'
 endif
 "}}}
 " vim-plug {{{
 if has('nvim') && has('unix') && executable('curl')
 	" auto install plug if not found
-	if empty(glob('$XDG_CONFIG_HOME/nvim/autoload/plug.vim'))
-		silent !curl -fLo "$XDG_CONFIG_HOME/nvim/autoload/plug.vim" --create-dirs
+	if empty(glob('$XDG_DATA_HOME/nvim/site/autoload/plug.vim'))
+		!curl -fLo "$XDG_DATA_HOME/nvim/site/autoload/plug.vim" --create-dirs
 					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 		autocmd! VimEnter * PlugInstall | UpdateRemotePlugins
 	endif
