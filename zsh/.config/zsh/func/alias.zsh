@@ -26,6 +26,7 @@ alias tmux='tmux -2'
 alias dmesg='dmesg -exL'
 # dl
 alias ydl="youtube-dl -icv --yes-playlist --no-call-home -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4'"
+alias ydla="youtube-dl -icv --yes-playlist --no-call-home -f 'bestaudio[ext=m4a]'"
 
 #########################################################################
 # UTILITY
