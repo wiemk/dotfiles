@@ -2,134 +2,144 @@
 # # vim: ft=gitconfig
 
 [core]
-    excludefiles = ~/.config/git/ignore
-    askpass =
-    autocrlf = input
-    logAllRefUpdates = true
+	excludefiles = ~/.config/git/ignore
+	askpass =
+	autocrlf = input
+	logAllRefUpdates = true
 [user]
-    name = Thorsten Schubert
-    email = tschubert@bafh.org
+	name = Thorsten Schubert
+	email = tschubert@bafh.org
 [alias]
-    a = add --all
-    a-p = add --all --patch
-    amend = commit --amend
-    br = branch
-    bra = branch -vv
-    c = commit -m 'temporary commit - do not push'
-    cl = log --graph --pretty=format:'%an: %s%C(yellow)%d%Creset %Cgreen(%cr)%Creset' --date=relative
-    cls = log --pretty=format:'%an (%ae): %C(yellow)%s%Creset' --shortstat
-    cim = commit -m
-    co = checkout
-    di = diff
-    dt = difftool
-    empty = !git init && git commit --allow-empty -m Initial
-    export = !touch $(git rev-parse --git-dir)/git-daemon-export-ok
-    fa = fetch --all
-    fo = log --pretty=oneline --shortstat --abbrev-commit
-    follow = log --oneline --follow --stat --summary --
-    fun = "!git fsck | awk '/dangling commit/ {print $3 \"^!\"}' | xargs git log"
-    gg = grep --break --heading -n
-    ia = add -p
-    ignored = ls-files --other -i --exclude-standard
-    in = log --oneline --decorate ..@{upstream}
-    l = log --decorate --graph --oneline --all
-    la = "!git config --get-regexp '^alias\\.' | sed -e 's#^alias\\.##' -e 's#\\ #\\\\#'| column -t -s '\\'"
-    lg = log --oneline --decorate
-    lgs = log --format=\"%C(yellow)%h%C(reset)%C(cyan)% GK%C(reset) %s\"
-    ls = ls-files
-    lsr = "!_() { [ \"$1\" ] || set -- HEAD; git ls-tree -r \"$@\"; }; _"
-    logs = log --show-signature
-    mend = commit --amend --reuse-message HEAD
-    mirror = clone --mirror
-    mkobject = hash-object --stdin -w
-    mrproper = !git reset --hard HEAD && git clean -fdx
-    out = log --oneline --decorate @{upstream}..
-    p = pull --ff-only
-    prb = pull --rebase
-    puam = "!git remote --| while read -r i; do git push $i master; done"
-    rbc = rebase --continue
-    rbs = rebase -i
-    re = rebase
-    rec = rebase --continue
-    refs = for-each-ref
-    repack-to-alternate = repack -dal
-    repack-to-local = repack -da
-    s = status -sb
-    sg = diff --cached
-    st = status
-    staged = diff --cached
-    stat = diff --stat
-    statg = diff --cached --stat
-    tagv = !git tag -v $(git describe --abbrev=0)
-    tg = log --oneline --decorate --graph
-    tip = !git --no-pager log -1 --decorate --abbrev-commit --date=relative --show-signature
-    undo = reset --soft HEAD^
-    unexport = !rm -v $(git rev-parse --git-dir)/git-daemon-export-ok
-    unpushed = log --stat origin/master..HEAD
-    wdiff = diff -w --word-diff-regex=. --color-words -U
-    wipe = reset --hard HEAD
-    wshow = show --word-diff
-    fpush = push --force-with-lease
-    uncommit = reset HEAD^
+	a = add --all
+	a-p = add --all --patch
+	amend = commit --amend
+	br = branch
+	bra = branch -vv
+	c = commit -m 'temporary commit - do not push'
+	cl = log --graph --pretty=format:'%an: %s%C(yellow)%d%Creset %Cgreen(%cr)%Creset' --date=relative
+	cls = log --pretty=format:'%an (%ae): %C(yellow)%s%Creset' --shortstat
+	cim = commit -m
+	co = checkout
+	di = diff
+	dt = difftool
+	empty = !git init && git commit --allow-empty -m Initial
+	export = !touch $(git rev-parse --git-dir)/git-daemon-export-ok
+	fa = fetch --all
+	fo = log --pretty=oneline --shortstat --abbrev-commit
+	follow = log --oneline --follow --stat --summary --
+	fun = "!git fsck | awk '/dangling commit/ {print $3 \"^!\"}' | xargs git log"
+	gg = grep --break --heading -n
+	glog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+	ia = add -p
+	ignored = ls-files --other -i --exclude-standard
+	in = log --oneline --decorate ..@{upstream}
+	l = log --decorate --graph --oneline --all
+	la = "!git config --get-regexp '^alias\\.' | sed -e 's#^alias\\.##' -e 's#\\ #\\\\#'| column -t -s '\\'"
+	lg = log --oneline --decorate
+	lgs = log --format=\"%C(yellow)%h%C(reset)%C(cyan)% GK%C(reset) %s\"
+	ls = ls-files
+	lsr = "!_() { [ \"$1\" ] || set -- HEAD; git ls-tree -r \"$@\"; }; _"
+	logs = log --show-signature
+	mend = commit --amend --reuse-message HEAD
+	mirror = clone --mirror
+	mkobject = hash-object --stdin -w
+	mrproper = !git reset --hard HEAD && git clean -fdx
+	out = log --oneline --decorate @{upstream}..
+	p = pull --ff-only
+	prb = pull --rebase
+	prune = fetch --prune
+	puam = "!git remote --| while read -r i; do git push $i master; done"
+	rbc = rebase --continue
+	rbs = rebase -i
+	re = rebase
+	rec = rebase --continue
+	refs = for-each-ref
+	repack-to-alternate = repack -dal
+	repack-to-local = repack -da
+	s = status -sb
+	sg = diff --cached
+	st = status
+	staged = diff --cached
+	stash-all = stash save --include-untracked
+	stat = diff --stat
+	statg = diff --cached --stat
+	tagv = !git tag -v $(git describe --abbrev=0)
+	tg = log --oneline --decorate --graph
+	tip = !git --no-pager log -1 --decorate --abbrev-commit --date=relative --show-signature
+	undo = reset --soft HEAD^
+	unexport = !rm -v $(git rev-parse --git-dir)/git-daemon-export-ok
+	unpushed = log --stat origin/master..HEAD
+	wdiff = diff -w --word-diff-regex=. --color-words -U
+	wipe = reset --hard HEAD
+	wshow = show --word-diff
+	fpush = push --force-with-lease
+	uncommit = reset HEAD^
 [color]
-    ui = auto
-    branch = auto
-    diff = auto
-    status = auto
+	ui = auto
+	branch = auto
+	diff = auto
+	status = auto
 [color "branch"]
-    current = green bold
-    local = blue
-    remote = red reverse
+	current = green bold
+	local = blue
+	remote = red reverse
 [color "diff"]
-    func = cyan bold
-    old = red bold
-    new = green bold
-    whitespace = magenta bold
+	func = cyan bold
+	old = red bold
+	new = green bold
+	whitespace = magenta bold
 [color "status"]
-    added = green bold
-    changed = yellow bold
-    untracked = red bold
+	added = green bold
+	changed = yellow bold
+	untracked = red bold
 [color "grep"]
-    filename = magenta
-    linenumber = green
-    match = green bold
+	filename = magenta
+	linenumber = green
+	match = green bold
 [column]
-    ui = auto
-    branch = never
-    status = never
-    tag = auto dense
+	ui = auto
+	branch = never
+	status = never
+	tag = auto dense
 [credential]
-    helper = gnome-keyring
-    #helper = cache --socket $XDG_RUNTIME_DIR/git-credential-cache.socket
-    #helper = store --file ~/.auth/git-credential-store
-    useHttpPath = false
+	helper = gnome-keyring
+	#helper = cache --socket $XDG_RUNTIME_DIR/git-credential-cache.socket
+	#helper = store --file ~/.auth/git-credential-store
+	useHttpPath = false
 [diff]
-    tool = vimdiff
+	tool = vimdiff
 [grep]
-    lineNumber = true
-    extendedRegexp = true
+	lineNumber = true
+	extendedRegexp = true
 [init]
-    templateDir = ~/.config/git/template
+	templateDir = ~/.config/git/template
 [merge]
-    tool = vimdiff
-    conflictStyle = diff3
+	tool = vimdiff
+	conflictStyle = diff3
+	ff = only
+[status]
+	showUntrackedFiles = all
+[transfer]
+	fsckobjects = true
 [mergetool "vimdiff"]
-    cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+	cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
 [pack]
-    writebitmaps = true
+	writebitmaps = true
 [push]
-    #default = upstream
-    default = current
+	#default = upstream
+	#default = current
+	default = simple
+	followTags = true
 [rebase]
-    autosquash = true
+	autosquash = true
 [receive]
-    denyCurrentBranch = refuse
+	denyCurrentBranch = refuse
 [sendemail]
-    from = Thorsten Schubert <tschubert@bafh.org>
-    confirm = auto
-    chainReplyTo = false
-    smtpServer = /usr/bin/msmtp
-    #smtpServerOption = --debug
-    smtpServerOption = --read-envelope-from
+	from = Thorsten Schubert <tschubert@bafh.org>
+	confirm = auto
+	chainReplyTo = false
+	smtpServer = /usr/bin/msmtp
+	#smtpServerOption = --debug
+	smtpServerOption = --read-envelope-from
 [include]
-    path = ~/.gitconfig.local
+	path = ~/.gitconfig.local
