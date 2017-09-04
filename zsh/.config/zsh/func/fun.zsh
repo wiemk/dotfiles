@@ -122,7 +122,6 @@ c() { builtin cd "$@" && ls -- }
 +() { sudo "$@" }
 -() { builtin cd .. }
 @() { cat "$@" }
-p() { $PAGER "$@" }
 rh() { run-help "$1" }
 
 #
