@@ -52,8 +52,8 @@ zplug 'modules/command-not-found', from:prezto
 zstyle ':prezto:*:*' color 'yes'
 zstyle ':prezto:module:terminal' auto-title 'yes'
 zstyle ':prezto:module:editor' dot-expansion 'yes'
-zstyle ':prezto:module:tmux:auto-start' local 'yes'
-zstyle ':prezto:module:tmux:auto-start' remote 'yes'
+zstyle ':prezto:module:tmux:auto-start' local 'no'
+zstyle ':prezto:module:tmux:auto-start' remote 'no'
 
 if (( $+commands[fzf] )); then
 	if [[ -d '/usr/share/fzf' ]]; then
