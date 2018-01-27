@@ -60,10 +60,10 @@ if (( $+commands[fzf] )); then
 	if [[ -d '/usr/share/fzf' ]]; then
 		zplug '/usr/share/fzf', from:local, use:"*.zsh"
 		#zplug '/usr/bin', from:local, use:'fzf-tmux'
-	else
-		zplug 'junegunn/fzf', from:github, use:"shell/*.zsh"
-		zplug 'junegunn/fzf', from:github, use:'bin/fzf-tmux', as:command
 	fi
+else
+	zplug 'junegunn/fzf', from:github, use:"shell/*.zsh"
+	zplug 'junegunn/fzf', from:github, use:'bin/fzf', as:command
 fi
 
 # WARNING: this introduces a rather large (300-500ms) delay
