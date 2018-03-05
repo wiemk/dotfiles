@@ -462,7 +462,7 @@ nnoremap <leader>src :%s/\<<C-r><C-w>\>//g<Left><Left>
 nnoremap <leader>s :%s//g<Left><Left>
 
 " use sudo for saving
-cnoremap sudow w !sudo tee % > /dev/null
+cnoremap w!! execute 'silent! write !sudo tee % >/dev/null' <bar> edit!
 
 nnoremap <leader>cc :set number!<CR>
 " Toggle whitespace characters
@@ -502,9 +502,10 @@ augroup formatting
 	autocmd!
 	" for all text files set tw to 78
 	autocmd FileType text setlocal textwidth=78
+	autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 	" convert spaces to tabs when reading file
-	autocmd BufReadPost * if (&readonly == 0) | set noexpandtab | retab! | endif
-	autocmd BufWritePre * if(&readonly == 0) | call StripTrailingWhitespaces() | endif
+"	autocmd BufReadPost * if (&readonly == 0) | set noexpandtab | retab! | endif
+"	autocmd BufWritePre * if(&readonly == 0) | call StripTrailingWhitespaces() | endif
 augroup end
 
 " source vim configuration upon save
