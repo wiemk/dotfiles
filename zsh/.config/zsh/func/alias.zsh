@@ -1,8 +1,4 @@
-# 30-alias.zsh
-
-#########################################################################
-# COREUTILS
-#########################################################################
+# alias.zsh
 #
 # file operations
 alias rr='rm -rvI'
@@ -12,7 +8,6 @@ alias mv='mv -vi'
 alias ln='ln -vi'
 alias mkdir='mkdir -vp'
 # permissions
-alias sudo=ngsudo
 alias chmod='chmod -c --preserve-root'
 alias chown='chown -c --preserve-root'
 alias chgrp='chgrp -c --preserve-root'
@@ -33,13 +28,5 @@ alias xc='xclip -o | ix'
 alias performance='perf top -g -p'
 alias largest='du --max-depth=1 2> /dev/null | sort -n -r | head -n20'
 
-#########################################################################
-# XDG fixes
-#########################################################################
-#
-#alias ncmpcpp="ncmpcpp -c $XDG_CONFIG_HOME/ncmpcpp/config"
-#alias ncmpc="ncmpcpp -c $XDG_CONFIG_HOME/ncmpcpp/config"
-
 #
 # EOF
-# vim :set ts=4 sw=4 sts=4 et :

@@ -47,7 +47,7 @@ zplug 'modules/utility', from:prezto
 zplug 'modules/completion', from:prezto
 zplug 'modules/git', from:prezto
 zplug 'modules/tmux', from:prezto
-zplug 'modules/command-not-found', from:prezto
+#zplug 'modules/command-not-found', from:prezto
 
 zstyle ':prezto:*:*' color 'yes'
 zstyle ':prezto:module:terminal' auto-title 'yes'

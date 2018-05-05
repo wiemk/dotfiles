@@ -1,4 +1,4 @@
-# fun.zsh
+# .zsh.d/10-fun.zsh
 #########################################################################
 # TEXT MANIPULATION
 #########################################################################
@@ -69,6 +69,17 @@ sweb() {
 	/usr/bin/env python3 -m http.server $port --bind $host
 }
 
+# use systemd resolver
+shost() {
+	local cmd='/usr/lib/systemd/systemd-resolve-host'
+	if [[ -x $cmd ]]; then
+		$cmd "$@"
+	else
+		echo >&2 "$cmd not found."
+		return 1
+	fi
+}
+
 # display images in terminal
 img() {
 	for image in "$@"; do
@@ -105,22 +116,6 @@ rmtarget() {
 	fi
 }
 
-colorbar() {
-	awk 'BEGIN{
-		s="/\\/\\/\\/\\/\\"; s=s s s s s s s s;
-		for (colnum = 0; colnum<77; colnum++) {
-			r = 255-(colnum*255/76);
-			g = (colnum*510/76);
-			b = (colnum*255/76);
-			if (g>255) g = 510-g;
-			printf "\033[48;2;%d;%d;%dm", r,g,b;
-			printf "\033[38;2;%d;%d;%dm", 255-r,255-g,255-b;
-			printf "%s\033[0m", substr(s,colnum+1,1);
-		}
-		printf "\n";
-	}'
-}
-
 # shortcuts
 #ukill() { ps x -o	"%r %c " | grep $1 | awk -F' ' '{print $1}' | xargs -I % /bin/kill -TERM -- -% }
 c() { builtin cd "$@" && ls -- }
@@ -129,4 +124,6 @@ c() { builtin cd "$@" && ls -- }
 @() { cat "$@" }
 rh() { run-help "$1" }
 
+#
 # EOF
+# vim :set ts=4 sw=4 sts=4 et :
