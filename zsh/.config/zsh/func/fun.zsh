@@ -128,5 +128,6 @@ c() { builtin cd "$@" && ls -- }
 -() { builtin cd .. }
 @() { cat "$@" }
 rh() { run-help "$1" }
+punsh() { curl -F c=@- https://p.unsha.re/ }
 
 # EOF
