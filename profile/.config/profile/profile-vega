@@ -1,0 +1,10 @@
+# profile-zenode
+
+# debug
+if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
+	echo "$(date +%s): profile-electra" >> "${HOME}/shell_debug.log"
+fi
+
+exec /usr/bin/fish
+# vim: set ft=sh ts=4 sw=4 sts=0 tw=0 noet :
+# EOF
