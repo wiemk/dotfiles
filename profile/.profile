@@ -41,6 +41,14 @@ export PAGER='less'
 export LESS='-F -g -i -M -R -S -w -X -z-4'
 export LESSHISTFILE="${XDG_CACHE_HOME}/lesshist"
 
+# debug
+if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
+	echo "$(date +%s): .profile" >> "${HOME}/shell_debug.log"
+fi
+
+export PROFILE_SOURCED=true
+
+# this can block, so do it last
 MACHINE=${HOST:-$HOSTNAME}
 if [[ ! -z ${MACHINE+x} ]]; then
 	if [[ -r "${HOME}/.profile-${MACHINE}" ]]; then
@@ -49,13 +57,6 @@ if [[ ! -z ${MACHINE+x} ]]; then
 		source "${XDG_CONFIG_HOME}/profile/profile-${MACHINE}"
 	fi
 fi
-
-# debug
-if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
-	echo "$(date +%s): .profile" >> "${HOME}/shell_debug.log"
-fi
-
-export PROFILE_SOURCED=true
 
 # vim: set ft=sh ts=4 sw=4 sts=0 tw=0 noet :
 # EOF
