@@ -48,8 +48,10 @@ fi
 
 export PROFILE_SOURCED=true
 
-# this can block, so do it last
+# this can block, so defer execution to the end
 MACHINE=${HOST:-$HOSTNAME}
+MACHINE=$(printf "%s" $MACHINE | tr '[:upper:]' '[:lower:]')
+# https://stackoverflow.com/a/13864829
 if [[ ! -z ${MACHINE+x} ]]; then
 	if [[ -r "${HOME}/.profile-${MACHINE}" ]]; then
 		source "${HOME}/.profile-${MACHINE}"
