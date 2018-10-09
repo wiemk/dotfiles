@@ -11,6 +11,5 @@ fi
 
 PATH=$PATH:$HOME/.local/share/node_modules/.bin
 
-exec /usr/bin/fish
 # vim: set ft=sh ts=4 sw=4 sts=0 tw=0 noet :
 # EOF

@@ -46,9 +46,6 @@ if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
 	echo "$(date +%s): .profile" >> "${HOME}/shell_debug.log"
 fi
 
-export PROFILE_SOURCED=true
-
-# this can block, so defer execution to the end
 MACHINE=${HOST:-$HOSTNAME}
 MACHINE=$(printf "%s" $MACHINE | tr '[:upper:]' '[:lower:]')
 # https://stackoverflow.com/a/13864829
@@ -59,6 +56,8 @@ if [[ ! -z ${MACHINE+x} ]]; then
 		source "${XDG_CONFIG_HOME}/profile/profile-${MACHINE}"
 	fi
 fi
+
+export PROFILE_SOURCED=true
 
 # vim: set ft=sh ts=4 sw=4 sts=0 tw=0 noet :
 # EOF
