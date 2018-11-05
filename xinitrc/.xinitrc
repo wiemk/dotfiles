@@ -37,6 +37,7 @@ if [ hash dex 2>/dev/null ] ; then
 	dex -a -e bspwm
 else
 	hash VBoxClient-all 2>/dev/null && { VBoxClient-all & }
+	hash urxvtc 2>/dev/null && { urxvtc & }
 fi
 
 # disable display stuff if we are a virtualbox guest
