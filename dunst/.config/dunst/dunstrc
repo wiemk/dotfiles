@@ -216,27 +216,6 @@
 #    urgency = normal
 #
 
-[success]
-    appname = "speclj"
-    summary = "Success"
-    background = "#859900"
-    foreground = "#002b36"
-    format = "%b"
-
-[pending]
-    appname = "speclj"
-    summary = "Pending"
-    background = "#b58900"
-    foreground = "#002b36"
-    format = "%b"
-
-[failure]
-    appname = "speclj"
-    summary = "Failure"
-    background = "#dc322f"
-    foreground = "#002b36"
-    format = "%b"
-
 [success-notify]
     appname = "notify-send"
     summary = "Passed"
@@ -252,6 +231,13 @@
     foreground = "#002b36"
     format = "<b>%s</b> %b"
     timeout = 3
+
+[urxvt]
+	appname = "urxvtd"
+    background = "#dc322f"
+    foreground = "#002b36"
+    format = "<b>%s</b> %b"
+    timeout = 60
 
 [spotify]
     appname = "Spotify"
