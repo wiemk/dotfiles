@@ -1,0 +1,9 @@
+[Unit]
+Description=Notify about available updates hourly
+
+[Timer]
+OnCalendar=*:16
+Persistent=true
+
+[Install]
+WantedBy=default.target
