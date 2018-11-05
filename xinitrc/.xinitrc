@@ -34,10 +34,16 @@ declare units=(
 
 systemctl --user start ${units[@]}
 
+# honor /etc/xdg/autostart
 if [ hash dex 2>/dev/null ] ; then
 	dex -a -e bspwm
 else
 	hash VBoxClient-all 2>/dev/null && { VBoxClient-all & }
+fi
+
+# disable DPMS if we are a Virtualbox guest
+if [ -c /dev/vboxguest 2>/dev/null ] ; then
+	xset -dpms
 fi
 
 hash xsetroot 2>/dev/null && { xsetroot -cursor_name left_ptr & }
