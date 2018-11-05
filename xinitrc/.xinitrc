@@ -39,9 +39,11 @@ else
 	hash VBoxClient-all 2>/dev/null && { VBoxClient-all & }
 fi
 
-# disable DPMS if we are a Virtualbox guest
+# disable display stuff if we are a virtualbox guest
 if [ -c /dev/vboxguest 2>/dev/null ] ; then
 	xset -dpms
+	xset s noblank
+	xset s noexpose
 fi
 
 # set correct mouse cursor
