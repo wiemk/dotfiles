@@ -17,9 +17,7 @@ if [ -f "$userresources" ]; then
 fi
 
 
-# start some nice programs
-
-if [ -d /etc/X11/xinit/xinitrc.d ] ; then
+if [ -d /etc/X11/xinit/xinitrc.d ]; then
  for f in /etc/X11/xinit/xinitrc.d/?*.sh ; do
   [ -x "$f" ] && . "$f"
  done
@@ -46,6 +44,9 @@ if [ -c /dev/vboxguest 2>/dev/null ] ; then
 	xset -dpms
 fi
 
+# set correct mouse cursor
 hash xsetroot 2>/dev/null && { xsetroot -cursor_name left_ptr & }
+# adjust keyboard repeat rate
+xset r rate 300 30
 
 exec bspwm
