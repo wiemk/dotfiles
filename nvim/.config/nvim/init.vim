@@ -89,6 +89,7 @@ call plug#begin(s:plug_path)
 Plug 'lifepillar/vim-solarized8'
 " Plug 'chriskempson/base16-vim'
 Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 Plug 'tpope/vim-fugitive'
 Plug 'matze/vim-move'
 Plug 'jiangmiao/auto-pairs'
@@ -293,26 +294,29 @@ endif
 "augroup end
 "}}}
 
-if has('nvim')
-	if exists(+'termguicolors')
-"		set termguicolors
-	endif
-else
-	set t_Co=256
+if $TERM =~ '256color'
+	echo "foo"
+	"set termguicolors
 endif
-if &term != 'win32' && &t_Co == 256
-	if s:is_plug_active('oceanic-next')
+
+if s:is_plug_active('oceanic-next')
 		let s:cscheme = 'OceanicNext'
 		" enable italics, disabled by default
 		let g:oceanic_next_terminal_italic = 1
 		" enable bold, disabled by default
 		let g:oceanic_next_terminal_bold = 1
-	elseif s:is_plug_active('vim-solarized8')
+elseif s:is_plug_active('vim-solarized8')
 		let s:cscheme = 'solarized8_flat'
-	endif
-else
-	" force 16 colors in cmd
-	set t_Co=16
+elseif s:is_plug_active('base16-vim')
+		let s:cscheme = 'base16-atelier-dune'
+endif
+
+if s:cscheme == 'solarized8_flat' && !exists(+'termguicolors')
+	" force 16 colors for better consistency in non-truecolor terminals
+	let g:solarized_use16 = 1
+endif
+
+if &t_Co == 16
 	if s:is_plug_active('base16-vim')
 		let s:cscheme = 'base16-atelier-dune'
 	else
@@ -320,6 +324,7 @@ else
 		let s:cscheme = 'solarized8_flat'
 	endif
 endif
+" set the determined scheme
 exe 'colorscheme '.s:cscheme
 "set cursorcolumn
 highlight CursorLine cterm=bold gui=bold
@@ -621,12 +626,14 @@ execute 'nmap' '<' . g:move_key_modifier . '-Down>' '<Plug>MoveLineDown'
 execute 'nmap' '<' . g:move_key_modifier . '-Up>' '<Plug>MoveLineUp'
 "}}}
 " vim-airline {{{
-let g:airline_powerline_fonts = 1
+let g:airline_powerline_fonts = 0
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 if s:is_plug_active('oceanic-next')
 	let g:airline_theme='oceanicnext'
+elseif s:is_plug_active('vim-solarized8')
+	let g:airline_theme='solarized'
 endif
 "}}}
 " neocomplete {{{
