@@ -85,8 +85,9 @@ if has('unix') && executable('curl')
 endif
 
 call plug#begin(s:plug_path)
-Plug 'chriskempson/base16-vim'
-Plug 'mhartington/oceanic-next'
+" Plug 'mhartington/oceanic-next'
+Plug 'lifepillar/vim-solarized8'
+" Plug 'chriskempson/base16-vim'
 Plug 'vim-airline/vim-airline'
 Plug 'tpope/vim-fugitive'
 Plug 'matze/vim-move'
@@ -293,27 +294,33 @@ endif
 "}}}
 
 if has('nvim')
-	if has("termguicolors")
-		set termguicolors
+	if exists(+'termguicolors')
+"		set termguicolors
 	endif
 else
-	"set t_Co=256
+	set t_Co=256
 endif
-if &term != 'win32'
+if &term != 'win32' && &t_Co == 256
 	if s:is_plug_active('oceanic-next')
-		colorscheme OceanicNext
+		let s:cscheme = 'OceanicNext'
 		" enable italics, disabled by default
 		let g:oceanic_next_terminal_italic = 1
 		" enable bold, disabled by default
 		let g:oceanic_next_terminal_bold = 1
+	elseif s:is_plug_active('vim-solarized8')
+		let s:cscheme = 'solarized8_flat'
 	endif
 else
 	" force 16 colors in cmd
 	set t_Co=16
 	if s:is_plug_active('base16-vim')
-		colorscheme base16-atelier-dune
+		let s:cscheme = 'base16-atelier-dune'
+	else
+		let g:solarized_use16 = 1
+		let s:cscheme = 'solarized8_flat'
 	endif
 endif
+exe 'colorscheme '.s:cscheme
 "set cursorcolumn
 highlight CursorLine cterm=bold gui=bold
 

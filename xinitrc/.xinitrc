@@ -47,8 +47,11 @@ if [ -c /dev/vboxguest 2>/dev/null ] ; then
 	xset s noexpose
 fi
 
-# set correct mouse cursor
-hash xsetroot 2>/dev/null && { xsetroot -cursor_name left_ptr & }
+# set correct mouse cursor and bg color
+hash xsetroot 2>/dev/null && {
+	xsetroot -cursor_name left_ptr
+	xsetroot -solid "#272b30"
+}
 # adjust keyboard repeat rate
 xset r rate 300 30
 
