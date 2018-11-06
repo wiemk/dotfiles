@@ -294,11 +294,22 @@ endif
 "augroup end
 "}}}
 
-if $TERM =~ '256color'
-	echo "foo"
-	"set termguicolors
+let s:set_termguicolors = 0
+if exists('+termguicolors')
+	" this really is a mess
+	if $COLORTERM =~ 'truecolor' ||
+				\ $TERM =~ 'xterm-256color' ||
+				\ !empty(glob("/dev/lxss"))
+		if(!has('nvim'))
+			let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+			let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+		endif
+		set termguicolors
+		let s:set_termguicolors = 1
+	endif
 endif
 
+"determine the best colorscheme based on terminal color support
 if s:is_plug_active('oceanic-next')
 		let s:cscheme = 'OceanicNext'
 		" enable italics, disabled by default
@@ -311,8 +322,10 @@ elseif s:is_plug_active('base16-vim')
 		let s:cscheme = 'base16-atelier-dune'
 endif
 
-if s:cscheme == 'solarized8_flat' && !exists(+'termguicolors')
-	" force 16 colors for better consistency in non-truecolor terminals
+" force 16 colors for better consistency in non-truecolor terminals
+" when not in a remote session
+" needs solarized terminal colors or it will look wrong
+if s:cscheme == 'solarized8_flat' && !s:set_termguicolors
 	let g:solarized_use16 = 1
 endif
 
