@@ -302,6 +302,8 @@ function! IsTermTrueColor()
 	if $COLORTERM =~ '24bit' | return 1 | endif
 	" WSL terminal
 	if !empty(glob("/dev/lxss")) | return 1 | endif
+	" manual override
+	if $FORCE_TC == 1 | return 1 | endif
 	return 0
 endfunction
 
