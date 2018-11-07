@@ -33,7 +33,7 @@ if !isdirectory($XDG_CACHE_HOME . '/vim')
 endif
 
 if has('nvim')
-	let s:plug_path = $XDG_DATA_HOME . '/nvim/plugged'
+	let s:pack_path = $XDG_DATA_HOME . '/nvim'
 else
 	if (has('win32') && !has('nvim'))
 		language english
@@ -67,79 +67,91 @@ else
 	set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
 	set runtimepath=$XDG_DATA_HOME/vim/site,$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/after,$VIM,$VIMRUNTIME
 	let $MYVIMRC = "$XDG_CONFIG_HOME/vim/vimrc"
-	let s:plug_path = $XDG_DATA_HOME . '/vim/plugged'
+	let s:pack_path = $XDG_DATA_HOME . '/vim'
 endif
 "}}}
-" vim-plug {{{
-if has('unix') && executable('curl')
-	" auto install plug if not found
-	if has('nvim') && empty(glob('$XDG_DATA_HOME/nvim/site/autoload/plug.vim'))
-		silent !curl -fLo "$XDG_DATA_HOME/nvim/site/autoload/plug.vim" --create-dirs
-					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-		autocmd! VimEnter * PlugInstall | UpdateRemotePlugins
-	elseif !has('nvim') && empty(glob('$XDG_DATA_HOME/vim/site/autoload/plug.vim'))
-		silent !curl -fLo "$XDG_DATA_HOME/vim/site/autoload/plug.vim" --create-dirs
-					\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-		autocmd! VimEnter * PlugInstall
+" minpac {{{
+
+function! Bootstrap()
+	call PackInit()
+	call minpac#update('', {'do': 'call minpac#status()'})
+	if has('nvim') | UpdateRemotePlugins | endif
+	sleep 10
+	source $MYVIMRC
+endfunction
+
+let &packpath = s:pack_path . ',' . &packpath
+let s:minpac_path = s:pack_path . '/pack/minpac/opt/minpac'
+silent! packadd minpac
+if !exists('*minpac#init')  && executable('git')
+	if !isdirectory(s:minpac_path)
+		call mkdir(s:minpac_path, 'p')
 	endif
+	exe 'silent !git clone "https://github.com/k-takata/minpac.git" ' . s:minpac_path
+	autocmd! VimEnter * call Bootstrap()
 endif
 
-call plug#begin(s:plug_path)
-Plug 'mhartington/oceanic-next'
-Plug 'lifepillar/vim-solarized8'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'tpope/vim-fugitive'
-Plug 'matze/vim-move'
-Plug 'airblade/vim-gitgutter'
-Plug 'easymotion/vim-easymotion'
-"Plug 'jiangmiao/auto-pairs'
-"Plug 'justinmk/vim-dirvish'
+function! PackInit() abort
+	packadd minpac
+	call minpac#init()
 
-" fzf doesn't compile unter windows for now
-if has('unix') && s:use_fzf
-	if executable('fzf')
-		Plug 'junegunn/fzf'
+	call minpac#add('k-takata/minpac', {'type': 'opt'})
+	call minpac#add('mhartington/oceanic-next')
+	call minpac#add('lifepillar/vim-solarized8')
+	call minpac#add('vim-airline/vim-airline')
+	call minpac#add('vim-airline/vim-airline-themes')
+	call minpac#add('tpope/vim-fugitive')
+	call minpac#add('matze/vim-move')
+	call minpac#add('airblade/vim-gitgutter')
+	call minpac#add('easymotion/vim-easymotion')
+	call minpac#add('justinmk/vim-dirvish')
+	call minpac#add('tpope/vim-eunuch')
+
+	" fzf doesn't compile unter windows for now
+	if has('unix') && s:use_fzf
+		if executable('fzf')
+			call minpac#add('junegunn/fzf')
+		else
+			call minpac#add('junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' })
+		endif
+		call minpac#add('junegunn/fzf.vim')
 	else
-		Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
+		call minpac#add('ctrlpvim/ctrlp.vim', { 'on': ['CtrlP', 'CtrlPBuffer', 'CtrlPMixed', 'CtrlPMRU'] })
 	endif
-	Plug 'junegunn/fzf.vim'
-else
-	Plug 'ctrlpvim/ctrlp.vim', { 'on': ['CtrlP', 'CtrlPBuffer', 'CtrlPMixed', 'CtrlPMRU'] }
-endif
 
-if has('win32')
-	let g:vimproc_path = expand(fnamemodify(v:progpath, ':h')
-				\ . '\plugins\vimproc')
-	if(isdirectory(g:vimproc_path))
-		Plug g:vimproc_path
+	if has('win32')
+		let g:vimproc_path = expand(fnamemodify(v:progpath, ':h')
+					\ . '\plugins\vimproc')
+		if(isdirectory(g:vimproc_path))
+			call minpac#add(g:vimproc_path)
+		else
+			let g:vimproc#download_windows_dll = 1
+			call minpac#add('Shougo/vimproc.vim')
+		endif
+	elseif has('unix') && !has('nvim')
+		call minpac#add('Shougo/vimproc.vim', { 'do' : 'make' })
+	endif
+
+	let s:completion_provider = 0
+	if has('nvim')
+		if has('python3')
+			let s:completion_provider = 1
+			call minpac#add('Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' })
+		endif
 	else
-		let g:vimproc#download_windows_dll = 1
-		Plug 'Shougo/vimproc.vim'
+		if has('lua')
+			let s:completion_provider = 1
+			call minpac#add('Shougo/neocomplete.vim')
+		endif
 	endif
-elseif has('unix') && !has('nvim')
-	Plug 'Shougo/vimproc.vim', { 'do' : 'make' }
-endif
-
-let s:completion_provider = 0
-if has('nvim')
-	if has('python3')
-		let s:completion_provider = 1
-		Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+	if s:completion_provider
+		call minpac#add('Shougo/neco-vim')
 	endif
-else
-	if has('lua')
-		let s:completion_provider = 1
-		Plug 'Shougo/neocomplete.vim'
-	endif
-endif
-if s:completion_provider
-	Plug 'Shougo/neco-vim'
-endif
+endfunction
 
-call plug#end()
-
-command! PU PlugUpdate | PlugUpgrade
+command! PU call PackInit() | call minpac#update('', {'do': 'call minpac#status()'})
+command! PC call PackInit() | call minpac#clean()
+command! PS call PackInit() | call minpac#status()
 "}}}
 " general settings {{{
 let mapleader = "\<Space>"
@@ -229,8 +241,13 @@ function! s:keep_ex(arg)
 endfunction
 
 " don't pollute namespace with global variables if plugin isn't loaded
-function! s:is_plug_active(arg)
-	if(index(g:plugs_order, a:arg) >= 0)
+function! s:is_plug_active(module)
+	if !exists('*minpac#init')
+		return 0
+	endif
+
+	let l:plug_list = minpac#getpackages("minpac", "", a:module, 1)
+	if(!empty(l:plug_list))
 		return 1
 	endif
 	return 0
@@ -345,7 +362,7 @@ if &t_Co == 16
 	let g:theme = 'solarized8_flat'
 endif
 " set the determined scheme
-exe 'colorscheme '.g:theme
+exe 'silent! colorscheme '.g:theme
 "set cursorcolumn
 highlight CursorLine cterm=bold gui=bold
 
@@ -746,10 +763,27 @@ endif
 " "
 
 "}}}
+" eunuch {{{
+"	Delete: Delete a buffer and the file on disk simultaneously.
+"	:Unlink: Like :Delete, but keeps the now empty buffer.
+"	:Move: Rename a buffer and the file on disk simultaneously.
+"	:Rename: Like :Move, but relative to the current file's containing directory.
+"	:Chmod: Change the permissions of the current file.
+"	:Mkdir: Create a directory, defaulting to the parent of the current file.
+"	:Cfind: Run find and load the results into the quickfix list.
+"	:Clocate: Run locate and load the results into the quickfix list.
+"	:Lfind/:Llocate: Like above, but use the location list.
+"	:Wall: Write every open window. Handy for kicking off tools like guard.
+"	:SudoWrite: Write a privileged file with sudo.
+"	:SudoEdit: Edit a privileged file with sudo.
+"	File type detection for sudo -e is based on original file name.
+"	New files created with a shebang line are automatically made executable.
+"	New init scripts are automatically prepopulated with /etc/init.d/skeleton.
+"}}}
 " customization: {{{
 function! SourceIfExists(file)
-   	if filereadable(expand(a:file))
-       	exe 'source' a:file
+	if filereadable(expand(a:file))
+		exe 'source' a:file
     endif
 endfunction
 let g:vimrc_local_base = fnamemodify(resolve(expand('$MYVIMRC:p:h')), ':h')
