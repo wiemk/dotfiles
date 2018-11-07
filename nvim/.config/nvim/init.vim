@@ -295,11 +295,18 @@ endif
 "}}}
 
 let s:set_termguicolors = 0
+
+function! IsTermTrueColor()
+	" VTE, iTerm2, Konsole, ..
+	if $COLORTERM =~ 'truecolor' | return 1 | endif
+	if $COLORTERM =~ '24bit' | return 1 | endif
+	" WSL terminal
+	if !empty(glob("/dev/lxss")) | return 1 | endif
+	return 0
+endfunction
+
 if exists('+termguicolors')
-	" this really is a mess
-	if $COLORTERM =~ 'truecolor' ||
-				\ $TERM =~ 'xterm-256color' ||
-				\ !empty(glob("/dev/lxss"))
+	if IsTermTrueColor()"
 		if(!has('nvim'))
 			let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 			let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
