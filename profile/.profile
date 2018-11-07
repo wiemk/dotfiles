@@ -34,6 +34,8 @@ unset pathar
 
 # default applications by env
 export EDITOR=nvim
+# solarized8_flat or OceanicNext
+export NVIM_THEME=solarized8_flat
 export SUDO_EDITOR='nvim -Z -u /dev/null'
 export ALTERNATE_EDITOR=vim
 export VISUAL=$EDITOR

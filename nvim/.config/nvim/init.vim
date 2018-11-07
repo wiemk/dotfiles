@@ -7,6 +7,7 @@ if &term == 'win32'
 endif
 
 " Variables {{{
+let g:theme = $NVIM_THEME
 let g:text_width = 100
 let s:use_fzf = 1
 let s:ignore_ft = [
@@ -85,9 +86,8 @@ if has('unix') && executable('curl')
 endif
 
 call plug#begin(s:plug_path)
-" Plug 'mhartington/oceanic-next'
+ Plug 'mhartington/oceanic-next'
 Plug 'lifepillar/vim-solarized8'
-" Plug 'chriskempson/base16-vim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'tpope/vim-fugitive'
@@ -295,6 +295,11 @@ endif
 "}}}
 
 let s:set_termguicolors = 0
+let s:stheme = [ 'solarized8', 'solarized8_flat', 'solarized8_low', 'solarized8_high', 'OceanicNext' ]
+
+function! s:IsValidTheme()
+	 return index(s:stheme, g:theme) >= 0
+endfunction
 
 function! IsTermTrueColor()
 	" VTE, iTerm2, Konsole, ..
@@ -318,36 +323,30 @@ if exists('+termguicolors')
 	endif
 endif
 
+if !s:IsValidTheme()
+	let g:theme = 'solarized8_flat'
+endif
+
 "determine the best colorscheme based on terminal color support
-if s:is_plug_active('oceanic-next')
-		let s:cscheme = 'OceanicNext'
+if g:theme == 'OceanicNext'
 		" enable italics, disabled by default
 		let g:oceanic_next_terminal_italic = 1
 		" enable bold, disabled by default
 		let g:oceanic_next_terminal_bold = 1
-elseif s:is_plug_active('vim-solarized8')
-		let s:cscheme = 'solarized8_flat'
-elseif s:is_plug_active('base16-vim')
-		let s:cscheme = 'base16-atelier-dune'
 endif
 
 " force 16 colors for better consistency in non-truecolor terminals
-" when not in a remote session
 " needs solarized terminal colors or it will look wrong
-if s:cscheme == 'solarized8_flat' && !s:set_termguicolors
+if g:theme =~ 'solarized8*' && !s:set_termguicolors
 	let g:solarized_use16 = 1
 endif
 
 if &t_Co == 16
-	if s:is_plug_active('base16-vim')
-		let s:cscheme = 'base16-atelier-dune'
-	else
-		let g:solarized_use16 = 1
-		let s:cscheme = 'solarized8_flat'
-	endif
+	let g:solarized_use16 = 1
+	let g:theme = 'solarized8_flat'
 endif
 " set the determined scheme
-exe 'colorscheme '.s:cscheme
+exe 'colorscheme '.g:theme
 "set cursorcolumn
 highlight CursorLine cterm=bold gui=bold
 
@@ -653,9 +652,13 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 if s:is_plug_active('oceanic-next')
-	let g:airline_theme='oceanicnext'
+	if g:theme == 'OceanicNext'
+		let g:airline_theme='oceanicnext'
+	endif
 elseif s:is_plug_active('vim-solarized8')
-	let g:airline_theme='solarized'
+	if g:theme =~ 'solarized8*'
+		let g:airline_theme='solarized'
+	endif
 endif
 "}}}
 " neocomplete {{{
