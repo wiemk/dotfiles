@@ -1,11 +1,10 @@
 scriptencoding utf-8
 " seems to break some plugins
 " set noshellslash
-if v:version < 704 | finish | endif
+if v:version < 800 | finish | endif
 if &term == 'win32'
 	set termencoding=cp932
 endif
-
 " Variables {{{
 let g:theme = $NVIM_THEME
 let g:text_width = 100
@@ -86,16 +85,16 @@ if has('unix') && executable('curl')
 endif
 
 call plug#begin(s:plug_path)
- Plug 'mhartington/oceanic-next'
+Plug 'mhartington/oceanic-next'
 Plug 'lifepillar/vim-solarized8'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'tpope/vim-fugitive'
 Plug 'matze/vim-move'
-Plug 'jiangmiao/auto-pairs'
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'airblade/vim-gitgutter'
-" consider supertab, vim-surround
+Plug 'easymotion/vim-easymotion'
+"Plug 'jiangmiao/auto-pairs'
+"Plug 'justinmk/vim-dirvish'
 
 " fzf doesn't compile unter windows for now
 if has('unix') && s:use_fzf
@@ -557,17 +556,26 @@ if(s:is_plug_active('vim-gitgutter'))
 	let g:gitgutter_avoid_cmd_prompt_on_windows = 0
 endif
 "}}}
-" NERDTree {{{
-if(s:is_plug_active('nerdtree'))
-	nmap <silent> <leader>n :NERDTreeToggle<CR>
+" vim-dirvish {{{
+if(s:is_plug_active('vim-dirvish'))
+	" disable bloated netrw
+	let g:loaded_netrw = 1
+	let g:loaded_netrwPlugin = 1
+
+    command! -nargs=? -complete=dir Explore Dirvish <args>
+    command! -nargs=? -complete=dir Sexplore belowright split | silent Dirvish <args>
+    command! -nargs=? -complete=dir Vexplore leftabove vsplit | silent Dirvish <args>
+	
+	" not supported
+	set noautochdir
+	let g:dirvish_mode = 2
+	let g:dirvish_relative_paths = 1
+	
+	nnoremap <buffer> <silent> <leader>t :call dirvish#open('tabedit', 0)<CR>
+	xnoremap <buffer> <silent> <leader>t :call dirvish#open('tabedit', 0)<CR>
 	" close buffer without messing up layout
 	nnoremap <leader>q :bp<CR>:bd #<CR>
-	let g:NERDTreeChristmasTree = 1
-	let g:NERDTreeShowHidden = 1
-	let g:NERDTreeHijackNetrw = 1
-	let g:NERDTreeQuitOnOpen = 1
-	let g:NERDTreeDirArrows = 1
-	let g:NERDTreeChDirMode = 2
+
 	"}}}
 	" ctrlp {{{
 	if(s:is_plug_active('ctrlp.vim'))
@@ -719,5 +727,33 @@ if(s:is_plug_active('auto-pairs'))
 	endif
 endif
 "}}}
+" easymotion {{{
+" https://code.tutsplus.com/tutorials/vim-essential-plugin-easymotion--net-19223
+" <Leader>f{char} to move to {char}
+" map  <Leader>f <Plug>(easymotion-bd-f)
+" nmap <Leader>f <Plug>(easymotion-overwin-f)
+"
+" " s{char}{char} to move to {char}{char}
+" nmap s <Plug>(easymotion-overwin-f2)
+"
+"" Move to line
+" map <Leader>L <Plug>(easymotion-bd-jk)
+" nmap <Leader>L <Plug>(easymotion-overwin-line)
+
+" Move to word
+" map  <Leader>w <Plug>(easymotion-bd-w)
+" nmap <Leader>w <Plug>(easymotion-overwin-w)
+" "
+
+"}}}
+" customization: {{{
+function! SourceIfExists(file)
+   	if filereadable(expand(a:file))
+       	exe 'source' a:file
+    endif
+endfunction
+let g:vimrc_local_base = fnamemodify(resolve(expand('$MYVIMRC:p:h')), ':h')
+
+call SourceIfExists(g:vimrc_local_base . '/local.vim')
 "}}}
 " vim: set ts=4 sw=4 sts=0 tw=78 noet :
