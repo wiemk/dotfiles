@@ -71,7 +71,7 @@ else
 endif
 "}}}
 " minpac {{{
-exe 'set packpath+=' . s:pack_path
+let &packpath = s:pack_path . ',' . &packpath
 let s:minpac_path = s:pack_path . '/pack/minpac/opt/minpac'
 silent! packadd minpac
 if !exists('*minpac#init')  && executable('git')
