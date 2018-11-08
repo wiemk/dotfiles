@@ -71,16 +71,7 @@ else
 endif
 "}}}
 " minpac {{{
-
-function! Bootstrap()
-	call PackInit()
-	call minpac#update('', {'do': 'call minpac#status()'})
-	if has('nvim') | UpdateRemotePlugins | endif
-	sleep 10
-	source $MYVIMRC
-endfunction
-
-let &packpath = s:pack_path . ',' . &packpath
+exe 'set packpath+=' . s:pack_path
 let s:minpac_path = s:pack_path . '/pack/minpac/opt/minpac'
 silent! packadd minpac
 if !exists('*minpac#init')  && executable('git')
@@ -88,10 +79,20 @@ if !exists('*minpac#init')  && executable('git')
 		call mkdir(s:minpac_path, 'p')
 	endif
 	exe 'silent !git clone "https://github.com/k-takata/minpac.git" ' . s:minpac_path
-	autocmd! VimEnter * call Bootstrap()
+	autocmd! VimEnter * call s:bootstrap()
 endif
 
-function! PackInit() abort
+command! PU call PackInit() | call minpac#update('', {'do': 'call minpac#status()'})
+command! PC call PackInit() | call minpac#clean()
+command! PS call PackInit() | call minpac#status()
+
+function! s:bootstrap() abort
+	call s:pack_init()
+	call minpac#update('', {'do': 'call minpac#status()'})
+	if has('nvim') | UpdateRemotePlugins | endif
+endfunction
+
+function! s:pack_init() abort
 	packadd minpac
 	call minpac#init()
 
@@ -122,7 +123,7 @@ function! PackInit() abort
 	if has('win32')
 		let g:vimproc_path = expand(fnamemodify(v:progpath, ':h')
 					\ . '\plugins\vimproc')
-		if(isdirectory(g:vimproc_path))
+		if (isdirectory(g:vimproc_path))
 			call minpac#add(g:vimproc_path)
 		else
 			let g:vimproc#download_windows_dll = 1
@@ -148,10 +149,6 @@ function! PackInit() abort
 		call minpac#add('Shougo/neco-vim')
 	endif
 endfunction
-
-command! PU call PackInit() | call minpac#update('', {'do': 'call minpac#status()'})
-command! PC call PackInit() | call minpac#clean()
-command! PS call PackInit() | call minpac#status()
 "}}}
 " general settings {{{
 let mapleader = "\<Space>"
@@ -219,7 +216,7 @@ if has('unnamedplus')
 endif
 
 " use a POSIX compatible shell
-if(!has('nvim') && &shell == "/usr/bin/fish")
+if (!has('nvim') && &shell == "/usr/bin/fish")
 	set shell=/usr/bin/bash
 endif
 "}}}
@@ -267,19 +264,6 @@ function! s:has_vimproc() abort
 	endif
 	return s:_has_vimproc
 endfunction
-"}}}
-" vimproc without vim-plug {{{
-" manually managed vimproc, replaced with vim-plug
-"if has('win32') && !s:has_vimproc() "!exists(':VimProcBang')
-"	let s:plugin_contrib = fnamemodify(v:progpath, ':h') . '\plugins\vimproc'
-"	if isdirectory(s:plugin_contrib)
-"		let g:vimproc#download_windows_dll = 0
-"		let &rtp .= ','.s:plugin_contrib
-"	else
-"		let g:vimproc#download_windows_dll = 1
-"	endif
-"endif
-"let s:completion_provider = 0
 "}}}
 " gvim options {{{
 if has('gui_running')
@@ -332,7 +316,7 @@ endfunction
 
 if exists('+termguicolors')
 	if s:is_term_truecolor()
-		if(!has('nvim'))
+		if (!has('nvim'))
 			let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 			let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 		endif
@@ -399,10 +383,10 @@ function! s:ToggleWhitespaceMatch(mode)
 		let l:pattern = []
 		let w:ws_id = []
 	endif
-	if(!exists('w:ws_id'))
+	if (!exists('w:ws_id'))
 		let w:ws_id = []
 	endif
-	if(!empty(w:ws_id))
+	if (!empty(w:ws_id))
 		call map(w:ws_id, 'matchdelete(v:val)')
 		unlet w:ws_id[:]
 	endif
@@ -531,7 +515,7 @@ nnoremap <silent> <leader>ml :call AppendModeline()<CR>
 
 " relative numbering
 function! NumberToggle()
-	if(&relativenumber == 1)
+	if (&relativenumber == 1)
 		set nornu
 		set number
 	else
@@ -555,8 +539,8 @@ augroup formatting
 	autocmd FileType text setlocal textwidth=78
 	autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 	" convert spaces to tabs when reading file
-"	autocmd BufReadPost * if (&readonly == 0) | set noexpandtab | retab! | endif
-"	autocmd BufWritePre * if(&readonly == 0) | call StripTrailingWhitespaces() | endif
+" autocmd BufReadPost * if (&readonly == 0) | set noexpandtab | retab! | endif
+" autocmd BufWritePre * if (&readonly == 0) | call StripTrailingWhitespaces() | endif
 augroup end
 
 " source vim configuration upon save
@@ -571,12 +555,12 @@ augroup end
 "}}}
 " plugins: {{{
 " vim-gitgutter {{{
-if(s:is_module_in_path('vim-gitgutter'))
+if (s:is_module_in_path('vim-gitgutter'))
 	let g:gitgutter_avoid_cmd_prompt_on_windows = 0
 endif
 "}}}
 " vim-dirvish {{{
-if(s:is_module_in_path('vim-dirvish'))
+if (s:is_module_in_path('vim-dirvish'))
 	" disable bloated netrw
 	let g:loaded_netrw = 1
 	let g:loaded_netrwPlugin = 1
@@ -584,12 +568,12 @@ if(s:is_module_in_path('vim-dirvish'))
     command! -nargs=? -complete=dir Explore Dirvish <args>
     command! -nargs=? -complete=dir Sexplore belowright split | silent Dirvish <args>
     command! -nargs=? -complete=dir Vexplore leftabove vsplit | silent Dirvish <args>
-	
+
 	" not supported
 	set noautochdir
 	let g:dirvish_mode = 2
 	let g:dirvish_relative_paths = 1
-	
+
 	nnoremap <buffer> <silent> <leader>t :call dirvish#open('tabedit', 0)<CR>
 	xnoremap <buffer> <silent> <leader>t :call dirvish#open('tabedit', 0)<CR>
 	" close buffer without messing up layout
@@ -597,15 +581,15 @@ if(s:is_module_in_path('vim-dirvish'))
 
 	"}}}
 	" ctrlp {{{
-	if(s:is_module_in_path('ctrlp.vim'))
-		"	let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
+	if (s:is_module_in_path('ctrlp.vim'))
+		" let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
 		let g:ctrlp_use_caching = 1
 		let g:ctrlp_clear_cache_on_exit = 0
 		let g:ctrlp_show_hidden = 1
-		"	let g:ctrlp_working_path_mode = 0
-		if(has('unix') && executable('ag'))
+		" let g:ctrlp_working_path_mode = 0
+		if (has('unix') && executable('ag'))
 			let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-		elseif(has('win32') && executable('dir'))
+		elseif (has('win32') && executable('dir'))
 			let g:ctrlp_user_command = 'dir %s /-n /b /s /a-d'
 		endif
 		let g:ctrlp_extensions = [
@@ -624,7 +608,7 @@ if(s:is_module_in_path('vim-dirvish'))
 endif
 "}}}
 " fzf {{{
-if(s:is_module_in_path('fzf'))
+if (s:is_module_in_path('fzf'))
 	set rtp+=~/.fzf
 	let g:fzf_prefer_tmux = 0
 	let g:fzf_colors =
@@ -689,7 +673,7 @@ elseif s:is_module_in_path('vim-solarized8')
 endif
 "}}}
 " neocomplete {{{
-if(s:is_module_in_path('neocomplete.vim'))
+if (s:is_module_in_path('neocomplete.vim'))
 	let g:neocomplete#enable_at_startup = 1
 	" increases screen flicker
 	let g:neocomplete#enable_refresh_always = 0
@@ -705,7 +689,7 @@ if(s:is_module_in_path('neocomplete.vim'))
 	if s:is_module_in_path('vimproc')
 		let g:neocomplete#use_vimproc = 1
 	endif
-	"	" Define keyword.
+	" Define keyword.
 	if !exists('g:neocomplete#keyword_patterns')
 		let g:neocomplete#keyword_patterns = {}
 	endif
@@ -717,7 +701,7 @@ if(s:is_module_in_path('neocomplete.vim'))
 endif
 "}}}
 " deoplete {{{
-if(s:is_module_in_path('deoplete.nvim'))
+if (s:is_module_in_path('deoplete.nvim'))
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#enable_refresh_always = 0
 	let g:deoplete#max_list = 30
@@ -739,8 +723,8 @@ if(s:is_module_in_path('deoplete.nvim'))
 endif
 "}}}
 " auto-pairs {{{
-if(s:is_module_in_path('auto-pairs'))
-	if(s:is_module_in_path('neocomplete.vim') || s:is_module_in_path('deoplete.nvim'))
+if (s:is_module_in_path('auto-pairs'))
+	if (s:is_module_in_path('neocomplete.vim') || s:is_module_in_path('deoplete.nvim'))
 		let g:AutoPairsMapCR = 0
 		imap <expr><CR> pumvisible() ?	"\<C-y>" :	"\<CR>\<Plug>AutoPairsReturn"
 	endif
@@ -766,21 +750,21 @@ endif
 
 "}}}
 " eunuch {{{
-"	Delete: Delete a buffer and the file on disk simultaneously.
-"	:Unlink: Like :Delete, but keeps the now empty buffer.
-"	:Move: Rename a buffer and the file on disk simultaneously.
-"	:Rename: Like :Move, but relative to the current file's containing directory.
-"	:Chmod: Change the permissions of the current file.
-"	:Mkdir: Create a directory, defaulting to the parent of the current file.
-"	:Cfind: Run find and load the results into the quickfix list.
-"	:Clocate: Run locate and load the results into the quickfix list.
-"	:Lfind/:Llocate: Like above, but use the location list.
-"	:Wall: Write every open window. Handy for kicking off tools like guard.
-"	:SudoWrite: Write a privileged file with sudo.
-"	:SudoEdit: Edit a privileged file with sudo.
-"	File type detection for sudo -e is based on original file name.
-"	New files created with a shebang line are automatically made executable.
-"	New init scripts are automatically prepopulated with /etc/init.d/skeleton.
+" Delete: Delete a buffer and the file on disk simultaneously.
+" :Unlink: Like :Delete, but keeps the now empty buffer.
+" :Move: Rename a buffer and the file on disk simultaneously.
+" :Rename: Like :Move, but relative to the current file's containing directory.
+" :Chmod: Change the permissions of the current file.
+" :Mkdir: Create a directory, defaulting to the parent of the current file.
+" :Cfind: Run find and load the results into the quickfix list.
+" :Clocate: Run locate and load the results into the quickfix list.
+" :Lfind/:Llocate: Like above, but use the location list.
+" :Wall: Write every open window. Handy for kicking off tools like guard.
+" :SudoWrite: Write a privileged file with sudo.
+" :SudoEdit: Edit a privileged file with sudo.
+" File type detection for sudo -e is based on original file name.
+" New files created with a shebang line are automatically made executable.
+" New init scripts are automatically prepopulated with /etc/init.d/skeleton.
 "}}}
 " customization: {{{
 function! SourceIfExists(file)
