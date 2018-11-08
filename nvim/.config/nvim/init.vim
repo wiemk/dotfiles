@@ -82,14 +82,17 @@ if !exists('*minpac#init')  && executable('git')
 	autocmd! VimEnter * call s:bootstrap()
 endif
 
-command! PU call PackInit() | call minpac#update('', {'do': 'call minpac#status()'})
-command! PC call PackInit() | call minpac#clean()
-command! PS call PackInit() | call minpac#status()
+" load our plugins explicitly *before* vimrc completes processing
+packloadall
+
+command! PU call s:pack_init() | call minpac#update('', {'do': 'call minpac#status()'})
+command! PC call s:pack_init() | call minpac#clean()
+command! PS call s:pack_init() | call minpac#status()
 
 function! s:bootstrap() abort
 	call s:pack_init()
-	call minpac#update('', {'do': 'call minpac#status()'})
 	if has('nvim') | UpdateRemotePlugins | endif
+	call minpac#update('', {'do': 'call minpac#status() | cquit'})
 endfunction
 
 function! s:pack_init() abort
@@ -107,6 +110,7 @@ function! s:pack_init() abort
 	call minpac#add('easymotion/vim-easymotion')
 	call minpac#add('justinmk/vim-dirvish')
 	call minpac#add('tpope/vim-eunuch')
+"	call minpac#add('davidhalter/jedi-vim')
 
 	" fzf doesn't compile unter windows for now
 	if has('unix') && s:use_fzf
@@ -133,22 +137,23 @@ function! s:pack_init() abort
 		call minpac#add('Shougo/vimproc.vim', { 'do' : 'make' })
 	endif
 
-	let s:completion_provider = 0
+	let l:completion_provider = 0
 	if has('nvim')
 		if has('python3')
-			let s:completion_provider = 1
+			let l:completion_provider = 1
 			call minpac#add('Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' })
 		endif
 	else
 		if has('lua')
-			let s:completion_provider = 1
+			let l:completion_provider = 1
 			call minpac#add('Shougo/neocomplete.vim')
 		endif
 	endif
-	if s:completion_provider
+	if l:completion_provider
 		call minpac#add('Shougo/neco-vim')
 	endif
 endfunction
+
 "}}}
 " general settings {{{
 let mapleader = "\<Space>"
@@ -239,9 +244,17 @@ endfunction
 
 " don't pollute namespace with global variables if plugin isn't loaded
 " and try to not initialize minpac if it isn't needed
+function! GetModulesInPath()
+	return uniq(sort(map(split(&runtimepath, ','), 'fnamemodify(v:val, ":t")')))
+endfunction
+
 function! s:is_module_in_path(module)
-	let l:module = map(split(&runtimepath, ','), 'fnamemodify(v:val, ":t")')
-	 return index(l:module, a:module) >= 0
+	let l:modules = map(split(&runtimepath, ','), 'fnamemodify(v:val, ":t")')
+	return index(l:modules, a:module) >= 0
+endfunction
+
+function! GetModuleInPath(module)
+	return s:is_module_in_path(a:module)
 endfunction
 
 function! s:is_plug_enabled(module)
@@ -702,6 +715,10 @@ endif
 "}}}
 " deoplete {{{
 if (s:is_module_in_path('deoplete.nvim'))
+	if (s:is_module_in_path('jedi-vim'))
+		let g:jedi#completions_enabled = 0
+	endif
+
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#enable_refresh_always = 0
 	let g:deoplete#max_list = 30
