@@ -33,7 +33,7 @@ if !isdirectory($XDG_CACHE_HOME . '/vim')
 endif
 
 if has('nvim')
-	let s:pack_path = $XDG_DATA_HOME . '/nvim'
+	let g:pack_path = $XDG_DATA_HOME . '/nvim'
 else
 	if (has('win32') && !has('nvim'))
 		language english
@@ -67,12 +67,12 @@ else
 	set viminfo+=n$XDG_CACHE_HOME/vim/viminfo
 	set runtimepath=$XDG_DATA_HOME/vim/site,$XDG_CONFIG_HOME/vim,$XDG_CONFIG_HOME/vim/after,$VIM,$VIMRUNTIME
 	let $MYVIMRC = "$XDG_CONFIG_HOME/vim/vimrc"
-	let s:pack_path = $XDG_DATA_HOME . '/vim'
+	let g:pack_path = $XDG_DATA_HOME . '/vim'
 endif
 "}}}
 " minpac {{{
-let &packpath = s:pack_path . ',' . &packpath
-let s:minpac_path = s:pack_path . '/pack/minpac/opt/minpac'
+let &packpath = g:pack_path . ',' . &packpath
+let s:minpac_path = g:pack_path . '/pack/minpac/opt/minpac'
 silent! packadd minpac
 if !exists('*minpac#init')  && executable('git')
 	if !isdirectory(s:minpac_path)
@@ -82,10 +82,7 @@ if !exists('*minpac#init')  && executable('git')
 	autocmd! VimEnter * call s:bootstrap()
 endif
 
-" load our plugins explicitly *before* vimrc completes processing
-packloadall
-
-command! PU call s:pack_init() | call minpac#update('', {'do': 'call minpac#status()'})
+command! PU call s:pack_init() | call minpac#update('', {'do': 'call minpac#status() | cquit'})
 command! PC call s:pack_init() | call minpac#clean()
 command! PS call s:pack_init() | call minpac#status()
 
@@ -110,7 +107,8 @@ function! s:pack_init() abort
 	call minpac#add('easymotion/vim-easymotion')
 	call minpac#add('justinmk/vim-dirvish')
 	call minpac#add('tpope/vim-eunuch')
-"	call minpac#add('davidhalter/jedi-vim')
+	call minpac#add('davidhalter/jedi-vim')
+	call minpac#add('ervandew/supertab')
 
 	" fzf doesn't compile unter windows for now
 	if has('unix') && s:use_fzf
@@ -242,15 +240,26 @@ function! s:keep_ex(arg)
 	call winrestview(l:winview)
 endfunction
 
-" don't pollute namespace with global variables if plugin isn't loaded
-" and try to not initialize minpac if it isn't needed
-function! GetModulesInPath()
+function! GetModulesInRtp()
 	return uniq(sort(map(split(&runtimepath, ','), 'fnamemodify(v:val, ":t")')))
 endfunction
 
-function! s:is_module_in_path(module)
+function! s:is_module_in_rtp(module)
 	let l:modules = map(split(&runtimepath, ','), 'fnamemodify(v:val, ":t")')
 	return index(l:modules, a:module) >= 0
+endfunction
+
+" don't pollute namespace with global variables if plugin isn't loaded
+" and try to not initialize minpac if it isn't needed
+" additionally packaddall would result in plugins loading without its parameters
+" being considered, so we need vim handle the loading after this vimrc got parsed
+" which results in a problem detecting whether the specific plugin is enabled
+" or not.
+
+function! s:is_module_in_path(module)
+	let l:mpath = glob(g:pack_path . '/pack/minpac/start/*', 0, 1)
+	call map(l:mpath, 'fnamemodify(v:val, ":t")')
+	return index(l:mpath, a:module) >= 0
 endfunction
 
 function! GetModuleInPath(module)
@@ -722,21 +731,29 @@ if (s:is_module_in_path('deoplete.nvim'))
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#enable_refresh_always = 0
 	let g:deoplete#max_list = 30
+
 	" don't select anything automatically
 	let g:deoplete#enable_auto_select = 0
-
 	if !exists('g:deoplete#keyword_patterns')
 		let g:deoplete#keyword_patterns = {}
 	endif
 	let g:deoplete#keyword_patterns._ = '[a-zA-Z_]\k*\(?'
-	" call deoplete#enable()
+
+	"call deoplete#enable()
 	let g:deoplete#enable_smart_case = 1
 	if !exists('g:deoplete#omni#input_patterns')
 		let g:deoplete#omni#input_patterns = {}
 	endif
+	
 	inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+
 	" close window after completion
 	autocmd! InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+endif
+"}}}
+" supertab {{{
+if (s:is_module_in_path('supertab'))
+	let g:SuperTabDefaultCompletionType = "<c-n>"
 endif
 "}}}
 " auto-pairs {{{
