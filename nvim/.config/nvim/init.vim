@@ -102,11 +102,11 @@ function! s:pack_init() abort
 	call minpac#add('vim-airline/vim-airline')
 	call minpac#add('vim-airline/vim-airline-themes')
 	call minpac#add('tpope/vim-fugitive')
+	call minpac#add('tpope/vim-eunuch')
 	call minpac#add('matze/vim-move')
 	call minpac#add('airblade/vim-gitgutter')
 	call minpac#add('easymotion/vim-easymotion')
 	call minpac#add('justinmk/vim-dirvish')
-	call minpac#add('tpope/vim-eunuch')
 	call minpac#add('davidhalter/jedi-vim')
 	call minpac#add('ervandew/supertab')
 
@@ -255,11 +255,12 @@ endfunction
 " being considered, so we need vim handle the loading after this vimrc got parsed
 " which results in a problem detecting whether the specific plugin is enabled
 " or not.
-
 function! s:is_module_in_path(module)
-	let l:mpath = glob(g:pack_path . '/pack/minpac/start/*', 0, 1)
-	call map(l:mpath, 'fnamemodify(v:val, ":t")')
-	return index(l:mpath, a:module) >= 0
+	if !exists("g:mpath")
+		let g:mpath = glob(g:pack_path . '/pack/minpac/start/*', 0, 1)
+		call map(g:mpath, 'fnamemodify(v:val, ":t")')
+	endif
+	return index(g:mpath, a:module) >= 0
 endfunction
 
 function! GetModuleInPath(module)
