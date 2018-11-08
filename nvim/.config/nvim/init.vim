@@ -241,16 +241,18 @@ function! s:keep_ex(arg)
 endfunction
 
 " don't pollute namespace with global variables if plugin isn't loaded
-function! s:is_plug_active(module)
+" and try to not initialize minpac if it isn't needed
+function! s:is_module_in_path(module)
+	let l:module = map(split(&runtimepath, ','), 'fnamemodify(v:val, ":t")')
+	 return index(l:module, a:module) >= 0
+endfunction
+
+function! s:is_plug_enabled(module)
 	if !exists('*minpac#init')
 		return 0
 	endif
-
 	let l:plug_list = minpac#getpackages("minpac", "", a:module, 1)
-	if(!empty(l:plug_list))
-		return 1
-	endif
-	return 0
+	return empty(l:plug_list)
 endfunction
 
 " Check vimproc
@@ -313,11 +315,11 @@ endif
 let s:set_termguicolors = 0
 let s:stheme = [ 'solarized8', 'solarized8_flat', 'solarized8_low', 'solarized8_high', 'OceanicNext' ]
 
-function! s:IsValidTheme()
+function! s:is_valid_theme()
 	 return index(s:stheme, g:theme) >= 0
 endfunction
 
-function! IsTermTrueColor()
+function! s:is_term_truecolor()
 	" VTE, iTerm2, Konsole, ..
 	if $COLORTERM =~ 'truecolor' | return 1 | endif
 	if $COLORTERM =~ '24bit' | return 1 | endif
@@ -329,7 +331,7 @@ function! IsTermTrueColor()
 endfunction
 
 if exists('+termguicolors')
-	if IsTermTrueColor()"
+	if s:is_term_truecolor()
 		if(!has('nvim'))
 			let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 			let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
@@ -339,7 +341,7 @@ if exists('+termguicolors')
 	endif
 endif
 
-if !s:IsValidTheme()
+if !s:is_valid_theme()
 	let g:theme = 'solarized8_flat'
 endif
 
@@ -569,12 +571,12 @@ augroup end
 "}}}
 " plugins: {{{
 " vim-gitgutter {{{
-if(s:is_plug_active('vim-gitgutter'))
+if(s:is_module_in_path('vim-gitgutter'))
 	let g:gitgutter_avoid_cmd_prompt_on_windows = 0
 endif
 "}}}
 " vim-dirvish {{{
-if(s:is_plug_active('vim-dirvish'))
+if(s:is_module_in_path('vim-dirvish'))
 	" disable bloated netrw
 	let g:loaded_netrw = 1
 	let g:loaded_netrwPlugin = 1
@@ -595,7 +597,7 @@ if(s:is_plug_active('vim-dirvish'))
 
 	"}}}
 	" ctrlp {{{
-	if(s:is_plug_active('ctrlp.vim'))
+	if(s:is_module_in_path('ctrlp.vim'))
 		"	let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
 		let g:ctrlp_use_caching = 1
 		let g:ctrlp_clear_cache_on_exit = 0
@@ -622,7 +624,7 @@ if(s:is_plug_active('vim-dirvish'))
 endif
 "}}}
 " fzf {{{
-if(s:is_plug_active('fzf'))
+if(s:is_module_in_path('fzf'))
 	set rtp+=~/.fzf
 	let g:fzf_prefer_tmux = 0
 	let g:fzf_colors =
@@ -676,18 +678,18 @@ let g:airline_powerline_fonts = 0
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
-if s:is_plug_active('oceanic-next')
+if s:is_module_in_path('oceanic-next')
 	if g:theme == 'OceanicNext'
 		let g:airline_theme='oceanicnext'
 	endif
-elseif s:is_plug_active('vim-solarized8')
+elseif s:is_module_in_path('vim-solarized8')
 	if g:theme =~ 'solarized8*'
 		let g:airline_theme='solarized'
 	endif
 endif
 "}}}
 " neocomplete {{{
-if(s:is_plug_active('neocomplete.vim'))
+if(s:is_module_in_path('neocomplete.vim'))
 	let g:neocomplete#enable_at_startup = 1
 	" increases screen flicker
 	let g:neocomplete#enable_refresh_always = 0
@@ -700,7 +702,7 @@ if(s:is_plug_active('neocomplete.vim'))
 	let g:neocomplete#enable_auto_select = 0
 	let g:neocomplete#enable_fuzzy_completion = 1
 	let g:neocomplete#enable_auto_delimiter = 1
-	if s:is_plug_active('vimproc')
+	if s:is_module_in_path('vimproc')
 		let g:neocomplete#use_vimproc = 1
 	endif
 	"	" Define keyword.
@@ -715,7 +717,7 @@ if(s:is_plug_active('neocomplete.vim'))
 endif
 "}}}
 " deoplete {{{
-if(s:is_plug_active('deoplete.nvim'))
+if(s:is_module_in_path('deoplete.nvim'))
 	let g:deoplete#enable_at_startup = 1
 	let g:deoplete#enable_refresh_always = 0
 	let g:deoplete#max_list = 30
@@ -737,8 +739,8 @@ if(s:is_plug_active('deoplete.nvim'))
 endif
 "}}}
 " auto-pairs {{{
-if(s:is_plug_active('auto-pairs'))
-	if(s:is_plug_active('neocomplete.vim') || s:is_plug_active('deoplete.nvim'))
+if(s:is_module_in_path('auto-pairs'))
+	if(s:is_module_in_path('neocomplete.vim') || s:is_module_in_path('deoplete.nvim'))
 		let g:AutoPairsMapCR = 0
 		imap <expr><CR> pumvisible() ?	"\<C-y>" :	"\<CR>\<Plug>AutoPairsReturn"
 	endif
