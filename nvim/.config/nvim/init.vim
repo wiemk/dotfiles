@@ -579,7 +579,6 @@ augroup end
 " let s:my_vimrc = fnamemodify($MYVIMRC, ":t")
 augroup vimrc
 	autocmd!
-	autocmd VimLeave * echo &runtimepath
 	execute 'autocmd BufWritePost ' . $MYVIMRC . ' source % | redraw
 				\ | echom "Reloaded " . expand("%:p")'
 	execute 'autocmd BufWritePost ' . $MYGVIMR . ' if has("gui_running")
