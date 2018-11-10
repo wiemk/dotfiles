@@ -767,14 +767,19 @@ if (s:is_module_in_path('auto-pairs'))
 endif
 "}}}
 " easymotion {{{
-" default
-" map <Leader> <Leader> <Plug>(easymotion-prefix)
-" remap to single leader
-" map <Leader> <Plug>(easymotion-prefix)
-
-" n-key motions
-map  <Plug>(easymotion-prefix)/ <Plug>(easymotion-sn)
-omap <Plug>(easymotion-prefix)/ <Plug>(easymotion-tn)
+if (s:is_module_in_path('vim-easymotion'))
+	" default
+	" map <Leader> <Leader> <Plug>(easymotion-prefix)
+	let g:EasyMotion_smartcase = 1
+	" nmap s <Plug>(easymotion-overwin-f)
+	nmap s <Plug>(easymotion-overwin-f2)
+	" n-key motions
+	map  <Plug>(easymotion-prefix)/ <Plug>(easymotion-sn)
+	omap <Plug>(easymotion-prefix)/ <Plug>(easymotion-tn)
+	" JK motions: Line motions
+	map <Leader>j <Plug>(easymotion-j)
+	map <Leader>k <Plug>(easymotion-k)
+endif
 "}}}
 " eunuch {{{
 " Delete: Delete a buffer and the file on disk simultaneously.
