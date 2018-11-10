@@ -212,6 +212,10 @@ set concealcursor=nc
 set foldmethod=marker
 set foldlevelstart=0
 
+" invert default placing of split windows
+set splitright
+set splitbelow
+
 " clipBoard
 set clipboard=unnamed
 if has('unnamedplus')
@@ -474,6 +478,11 @@ augroup end
 nnoremap <silent> + :exe "resize " . (winheight(0) * 5/4)<CR>
 nnoremap <silent> - :exe "resize " . (winheight(0) * 1/2)<CR>
 nnoremap <silent><leader>y :set lines=50 columns=200<CR>
+
+" splitting
+map <leader>\| :vnew<CR>
+map <leader>- :new<CR>
+
 
 " Common typos
 cabbr WQ wq
