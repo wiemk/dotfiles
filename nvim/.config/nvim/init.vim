@@ -570,13 +570,14 @@ augroup end
 " let s:my_vimrc = fnamemodify($MYVIMRC, ":t")
 augroup vimrc
 	autocmd!
+	autocmd VimLeave * echo &runtimepath
 	execute 'autocmd BufWritePost ' . $MYVIMRC . ' source % | redraw
 				\ | echom "Reloaded " . expand("%:p")'
 	execute 'autocmd BufWritePost ' . $MYGVIMR . ' if has("gui_running")
 				\ | source % | redraw | echom "Reloaded " . expand("%:p") | endif'
 augroup end
 "}}}
-" plugins: {{{
+" plugins {{{
 " vim-gitgutter {{{
 if (s:is_module_in_path('vim-gitgutter'))
 	let g:gitgutter_avoid_cmd_prompt_on_windows = 0
@@ -766,23 +767,14 @@ if (s:is_module_in_path('auto-pairs'))
 endif
 "}}}
 " easymotion {{{
-" https://code.tutsplus.com/tutorials/vim-essential-plugin-easymotion--net-19223
-" <Leader>f{char} to move to {char}
-" map  <Leader>f <Plug>(easymotion-bd-f)
-" nmap <Leader>f <Plug>(easymotion-overwin-f)
-"
-" " s{char}{char} to move to {char}{char}
-" nmap s <Plug>(easymotion-overwin-f2)
-"
-"" Move to line
-" map <Leader>L <Plug>(easymotion-bd-jk)
-" nmap <Leader>L <Plug>(easymotion-overwin-line)
+" default
+" map <Leader> <Leader> <Plug>(easymotion-prefix)
+" remap to single leader
+" map <Leader> <Plug>(easymotion-prefix)
 
-" Move to word
-" map  <Leader>w <Plug>(easymotion-bd-w)
-" nmap <Leader>w <Plug>(easymotion-overwin-w)
-" "
-
+" n-key motions
+map  <Plug>(easymotion-prefix)/ <Plug>(easymotion-sn)
+omap <Plug>(easymotion-prefix)/ <Plug>(easymotion-tn)
 "}}}
 " eunuch {{{
 " Delete: Delete a buffer and the file on disk simultaneously.
