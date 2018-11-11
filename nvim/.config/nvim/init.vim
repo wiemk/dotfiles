@@ -529,6 +529,7 @@ vmap <F13> <Esc>
 if maparg('<C-x><C-l>', 'n') ==# ''
 	nnoremap <silent> <C-x><C-l> :nohlsearch<CR><C-L>
 endif
+nnoremap <silent><leader>ns :nohlsearch<CR>
 
 " strip comments
 nnoremap <silent> <leader>sc :%g/\v^(#\|$)/d<CR>
@@ -540,9 +541,9 @@ nnoremap <leader>s :%s//g<Left><Left>
 " use sudo for saving
 cnoremap w!! execute 'silent! write !sudo tee % >/dev/null' <bar> edit!
 
-nnoremap <leader>cc :set number!<CR>
+nnoremap <leader>ln :set number!<CR>
 " Toggle whitespace characters
-nnoremap <leader>ll :set list!<CR>
+nnoremap <leader>lw :set list!<CR>
 "}}}
 " mapped functions & autocommands {{{
 function! AppendModeline()
