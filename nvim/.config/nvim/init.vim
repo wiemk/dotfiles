@@ -832,4 +832,4 @@ let g:vimrc_local_base = fnamemodify(resolve(expand('$MYVIMRC:p:h')), ':h')
 
 call SourceIfExists(g:vimrc_local_base . '/local.vim')
 "}}}
-" vim: set ts=4 sw=4 sts=0 tw=78 noet :
+" vim: set ft=vim ts=4 sw=4 sts=0 tw=78 noet :
