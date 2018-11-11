@@ -109,6 +109,10 @@ function! s:pack_init() abort
 	call minpac#add('matze/vim-move')
 
 	" the pope
+	call minpac#add('tpope/vim-sensible')
+	" load early so it can get overriden
+	runtime! plugin/sensible.vim
+
 	call minpac#add('tpope/vim-fugitive')
 	call minpac#add('tpope/vim-eunuch')
 	call minpac#add('tpope/vim-rsi')
