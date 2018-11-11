@@ -3,9 +3,9 @@
 **General:**
 - add modeline:  
 `<leader> ml`
-- draw Whitespace:  
+- draw whitespace:  
 `<leader> lw`
-- toggle Line-Numbers:  
+- toggle line numbers:  
 `<leader> ln`
 - write with sudo and reopen with new permissions  
 `:w!!`
@@ -37,6 +37,8 @@
 `<Tab>`
 - cycle buffer previous  
 `<Shift-Tab>`
+- close buffer, keeping the current layout  
+`<leader> q`
 - remove highlight from search /  
 `<leader> ns`  
 `<C-x><C-l>`

@@ -514,6 +514,9 @@ nnoremap <leader>w :tabclose<CR>
 " buffers
 nnoremap <Tab> :bnext<CR>
 nnoremap <S-Tab> :bprevious<CR>
+" close buffer without messing up layout
+nnoremap <leader>q :bp<CR>:bd #<CR>
+
 
 " use F13 as Esc replacement when in insert mode
 imap <F13> <Esc>
@@ -613,14 +616,11 @@ if (s:is_module_in_path('vim-dirvish'))
 
 	" not supported
 	set noautochdir
-	let g:dirvish_mode = 2
+  	let g:dirvish_mode = 2
 	let g:dirvish_relative_paths = 1
 
-	nnoremap <buffer> <silent> <leader>t :call dirvish#open('tabedit', 0)<CR>
-	xnoremap <buffer> <silent> <leader>t :call dirvish#open('tabedit', 0)<CR>
-	" close buffer without messing up layout
-	nnoremap <leader>q :bp<CR>:bd #<CR>
-
+	" nnoremap <buffer> <silent> <leader>t :call dirvish#open('tabedit', 0)<CR>
+	" xnoremap <buffer> <silent> <leader>t :call dirvish#open('tabedit', 0)<CR>
 	"}}}
 	" ctrlp {{{
 	if (s:is_module_in_path('ctrlp.vim'))
