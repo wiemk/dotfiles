@@ -101,14 +101,19 @@ function! s:pack_init() abort
 	call minpac#add('lifepillar/vim-solarized8')
 	call minpac#add('vim-airline/vim-airline')
 	call minpac#add('vim-airline/vim-airline-themes')
-	call minpac#add('tpope/vim-fugitive')
-	call minpac#add('tpope/vim-eunuch')
-	call minpac#add('matze/vim-move')
 	call minpac#add('airblade/vim-gitgutter')
 	call minpac#add('easymotion/vim-easymotion')
 	call minpac#add('justinmk/vim-dirvish')
 	call minpac#add('davidhalter/jedi-vim')
 	call minpac#add('ervandew/supertab')
+	call minpac#add('matze/vim-move')
+
+	" the pope
+	call minpac#add('tpope/vim-fugitive')
+	call minpac#add('tpope/vim-eunuch')
+	call minpac#add('tpope/vim-rsi')
+	call minpac#add('tpope/vim-surround')
+	call minpac#add('tpope/vim-commentary')
 
 	" fzf doesn't compile unter windows for now
 	if has('unix') && s:use_fzf
@@ -805,6 +810,12 @@ endif
 " File type detection for sudo -e is based on original file name.
 " New files created with a shebang line are automatically made executable.
 " New init scripts are automatically prepopulated with /etc/init.d/skeleton.
+"}}}
+" commentary {{{
+if(s:is_module_in_path('vim-commentary'))
+	" example for setting commentary character
+	autocmd FileType apache setlocal commentstring=#\ %s
+endif
 "}}}
 " customization: {{{
 function! SourceIfExists(file)
