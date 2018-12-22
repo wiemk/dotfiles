@@ -40,8 +40,8 @@ else
 	hash urxvtc 2>/dev/null && { urxvtc & }
 fi
 
-# disable display stuff if we are a virtualbox guest
-if [ -c /dev/vboxguest 2>/dev/null ] ; then
+# disable display stuff if we are a VM
+if [ -c /dev/vboxguest ] || [ -d /dev/vmem ]; then
 	xset -dpms
 	xset s noblank
 	xset s noexpose
