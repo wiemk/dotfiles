@@ -1,5 +1,6 @@
 nvim/.config/nvim/plugged/*
 nvim/.config/nvim/local.vim
 fish/.config/fish/fishd.*
+fish/.config/fish/fish_variables
 fish/.config/fish/functions/fish_prompt.fish
 .netrwhist

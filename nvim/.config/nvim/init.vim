@@ -174,7 +174,7 @@ syntax enable
 set background=dark
 highlight Normal ctermbg=none
 " message
-set shortmess+=aI
+set shortmess+=a
 set confirm
 set title
 " beep
