@@ -1,18 +1,18 @@
 # ~/.profile
 # assume bash compatible shell
 # this file must get sourced by a shell specific profile (ZSH: .zprofile, bash: .bash_profile)
-#  you may link this to .xprofile aswell
+#  you may link this to .xprofile as well
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
 if [[ -d "${HOME}/tmp" ]]; then
 	XDG_CACHE_HOME="${HOME}/tmp/.cache"
 else
 	XDG_CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}
 fi
-export XDG_CACHE_HOME
+export XDG_CACHE_HOME #="${HOME}/.cache"
 export XDG_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
 
 # define additional PATH folders here
-pathar=("${XDG_DATA_HOME}/../bin")
+pathar=("${XDG_DATA_HOME}/../bin" "${HOME}/.cargo/bin")
 ##
 # PATH handling
 if type realpath >/dev/null 2>&1; then
@@ -33,11 +33,20 @@ fi
 unset pathar
 
 # default applications by env
-export EDITOR=nvim
+# emacs > nvim > vim > vi
+EDITOR=vi
+if type emacsclient >/dev/null 2>&1; then
+    EDITOR='emacsclient -qcn --alternate-editor=emacs'
+elif type nvim >/dev/null 2>&1; then
+    EDITOR=nvim
+    export NVIM_THEME=solarized8_flat
+elif type vim >/dev/null 2>&1; then
+    EDITOR=vim
+fi
+export EDITOR
 # solarized8_flat or OceanicNext
-export NVIM_THEME=solarized8_flat
-export SUDO_EDITOR='nvim -Z -u /dev/null'
-export ALTERNATE_EDITOR=vim
+export SUDO_EDITOR=vi
+export ALTERNATE_EDITOR=vi
 export VISUAL=$EDITOR
 export PAGER='less'
 export LESS='-F -g -i -M -R -S -w -X -z-4'
