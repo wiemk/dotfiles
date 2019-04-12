@@ -26,7 +26,6 @@ elif type nvim >/dev/null 2>&1; then
 elif type vim >/dev/null 2>&1; then
     EDITOR=vim
 fi
-
 export EDITOR
 export SUDO_EDITOR=vi
 export ALTERNATE_EDITOR=vi
@@ -54,24 +53,20 @@ fi
 # as late as possible
 if type realpath >/dev/null 2>&1; then
 	for (( i=0; i < ${#pathar[@]}; i++ )); do
-		realp="$(realpath -qms "${pathar[$i]}")"
-		if ! [[ "$PATH" =~ "$realp" ]]; then
-			spath+=("$realp")
-		fi
-		unset realp
+		pathar[$i]="$(realpath -qs "${pathar[$i]}")"
 	done
-	unset i pathar
+	unset i
 fi
 if [[ -n "$ZSH_VERSION" ]]; then
-	emulate zsh -c 'path=($spath $path)'
+	emulate zsh -c 'path=($pathar $path)'
 else
-	path=("${spath[@]}" "$PATH")
+	path=("${pathar[@]}" "$PATH")
 	path="$( printf '%s:' "${path[@]%/}" )"
 	path="${path:0:-1}"
 	export PATH="$path"
 	unset path
 fi
-unset spath
+unset pathar
 
 export PROFILE_SOURCED=true
 
