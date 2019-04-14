@@ -5,7 +5,7 @@ if [[ -d "${HOME}/tmp" ]]; then
 else
 	XDG_CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}
 fi
-export XDG_CACHE_HOME #="${HOME}/.cache"
+export XDG_CACHE_HOME
 export XDG_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
 
 # default applications by env
@@ -20,8 +20,8 @@ elif hash nvim &>/dev/null; then
 elif hash vim &>/dev/null; then
 	EDITOR=vim
 fi
-
 export EDITOR
+
 export SUDO_EDITOR=vi
 export ALTERNATE_EDITOR=vi
 export VISUAL=$EDITOR
@@ -32,17 +32,17 @@ export LESSHISTFILE="${XDG_CACHE_HOME}/lesshist"
 # define additional PATH folders here
 pathar=("${XDG_DATA_HOME}/../bin")
 # variables visible for systemd --user
-pam_whitelist=(XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME PATH)
+pam_exports=(XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME PATH)
 
 # source host specific profile
-MACHINE=${HOST:-$HOSTNAME}
-MACHINE=$(printf "%s" $MACHINE | tr '[:upper:]' '[:lower:]')
+machine=${HOST:-$HOSTNAME}
+machine=$(printf "%s" $machine | tr '[:upper:]' '[:lower:]')
 # https://stackoverflow.com/a/13864829
-if [[ ! -z ${MACHINE+x} ]]; then
-	if [[ -r "${HOME}/.profile-${MACHINE}" ]]; then
-		source "${HOME}/.profile-${MACHINE}"
-	elif [[ -r "${XDG_CONFIG_HOME}/profile/profile-${MACHINE}" ]]; then
-		source "${XDG_CONFIG_HOME}/profile/profile-${MACHINE}"
+if [[ ! -z ${machine+x} ]]; then
+	if [[ -r "${HOME}/.profile-${machine}" ]]; then
+		source "${HOME}/.profile-${machine}"
+	elif [[ -r "${XDG_CONFIG_HOME}/profile/profile-${machine}" ]]; then
+		source "${XDG_CONFIG_HOME}/profile/profile-${machine}"
 	fi
 fi
 
@@ -66,7 +66,7 @@ unset path spath
 # export for pam_env and avoid unnecessary writes
 create_export() {
 	local estr=()
-	for var in ${pam_whitelist[@]}; do
+	for var in ${pam_exports[@]}; do
 		printf -v buf '%s\t\tDEFAULT=%s\n' $var "${!var}"
 		estr+=("${buf}")
 		unset buf
@@ -90,9 +90,9 @@ is_identical() {
 	fi
 }
 
-myexp="$(create_export)"
-if ! is_identical "$myexp"; then
-	echo "$myexp" > "${HOME}/.pam_environment"
+render_exp="$(create_export)"
+if ! is_identical "$render_exp"; then
+	echo "$render_exp" > "${HOME}/.pam_environment"
 fi
 #################################################
 export PROFILE_SOURCED=true

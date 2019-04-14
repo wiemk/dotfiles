@@ -1,2 +1,0 @@
-#export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.systemlaf=javax.swing.plaf.metal.MetalLookAndFeel'
-SUDO_EDITOR=gedit

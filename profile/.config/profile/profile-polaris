@@ -1,18 +1,15 @@
-# profile-zenode
-
+# profile-polaris sourced by ~/.profile
 CARGO_HOME="${XDG_DATA_HOME}/cargo"
 RUSTUP_HOME="${XDG_DATA_HOME}/rustup"
 export CARGO_HOME RUSTUP_HOME
 
 pathar+=("${CARGO_HOME}/bin")
-pam_whitelist+=(CARGO_HOME RUSTUP_HOME)
+pam_exports+=(CARGO_HOME RUSTUP_HOME)
 
 export SYSTEMD_PAGER=
 
 # debug
 if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
-	echo "$(date +%s): profile-electra" >> "${HOME}/shell_debug.log"
+	echo "$(date +%s): profile-polaris" >> "${HOME}/shell_debug.log"
 fi
-
-# vim: set ft=sh ts=4 sw=4 sts=0 tw=0 noet :
 # EOF
