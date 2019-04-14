@@ -1,4 +1,7 @@
 # ~/.profile
+# touch ~/.pam_environment if you want to use environment
+# variables set by pam (useful for systemd user services)
+# shellcheck disable=2155,2043,1090
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
 if [[ -d "${HOME}/tmp" ]]; then
 	XDG_CACHE_HOME="${HOME}/tmp/.cache"
@@ -8,37 +11,41 @@ fi
 export XDG_CACHE_HOME
 export XDG_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
 
+has_cmd() {
+	hash "$1" &>/dev/null && return 0
+	return 1
+}
+
 # default applications by env
 # emacs > nvim > vim > vi
-EDITOR=vi
-if hash emacsclient &>/dev/null; then
+EDITOR='vi'
+if has_cmd emacsclient; then
 	EDITOR='emacsclient -qcn --alternate-editor=emacs'
-elif hash nvim &>/dev/null; then
-	EDITOR=nvim
+elif has_cmd nvim; then
+	EDITOR='nvim'
 	# solarized8_flat or OceanicNext
-	export NVIM_THEME=solarized8_flat
-elif hash vim &>/dev/null; then
-	EDITOR=vim
+	export NVIM_THEME='solarized8_flat'
+elif has_cmd vim; then
+	EDITOR='vim'
 fi
 export EDITOR
 
-export SUDO_EDITOR=vi
-export ALTERNATE_EDITOR=vi
-export VISUAL=$EDITOR
+export SUDO_EDITOR='vi'
+export ALTERNATE_EDITOR='vi'
+export VISUAL="${EDITOR}"
 export PAGER='less'
 export LESS='-F -g -i -M -R -S -w -X -z-4'
 export LESSHISTFILE="${XDG_CACHE_HOME}/lesshist"
 
 # define additional PATH folders here
-pathar=("${XDG_DATA_HOME}/../bin")
+path_exports=("${XDG_DATA_HOME}/../bin")
 # variables visible for systemd --user
 pam_exports=(XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME PATH)
 
 # source host specific profile
 machine=${HOST:-$HOSTNAME}
-machine=$(printf "%s" $machine | tr '[:upper:]' '[:lower:]')
-# https://stackoverflow.com/a/13864829
-if [[ ! -z ${machine+x} ]]; then
+machine=$(printf "%s" "$machine" | tr '[:upper:]' '[:lower:]')
+if [[ -n ${machine+x} ]]; then
 	if [[ -r "${HOME}/.profile-${machine}" ]]; then
 		source "${HOME}/.profile-${machine}"
 	elif [[ -r "${XDG_CONFIG_HOME}/profile/profile-${machine}" ]]; then
@@ -46,34 +53,38 @@ if [[ ! -z ${machine+x} ]]; then
 	fi
 fi
 
-# export after sourcing host specific profile
-if hash realpath &>/dev/null; then
-	for (( i=0; i < ${#pathar[@]}; i++ )); do
-		realp="$(realpath -qms "${pathar[$i]}")"
-		if ! [[ "$PATH" =~ "$realp" ]]; then
-			spath+=("$realp")
-		fi
-		unset realp
-	done
-	unset i pathar
-fi
-path=("${spath[@]}" "$PATH")
-path="$( printf '%s:' "${path[@]%/}" )"
-path="${path:0:-1}"
-export PATH="$path"
-unset path spath
+# export canonicalized 'path_exports' entries after sourcing host specific profile
+export_path() {
+	local -a rpath
+	if has_cmd realpath; then
+		for (( i=0; i < ${#path_exports[@]}; i++ )); do
+			local realp="$(realpath -qms "${path_exports[$i]}")"
+			if ! [[ "$PATH" =~ $realp ]]; then
+				rpath+=("$realp")
+			fi
+			unset realp
+		done
+		unset i path_exports
+	fi
+	local path=("${rpath[@]}" "$PATH")
+	printf -v spath '%s:' "${path[@]%/}"
+	PATH="${spath:0:-1}"
+	export PATH
+}
+export_path
 
 # export for pam_env and avoid unnecessary writes
 create_export() {
 	local estr=()
-	for var in ${pam_exports[@]}; do
-		printf -v buf '%s\t\tDEFAULT=%s\n' $var "${!var}"
+	for var in "${pam_exports[@]}"; do
+		printf -v buf '%-32s DEFAULT=%s\n' "$var" "${!var}"
 		estr+=("${buf}")
 		unset buf
 	done
-	local buf="${estr[@]}"
-	buf=${buf%?}
-	echo -e "${buf}"
+	local IFS=''
+	local buf="${estr[*]}"
+	unset IFS
+	echo -e "${buf%?}"
 }
 
 is_identical() {
@@ -83,7 +94,7 @@ is_identical() {
 		local obuf="$(<"${pamenv}")"
 		local ohash=$(echo "${obuf}" | command sha1sum | cut -d ' ' -f1)
 		local nhash=$(echo "${nbuf}" | command sha1sum | cut -d ' ' -f1)
-		if [[ $ohash == $nhash ]]; then
+		if [[ "$ohash" == "$nhash" ]]; then
 			return 0
 		fi
 		return 1
@@ -92,6 +103,7 @@ is_identical() {
 
 render_exp="$(create_export)"
 if ! is_identical "$render_exp"; then
+	echo >&2 "~/.pam_environment updated"
 	echo "$render_exp" > "${HOME}/.pam_environment"
 fi
 #################################################

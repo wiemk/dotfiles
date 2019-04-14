@@ -1,6 +1,7 @@
 # profile-electra sourced by ~/.profile
-DOTFILES=$HOME/repos/working/dotfiles
-PATH=$PATH:$HOME/.local/share/node_modules/.bin
+
+DOTFILES="${HOME}/repos/working/dotfiles"
+path_exports+=("${HOME}/.local/share/node_modules/.bin")
 
 # debug
 if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
