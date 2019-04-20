@@ -5,3 +5,7 @@ if not functions -q fisher
     curl https://raw.githubusercontent.com/jorgebucaran/fisher/master/fisher.fish --create-dirs -sLo $XDG_CONFIG_HOME/fish/functions/fisher.fish
     fish -c fisher
 end
+
+if not type -q fzy
+	echo "Please install fzy (https://github.com/jhawthorn/fzy)."
+end
