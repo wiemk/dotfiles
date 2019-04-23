@@ -20,7 +20,7 @@ has_cmd() {
 # emacs > nvim > vim > vi
 EDITOR='vi'
 if has_cmd emacsclient; then
-	EDITOR='emacsclient -qcn --alternate-editor=emacs'
+	EDITOR='emacsclient -qcn -a emacs'
 elif has_cmd nvim; then
 	EDITOR='nvim'
 	# solarized8_flat or OceanicNext

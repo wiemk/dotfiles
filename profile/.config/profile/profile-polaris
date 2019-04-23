@@ -8,6 +8,9 @@ pam_exports+=(CARGO_HOME RUSTUP_HOME)
 
 export SYSTEMD_PAGER=
 
+export EDITOR='ed'
+export VISUAL="${EDITOR}"
+
 # debug
 if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
 	echo "$(date +%s): profile-polaris" >> "${HOME}/shell_debug.log"
