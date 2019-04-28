@@ -74,6 +74,7 @@
 	wshow = show --word-diff
 	fpush = push --force-with-lease
 	uncommit = reset HEAD^
+	glogall = log --branches --remotes --tags --graph --oneline --decorate --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --date=relative
 [color]
 	ui = auto
 	branch = auto
@@ -103,8 +104,6 @@
 	tag = auto dense
 [credential]
 	helper = gnome-keyring
-	#helper = cache --socket $XDG_RUNTIME_DIR/git-credential-cache.socket
-	#helper = store --file ~/.auth/git-credential-store
 	useHttpPath = false
 [diff]
 	tool = vimdiff
@@ -126,20 +125,11 @@
 [pack]
 	writebitmaps = true
 [push]
-	#default = upstream
-	#default = current
 	default = simple
 	followTags = true
 [rebase]
 	autosquash = true
 [receive]
 	denyCurrentBranch = refuse
-[sendemail]
-	from = Thorsten Schubert <tschubert@bafh.org>
-	confirm = auto
-	chainReplyTo = false
-	smtpServer = /usr/bin/msmtp
-	#smtpServerOption = --debug
-	smtpServerOption = --read-envelope-from
 [include]
 	path = ~/.gitconfig.local
