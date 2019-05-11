@@ -24,7 +24,7 @@ export XDG_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
 # default: emacs > nvim > vim > vi
 EDITOR='vi'
 if is_cmd emacsclient; then
-	EDITOR='emacsclient -qcn -a emacs'
+	EDITOR='emacsclient -qc -a emacs'
 elif is_cmd nvim; then
 	EDITOR='nvim'
 	# solarized8_flat or OceanicNext

@@ -9,7 +9,7 @@ env_exports+=( CARGO_HOME RUSTUP_HOME )
 
 export SYSTEMD_PAGER=
 
-export EDITOR='ed'
+export EDITOR='ed -w'
 export VISUAL="${EDITOR}"
 
 # debug
