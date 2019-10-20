@@ -9,9 +9,9 @@ is_cmd() {
 
 #################################################
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
-if [[ -d "${HOME}/tmp" ]]; then
-	XDG_CACHE_HOME="${HOME}/tmp/.cache"
-	TMPDIR="${HOME}/tmp"
+if [[ -d "${HOME}/.tmp" ]]; then
+	XDG_CACHE_HOME="${HOME}/.tmp/cache"
+	TMPDIR="${HOME}/.tmp"
 else
 	XDG_CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}
 fi
