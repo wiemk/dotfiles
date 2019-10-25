@@ -18,4 +18,5 @@ function upd --description 'shortcut for upgrading the system'
 		echo "unknown distribution" >&2
 		return 2
 	end
+	command sync
 end
