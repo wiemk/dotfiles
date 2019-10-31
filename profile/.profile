@@ -1,7 +1,10 @@
+#!/usr/bin/env bash
+
 # ~/.profile
-# you can override exported variables in host specific profiles in
-# ${XDG_CONFIG_HOME}/profile/profile-${HOSTNAME}
-# shellcheck disable=2155,2039,2043,1090
+# you can override exported variables in host specific profiles
+# in ${XDG_CONFIG_HOME}/profile/profile-${HOSTNAME}
+# shellcheck disable=2155
+
 is_cmd() {
 	hash "$1" &>/dev/null && return 0
 	return 1
@@ -57,7 +60,7 @@ env_exports=("${pam_exports[@]}")
 # source host specific profile
 source_machine_profile() {
 	local machine=${HOST:-$HOSTNAME}
-	machine=$(printf "%s" "$machine" | tr '[:upper:]' '[:lower:]')
+	machine=${machine,,}
 	if [[ -n ${machine+x} ]]; then
 		if [[ -r "${HOME}/.profile-${machine}" ]]; then
 			source "${HOME}/.profile-${machine}"
@@ -90,60 +93,57 @@ export_path
 
 # export for pam_env and avoid unnecessary writes
 create_pam_export() {
-	local estr=()
+	local -a buf
 	for var in "${pam_exports[@]}"; do
-		printf -v buf '%-32s DEFAULT=%s\n' "$var" "${!var}"
-		estr+=("${buf}")
-		unset buf
+		printf -v line '%-32s DEFAULT=%s' "$var" "${!var}"
+		buf+=("${line}")
 	done
-	local IFS=''
-	local buf="${estr[*]}"
-	unset IFS
-	echo -e "${buf%?}"
+	local IFS=$'\n'
+	printf '%s' "${buf[*]}"
 }
 
 # same for environment.d
 create_env_export() {
-	local estr=()
+	local -a buf
 	for var in "${env_exports[@]}"; do
-		printf -v buf '%s=%s\n' "$var" "${!var}"
-		estr+=("${buf}")
-		unset buf
+		printf -v line '%s=%s' "$var" "${!var}"
+		buf+=("${line}")
 	done
-	local IFS=''
-	local buf="${estr[*]}"
-	unset IFS
-	echo -e "${buf%?}"
+	IFS=$'\n'
+	printf '%s' "${buf[*]}"
 }
 
-is_identical() {
-	local file="$1"
-	local nbuf="$2"
+is_identical_sha() {
+	local file="$1" nbuf="$2"
 	if [[ -f "${file}" ]]; then
 		local obuf="$(<"${file}")"
-		local ohash=$(echo "${obuf}" | command sha1sum | cut -d ' ' -f1)
-		local nhash=$(echo "${nbuf}" | command sha1sum | cut -d ' ' -f1)
-		if [[ "$ohash" == "$nhash" ]]; then
-			return 0
-		fi
-		return 1
+		local ohash=$(printf '%s' "${obuf}" | command sha1sum | cut -d ' ' -f1)
+		local nhash=$(printf '%s' "${nbuf}" | command sha1sum | cut -d ' ' -f1)
+		test "$ohash" == "$nhash"
+	fi
+}
+
+is_identical_cmp() {
+	local file="$1" nbuf="$2"
+	if [[ -f "${file}" ]]; then
+		command cmp -s "$file" <(printf '%s\n' "${nbuf}")
 	fi
 }
 
 write_pam_export() {
 	render_exp="$(create_pam_export)"
-	if ! is_identical "${HOME}/.pam_environment" "$render_exp"; then
-		echo >&2 "${HOME}/.pam_environment updated"
-		echo "$render_exp" > "${HOME}/.pam_environment"
+	if ! is_identical_cmp "${HOME}/.pam_environment" "$render_exp"; then
+		printf '%s\n' "${HOME}/.pam_environment updated" >&2
+		printf '%s\n' "$render_exp" > "${HOME}/.pam_environment"
 	fi
 }
 write_pam_export
 
 write_env_export() {
 	render_exp="$(create_env_export)"
-	if ! is_identical "${XDG_CONFIG_HOME}/environment.d/50-profile.conf" "$render_exp"; then
-		echo >&2 "${XDG_CONFIG_HOME}/environment.d/50-profile.conf updated"
-		echo "$render_exp" > "${XDG_CONFIG_HOME}/environment.d/50-profile.conf"
+	if ! is_identical_cmp "${XDG_CONFIG_HOME}/environment.d/50-profile.conf" "$render_exp"; then
+		printf '%s\n' "${XDG_CONFIG_HOME}/environment.d/50-profile.conf updated" >&2
+		printf '%s\n' "$render_exp" > "${XDG_CONFIG_HOME}/environment.d/50-profile.conf"
 	fi
 }
 write_env_export
@@ -153,6 +153,6 @@ export PROFILE_SOURCED=true
 
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
-	echo "$(date +%s): .profile" >> "${HOME}/shell_debug.log"
+	printf '%d%s\n' "${EPOCHSECONDS}" ': .profile' >> "${HOME}/shell_debug.log"
 fi
 # EOF
