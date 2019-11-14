@@ -1,0 +1,11 @@
+[Unit]
+Description=Creates restic snapshots
+OnFailure=telegram-notification@%n.service
+Before=restic-runner-check@%i.service restic-runner-expire@%i.service
+
+[Service]
+Type=oneshot
+
+ExecStart=restic-runner --repo "%i" --set live backup
+KillMode=none
+TimeoutSec=5min

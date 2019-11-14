@@ -1,0 +1,13 @@
+[Unit]
+Description=Hourly restic backups to %i
+# stop timer when parent exits
+PartOf=backup@%i.target
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=120
+Unit=%p@%i.service
+
+[Install]
+WantedBy=backup@%i.target

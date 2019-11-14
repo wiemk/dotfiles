@@ -1,8 +1,6 @@
-nvim/.config/nvim/plugged/*
-nvim/.config/nvim/local.vim
-fish/.config/fish/fishd.*
-fish/.config/fish/functions/*
-fish/.config/fish/conf.d/*
-fish/.config/fish/functions/fish_prompt.fish
-fish/.config/fish/completions
-.netrwhist
+core/fish/.config/fish/fishd.*
+core/fish/.config/fish/functions/*
+core/fish/.config/fish/conf.d/*
+core/fish/.config/fish/functions/fish_prompt.fish
+core/fish/.config/fish/completions
+core/systemd/user/telegram-notification@.service.d/override.conf

@@ -135,3 +135,5 @@
 	path = ~/.gitconfig.local
 [pull]
 	rebase = true
+[feature]
+	manyFiles = true

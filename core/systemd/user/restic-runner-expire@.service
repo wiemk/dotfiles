@@ -1,0 +1,10 @@
+[Unit]
+Description=Deletes old restic snapshots
+OnFailure=telegram-notification@%n.service
+#After=restic-runner-backup@%i.service
+Before=restic-runner-check@%i.service
+
+[Service]
+Type=oneshot
+
+ExecStart=restic-runner --repo "%i" --set live expire

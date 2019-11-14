@@ -1,0 +1,9 @@
+[Unit]
+Description=Backup services for %i
+# deprecated, managed through custom target now
+# Wants=restic-runner-shutdown@%i.service restic-runner-backup@%i.timer restic-runner-expire@%i.timer restic-runner-check@%i.timer
+
+[Install]
+# also enable all children
+Also=restic-runner-shutdown@%i.service restic-runner-backup@%i.timer restic-runner-expire@%i.timer restic-runner-check@%i.timer
+WantedBy=timers.target

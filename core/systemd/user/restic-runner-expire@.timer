@@ -1,0 +1,13 @@
+[Unit]
+Description=Remove old restic snapshots daily from %i
+# stop timer when parent exits
+PartOf=backup@%i.target
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=120
+Unit=%p@%i.service
+
+[Install]
+WantedBy=backup@%i.target

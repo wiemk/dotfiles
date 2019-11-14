@@ -1,0 +1,13 @@
+[Unit]
+Description=check restic backup consistency of %i weekly
+# stop timer when parent exits
+PartOf=backup@%i.target
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+RandomizedDelaySec=120
+Unit=%p@%i.service
+
+[Install]
+WantedBy=backup@%i.target

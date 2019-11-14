@@ -1,0 +1,14 @@
+[Unit]
+Description=Restic backup service on shutdown
+OnFailure=telegram-notification@%n.service
+PartOf=backup@%i.target
+
+[Service]
+Type=oneshot
+ExecStop=restic-runner --repo "%i" --set shutdown backup
+RemainAfterExit=true
+KillMode=none
+TimeoutSec=5min
+
+[Install]
+WantedBy=backup@%i.target
