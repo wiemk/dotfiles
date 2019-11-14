@@ -1,0 +1,4 @@
+[submodule "contrib/gdb-dashboard"]
+	path = contrib/gdb-dashboard
+	url = https://github.com/cyrus-and/gdb-dashboard.git
+	branch = master
