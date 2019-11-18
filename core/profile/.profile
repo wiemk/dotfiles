@@ -9,6 +9,32 @@ is_cmd() {
 	hash "$1" &>/dev/null
 }
 
+is_in_exp () { 
+    local haystack="$1[@]"
+    local needle=$2
+    local in=1
+    for e in "${!haystack}"; do
+        if [[ $e == "$needle" ]]; then
+            in=0
+            break
+        fi
+    done
+    return $in
+}
+
+is_in_ref () { 
+    local -n haystack="$1"
+    local needle=$2
+    local in=1
+    for e in "${haystack[@]}"; do
+        if [[ $e == "$needle" ]]; then
+            in=0
+            break
+        fi
+    done
+    return $in
+}
+
 #################################################
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
 if [[ -d "${HOME}/.tmp" ]]; then
@@ -42,6 +68,7 @@ export VISUAL="${EDITOR}"
 export PAGER='less'
 export LESS='-F -g -i -M -R -S -w -X -z-4'
 export LESSHISTFILE="${XDG_CACHE_HOME}/lesshist"
+export SYSTEMD_PAGER='cat'
 
 #################################################
 # define additional PATH folders here
@@ -74,10 +101,14 @@ source_machine_profile
 export_path() {
 	local -a rpath
 	if is_cmd realpath; then
+		# let's do not use IFS or eval shenanigans here
+		# if the user specified the path multiple times
+		# we honor that decision
+		readarray -t -d ':' apath <<< "$PATH"
 		for (( i=0; i < ${#path_exports[@]}; i++ )); do
 			local realp="$(realpath -qms "${path_exports[$i]}")"
-			# check if already added
-			if ! [[ "$PATH" =~ $realp ]]; then
+			# check if already added,
+			if ! is_in_ref apath "$realp"; then
 				rpath+=("$realp")
 			fi
 		done

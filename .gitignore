@@ -3,4 +3,5 @@ core/fish/.config/fish/functions/*
 core/fish/.config/fish/conf.d/*
 core/fish/.config/fish/functions/fish_prompt.fish
 core/fish/.config/fish/completions
+core/fish/.config/fish/fish_variables
 core/systemd/user/telegram-notification@.service.d/override.conf
