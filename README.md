@@ -3,4 +3,4 @@
 **usage:**
 `stow -d dotfiles/ -t $HOME -S <target>`
 
-Please symlink submodules inside contrib manually because they usually do have an incompatible directory structure.
+Please symlink submodules inside contrib manually, they usually do have an incompatible directory structure.

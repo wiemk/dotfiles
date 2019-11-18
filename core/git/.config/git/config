@@ -1,54 +1,43 @@
 # ~/.gitconfig: git-config(1) - Git configuration
 # # vim: ft=gitconfig
 
-[core]
-	excludefiles = ~/.config/git/ignore
-	askpass =
-	autocrlf = input
-	logAllRefUpdates = true
 [user]
 	name = Thorsten Schubert
 	email = tschubert@bafh.org
+	# sign with the ed25519 subkey
+	signingKey = "890563373AFD6DD0AA52970BF74F74BB63C458FD!"
+
 [alias]
 	a = add --all
 	a-p = add --all --patch
+	ainit = "!git init && git add --all && git commit -m 'initial commit'"
 	amend = commit --amend
 	br = branch
 	bra = branch -vv
-	c = commit -m 'temporary commit - do not push'
-	cl = log --graph --pretty=format:'%an: %s%C(yellow)%d%Creset %Cgreen(%cr)%Creset' --date=relative
-	cls = log --pretty=format:'%an (%ae): %C(yellow)%s%Creset' --shortstat
-	cim = commit -m
+	ci = commit
+	ci-m = commit -m
+	clone-svnsync = svn clone --use-svnsync-props
 	co = checkout
 	di = diff
-	dt = difftool
-	empty = !git init && git commit --allow-empty -m Initial
-	export = !touch $(git rev-parse --git-dir)/git-daemon-export-ok
+	emerge = merge --edit --no-ff
+	export = "!touch \"$(git rev-parse --git-dir)/git-daemon-export-ok\""
 	fa = fetch --all
-	fo = log --pretty=oneline --shortstat --abbrev-commit
 	follow = log --oneline --follow --stat --summary --
-	fun = "!git fsck | awk '/dangling commit/ {print $3 \"^!\"}' | xargs git log"
-	gg = grep --break --heading -n
-	glog = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
-	ia = add -p
-	ignored = ls-files --other -i --exclude-standard
+	fpush = push --force-with-lease
+	ftime = "!date +'--date=%s' -r"
+	fetch-notes = "!git config --add remote.origin.fetch \"+refs/notes/*:refs/notes/*\" && git fetch origin"
+	fetch-pr = "!git config --add remote.origin.fetch \"+refs/pull/*/head:refs/remotes/pr/*\" && git fetch origin"
 	in = log --oneline --decorate ..@{upstream}
-	l = log --decorate --graph --oneline --all
-	la = "!git config --get-regexp '^alias\\.' | sed -e 's#^alias\\.##' -e 's#\\ #\\\\#'| column -t -s '\\'"
 	lg = log --oneline --decorate
 	lgs = log --format=\"%C(yellow)%h%C(reset)%C(cyan)% GK%C(reset) %s\"
-	ls = ls-files
-	lsr = "!_() { [ \"$1\" ] || set -- HEAD; git ls-tree -r \"$@\"; }; _"
 	logs = log --show-signature
+	lost = "!git fsck | awk '/dangling commit/ {print $3 \"^!\"}' | xargs git log"
+	ls = ls-files
+	lsf = ls-files
+	lsr = "!_() { [ \"$1\" ] || set -- HEAD; git ls-tree -r \"$@\"; }; _"
 	mend = commit --amend --reuse-message HEAD
-	mirror = clone --mirror
 	mkobject = hash-object --stdin -w
-	mrproper = !git reset --hard HEAD && git clean -fdx
 	out = log --oneline --decorate @{upstream}..
-	p = pull --ff-only
-	prb = pull --rebase
-	prune = fetch --prune
-	puam = "!git remote --| while read -r i; do git push $i master; done"
 	rbc = rebase --continue
 	rbs = rebase -i
 	re = rebase
@@ -56,84 +45,175 @@
 	refs = for-each-ref
 	repack-to-alternate = repack -dal
 	repack-to-local = repack -da
-	s = status -sb
 	sg = diff --cached
 	st = status
 	staged = diff --cached
-	stash-all = stash save --include-untracked
 	stat = diff --stat
 	statg = diff --cached --stat
 	tagv = !git tag -v $(git describe --abbrev=0)
 	tg = log --oneline --decorate --graph
-	tip = !git --no-pager log -1 --decorate --abbrev-commit --date=relative --show-signature
-	undo = reset --soft HEAD^
-	unexport = !rm -v $(git rev-parse --git-dir)/git-daemon-export-ok
-	unpushed = log --stat origin/master..HEAD
-	wdiff = diff -w --word-diff-regex=. --color-words -U
-	wipe = reset --hard HEAD
-	wshow = show --word-diff
-	fpush = push --force-with-lease
+	tgs = log --format=\"%C(yellow)%h%C(reset)%C(cyan)% GS%C(reset) %s\" --graph
+	tip = !git --no-pager log -1 --decorate --abbrev-commit --date=relative
 	uncommit = reset HEAD^
-	glogall = log --branches --remotes --tags --graph --oneline --decorate --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --date=relative
+	undo = reset --soft HEAD^
+	unexport = "!rm -v \"$(git rev-parse --git-dir)/git-daemon-export-ok\""
+	wdiff = diff --word-diff
+	wshow = show --word-diff
+	ic = commit
+	tig = !tig
+
+[advice]
+	detachedHead = false
+	pushNonFastForward = false
+	statusHints = false
+
+[am]
+	messageid = true
+
 [color]
 	ui = auto
 	branch = auto
 	diff = auto
 	status = auto
-[color "branch"]
-	current = green bold
-	local = blue
-	remote = red reverse
+
+[color "decorate"]
+	remoteBranch = 202
+
 [color "diff"]
-	func = cyan bold
-	old = red bold
-	new = green bold
-	whitespace = magenta bold
-[color "status"]
-	added = green bold
-	changed = yellow bold
-	untracked = red bold
+	whitespace = red reverse
+	commit = 214
+	frag = 38
+	func = 87
+	new = 76
+	old = 196
+
 [color "grep"]
 	filename = magenta
 	linenumber = green
-	match = green bold
+
 [column]
 	ui = auto
 	branch = never
 	status = never
 	tag = auto dense
+
+[core]
+	excludefiles = ~/.config/git/ignore
+	askpass =
+	autocrlf = input
+	logAllRefUpdates = true
+
 [credential]
-	helper = gnome-keyring
+	#helper = libsecret
 	useHttpPath = false
+
 [diff]
-	tool = vimdiff
+	renames = copies
+	submodule = log
+	compactionHeuristic = true
+
+[diff "gpg"]
+	textconv = gpg -v
+	xfuncname = "^((pub|uid) .*)"
+
+[diff "ldif"]
+	xfuncname = "^(dn: .+)$"
+
+[filter "merge-known-hosts"]
+	clean = ssh-duphosts -m -
+	smudge = cat
+
+[gc]
+	reflogExpire = 365 days
+	reflogExpireUnreachable = 365 days
+
 [grep]
 	lineNumber = true
 	extendedRegexp = true
+
+[gui]
+	encoding = utf-8
+	fontdiff = -family \"DejaVu Sans Mono\" -size 9 -weight normal -slant roman -underline 0 -overstrike 0
+	spellingdictionary = none
+
+[http]
+	cookieFile = /home/grawity/.config/git/cookies
+	delegation = policy
+
 [init]
 	templateDir = ~/.config/git/template
+
+[log]
+	decorate = auto
+
 [merge]
-	tool = vimdiff
 	conflictStyle = diff3
-	ff = only
-[status]
-	showUntrackedFiles = all
-[transfer]
-	fsckobjects = true
-[mergetool "vimdiff"]
-	cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
-[pack]
-	writebitmaps = true
+	defaultToUpstream = true
+
 [push]
-	default = simple
-	followTags = true
-[rebase]
-	autosquash = true
-[receive]
-	denyCurrentBranch = refuse
-[include]
-	path = ~/.gitconfig.local
+	#default = upstream
+	default = current
+
 [pull]
 	rebase = true
+
+[rebase]
+	autosquash = true
+
+[receive]
+	denyCurrentBranch = refuse
+	
 [feature]
 	manyFiles = true
+
+[tag]
+	forceSignAnnotated = true
+
+[tig]
+	# [v2 opts]
+	main-view = id:no date:relative author:full,width=12 commit-title:graph=yes,refs,overflow=no
+	# [v2.1 opts]
+	main-view-date = relative
+	main-view-author-width = 12
+	main-view-commit-title-graph = v1
+
+	# revert to default
+	#blame-view = date:default author:full file-name:auto id:yes,color line-number:no,interval=5 text
+
+	# [global opts]
+	commit-order = topo
+	ignore-case = true
+	line-graphics = true
+	show-changes = no
+	split-view-height = 75%
+
+	mouse = true
+
+	# [diff opts]
+	diff-highlight = diff-highlight
+
+[tig "bind"]
+	generic = <Backspace> view-close
+	generic = \\ scroll-line-up
+	generic = E !git format-patch -1 %(commit)
+	generic = w :toggle wrap-lines
+	generic = ~ none
+	main = g :toggle commit-title-graph
+	main = G move-last-line
+	# fix Home/End in PuTTY
+	generic = <Esc>[1~ move-first-line
+	generic = <Esc>[4~ move-last-line
+
+[tig "color"]
+	cursor = black green
+	diff-add-highlight = black green
+	diff-del-highlight = black red
+	#diff-add-highlight = color83 color22
+	#diff-del-highlight = blue color52
+	title-blur = black blue
+	title-focus = white blue
+
+# local config
+[include]
+	path = ~/.config/git/config.local
+	path = ~/.gitconfig-local
