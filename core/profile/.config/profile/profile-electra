@@ -1,11 +1,12 @@
 # profile-electra sourced by ~/.profile
 
-DOTFILES="${HOME}/repos/working/dotfiles"
+export DOTFILES="${HOME}/repos/working/dotfiles"
 path_exports+=( "${HOME}/.local/share/node_modules/.bin" )
 
 # debug
 if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
-	echo "$(date +%s): profile-electra" >> "${HOME}/shell_debug.log"
+	printf '%d%s\n' "${EPOCHSECONDS}" ': profile-electra' >> "${HOME}/shell_debug.log"
 fi
 
+# vim: ts=4:sw=4:noet:ft=sh
 # EOF

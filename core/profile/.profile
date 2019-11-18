@@ -6,8 +6,7 @@
 # shellcheck disable=2155
 
 is_cmd() {
-	hash "$1" &>/dev/null && return 0
-	return 1
+	hash "$1" &>/dev/null
 }
 
 #################################################
@@ -77,12 +76,11 @@ export_path() {
 	if is_cmd realpath; then
 		for (( i=0; i < ${#path_exports[@]}; i++ )); do
 			local realp="$(realpath -qms "${path_exports[$i]}")"
+			# check if already added
 			if ! [[ "$PATH" =~ $realp ]]; then
 				rpath+=("$realp")
 			fi
-			unset realp
 		done
-		unset i path_exports
 	fi
 	local path=("${rpath[@]}" "$PATH")
 	printf -v spath '%s:' "${path[@]%/}"
@@ -155,4 +153,6 @@ export PROFILE_SOURCED=true
 if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
 	printf '%d%s\n' "${EPOCHSECONDS}" ': .profile' >> "${HOME}/shell_debug.log"
 fi
+
+# vim: ts=4:sw=4:noet:ft=sh
 # EOF
