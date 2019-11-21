@@ -2,10 +2,8 @@
 # # vim: ft=gitconfig
 
 [user]
-	name = Thorsten Schubert
-	email = tschubert@bafh.org
-	# sign with the ed25519 subkey
-	signingKey = "890563373AFD6DD0AA52970BF74F74BB63C458FD!"
+	name = wiemk
+	email = wiemk@wmnk.de
 
 [alias]
 	a = add --all
@@ -205,9 +203,6 @@
 	branch = never
 	status = never
 	tag = auto dense
-
-[commit]
-	gpgsign = true
 
 [core]
 	excludefiles = ~/.config/git/ignore
