@@ -8,6 +8,8 @@ core/fish/.config/fish/fish_variables
 core/systemd/user/telegram-notification@.service.d/override.conf
 
 # whitelist
+core/gnupg/.gnupg/*
+!core/gnupg/.gnupg/*.conf
 gui/mpv/.config/mpv/*
 !gui/mpv/.config/mpv/input.conf
 !gui/mpv/.config/mpv/mpv.conf
