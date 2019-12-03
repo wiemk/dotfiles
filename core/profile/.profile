@@ -39,11 +39,11 @@ is_in_ref () {
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
 if [[ -d "${HOME}/.tmp" ]]; then
 	XDG_CACHE_HOME="${HOME}/.tmp/cache"
-	TMPDIR="${HOME}/.tmp"
+	export TMPDIR="${HOME}/.tmp"
 else
 	XDG_CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}
 fi
-export XDG_CACHE_HOME TMPDIR
+export XDG_CACHE_HOME
 export XDG_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
 
 #################################################
@@ -76,7 +76,7 @@ path_exports=("${XDG_DATA_HOME}/../bin")
 # read by PAM through the pam_env module (man 8 pam_env) - be aware that fedora
 # is using a patched pam_env module which does not enable user_readenv by default
 # touch ${HOME}/.pam_environment for enabling
-pam_exports=(XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME TMPDIR PATH)
+pam_exports=(XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME PATH)
 # environment.d (man 8 environment.d) read by systemd-environment-d-generator
 # (man 8 systemd-environment-d-generator), initialized with default pam_exports
 # touch ${XDG_CONFIG_HOME}/environment.d/50-profile.conf for enabling
