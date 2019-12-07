@@ -38,8 +38,15 @@ disabled = true
 [ruby]
 disabled = true
 
+[php]
+disabled = true
+
 [time]
 disabled = true
 
 [cmd_duration]
 style = "bold green"
+
+[git_commit]
+disabled = false
+commit_hash_length = 7
