@@ -3,15 +3,14 @@ window:
     columns: 200
     lines: 55
   padding:
-    x: 1
-    y: 1
+    x: 4
+    y: 4
   dynamic_padding: false
   decorations: full
   startup_mode: Windowed
 scrolling:
   history: 0
   multiplier: 3
-tabspaces: 8
 font:
   normal:
     family: Source Code Pro

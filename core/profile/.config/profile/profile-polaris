@@ -1,12 +1,13 @@
 # profile-polaris sourced by ~/.profile
 CARGO_HOME="${XDG_DATA_HOME}/cargo"
 RUSTUP_HOME="${XDG_DATA_HOME}/rustup"
-export CARGO_HOME RUSTUP_HOME
+PYLINTHOME="${XDG_CACHE_HOME}/pylint"
+export CARGO_HOME RUSTUP_HOME PYLINTHOME
 
 path_exports+=( "${CARGO_HOME}/bin" '/usr/share/bcc/tools' )
-pam_exports+=( CARGO_HOME RUSTUP_HOME )
+pam_exports+=( CARGO_HOME RUSTUP_HOME PYLINTHOME )
 
-env_exports+=( CARGO_HOME RUSTUP_HOME )
+env_exports+=( CARGO_HOME RUSTUP_HOME PYLINTHOME )
 
 # override generic settings
 export EDITOR='code -w'
