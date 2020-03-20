@@ -17,6 +17,12 @@ disabled = true
 [java]
 disabled = true
 
+[nodejs]
+disabled = true
+
+[golang]
+disabled = true
+
 [dotnet]
 disabled = true
 
@@ -41,12 +47,48 @@ disabled = true
 [php]
 disabled = true
 
+[crystal]
+disabled = true
+
+[elixir]
+disabled = true
+
+[elm]
+disabled = true
+
+[haskell]
+disabled = true
+
+[kubernetes]
+disabled = true
+
+[line_break]
+disabled = false
+
 [time]
 disabled = true
 
 [cmd_duration]
 style = "bold green"
 
+[git_branch]
+disabled = false
+
+[git_state]
+disabled = false
+
+[git_status]
+disabled = false
+
 [git_commit]
 disabled = false
 commit_hash_length = 7
+
+[hg_branch]
+disabled = true
+
+[singularity]
+disabled = true
+
+[terraform]
+disabled = true
