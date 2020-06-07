@@ -1,11 +1,7 @@
 # ~/.XCompose - Compose(5) - Compose (Multi) key mappings for XIM input method
 #
 # Enabling compose key: <https://wiki.ubuntu.com/ComposeKey>
-#
-# NOTE: In GTK, custom definitions only work in 3.18+gitmaster (as of commit
-#       a41f02f9b1843e0f0085f801430e55f413a9bf9c). For older versions, switch
-#       to 'ibus' or 'xim' immodules (see GTK_IM_MODULE in my "environ" file)
-#
+
 # NOTE: IBus support for XCompose is incomplete – only 2-letter shortcuts are
 #       supported, e.g. "<Multi_key> <z> <w> <j>" won't work. However, stacked
 #       <Multi_key> works fine.
@@ -14,145 +10,14 @@
 
 include "%L"
 
-# letters
+<Multi_key> <l> <q>			: "“"   U201c # LEFT DOUBLE QUOTATION MARK
+<Multi_key> <r> <q>			: "”"   U201d # RIGHT DOUBLE QUOTATION MARK
 
-<Multi_key> <D> <A>			: "Δ"	U0394 # Delta
-<Multi_key> <D> <a>			: "Δ"	U0394 # Delta
-<Multi_key> <d> <a>			: "δ"	U03B4 # delta
-<Multi_key> <l> <a>			: "λ"	U03BB # lambda
-<Multi_key> <O> <M>			: "Ω"	U03A9 # Omega
-<Multi_key> <O> <m>			: "Ω"	U03A9 # Omega
-<Multi_key> <o> <m>			: "ω"	U03C9 # omega
-<Multi_key> <p> <i>			: "π"	U03C0 # pi
+<Multi_key> <l> <s>			: "‘"	U201c # LEFT DOUBLE QUOT. MARK <"
+<Multi_key> <r> <s>			: "’"   U2019 # RIGHT SINGLE QUOTATION MARK
 
-<Multi_key> <n> <n>			: "𝒏"	#U1d48f
-<Multi_key> <n> <quotedbl>		: "n̈"	# SPINAL TAP
+<Multi_key> <l> <d>			: "„"   U201e # DOUBLE LOW-9 QUOTATION MARK
+<Multi_key> <r> <d>			: "”"   U201d # RIGHT DOUBLE QUOTATION MARK
 
-# various glyphs
-
-<Multi_key> <equal> <equal>		: "–"	U2013 # EN DASH, - - .
-<Multi_key> <zcaron> <zcaron>		: "–"	U2013 # EN DASH, - - .
-<Multi_key> <e> <u>			: "€"	U20AC # EURO SIGN, e =
-<Multi_key> <equal> <asciitilde>	: "≈"	U2248 # almost equal
-<Multi_key> <asciitilde> <asciitilde>	: "≈"	U2248
-<Multi_key> <less> <4>			: "❤"	U2764
-<Multi_key> <3> <greater>		: "❥"	U2765
-<Multi_key> <slash> <slash>		: "⁄"	U2044 # FRACTION SLASH
-<Multi_key> <v> <slash>			: "✔"	U2714 # check
-<Multi_key> <ampersand> <ampersand>	: "∧"	U2227 # LOGICAL AND
-<Multi_key> <bar> <bar>			: "∨"	U2228 # LOGICAL OR
-<Multi_key> <minus> <period>		: "⋯"	U22EF # MID HORIZ ELLIPSIS
-<Multi_key> <bar> <period>		: "⁝"	U205D # TRICOLON
-<Multi_key> <4> <period>		: "⁞"	U205E # VERTICAL FOUR DOTS
-<Multi_key> <backslash> <backslash>	: "¦"	U00A6 # BROKEN BAR
-<Multi_key> <bar> <greater>		: "❯"
-
-<Multi_key> <Multi_key> <bar> <bar>		: "∩"	U2229 # INTERSECTION
-<Multi_key> <Multi_key> <ampersand> <ampersand>	: "∪"	U222A # UNION
-
-# quotation marks
-
-<Multi_key> <l> <q>			: "“"	U201c # LEFT DOUBLE QUOT. MARK <"
-<Multi_key> <r> <q>			: "”"	U201d # RIGHT DOUBLE QUOT. MARK >"
-
-<Multi_key> <apostrophe> <period>	: "’"	U2019 # RIGHT SINGLE QUOT. MARK >'
-<Multi_key> <period> <apostrophe>	: "’"	U2019 # -same-
-
-<Multi_key> <bracketleft> <less>	: "〈"	U3008 # LEFT ANGLE BRACKET
-<Multi_key> <bracketright> <greater>	: "〉"	U3009 # RIGHT ANGLE BRACKET
-
-<Multi_key> <bracketleft> <parenleft>	: "〔"	U3014 # LEFT TORTOISE SHELL BRACKET
-<Multi_key> <bracketright> <parenright>	: "〕"	U3015 # RIGHT TORTOISE SHELL BRACKET
-
-<Multi_key> <bracketleft> <apostrophe>	: "「"	U300c # LEFT CORNER BRACKET
-<Multi_key> <bracketright> <apostrophe>	: "」"	U300d # RIGHT CORNER BRACKET
-
-<Multi_key> <bracketleft> <quotedbl>	: "『"	U300e
-<Multi_key> <bracketright> <quotedbl>	: "』"	U300f
-
-<Multi_key> <Multi_key> <bracketleft> <apostrophe>	: "｢" Uff62 # HALF… LEFT C B
-<Multi_key> <Multi_key> <bracketright> <apostrophe>	: "｣" Uff63 # HALF… RIGHT C B
-
-# invisible punctuation
-
-<Multi_key> <n> <h> <y>			: U2011 # non-breaking hyphen
-<Multi_key> <s> <h> <y>			: U00ad # 'hyphen' soft hyphen
-<Multi_key> <z> <w> <j>			: U200d # zero-width joiner
-<Multi_key> <z> <w> <n> <j>		: U200c # zero-width non-joiner
-<Multi_key> <z> <w> <s>			: U200b # zero-width space
-
-# http://unicode.org/reports/tr9/#Directional_Formatting_Characters
-
-<Multi_key> <Multi_key> <l> <r> <e>	: U202a # left-to-right embedding
-<Multi_key> <Multi_key> <l> <r> <m>	: U200e # left-to-right mark
-<Multi_key> <Multi_key> <l> <r> <o>	: U202d # left-to-right override
-<Multi_key> <Multi_key> <p> <d> <f>	: U202c # pop directional formatting
-<Multi_key> <Multi_key> <r> <l> <e>	: U202b # right-to-left embedding
-<Multi_key> <Multi_key> <r> <l> <m>	: U200f # right-to-left mark
-<Multi_key> <Multi_key> <r> <l> <o>	: U202e # right-to-left override
-
-# arrows
-
-<Multi_key> <6> <6>			: "↑" # up arrow
-<Multi_key> <v> <v>			: "↓" # down arrow
-
-<Multi_key> <l> <r>			: "⇆" # lrarr
-<Multi_key> <r> <l>			: "⇄" # rlarr
-
-<Multi_key> <Return> <Return> 		: "↵"
-
-# arrows on keypad
-
-<Multi_key> <KP_5> <KP_1>		: "↙"
-<Multi_key> <KP_5> <KP_2>		: "↓"
-<Multi_key> <KP_5> <KP_3>		: "↘"
-<Multi_key> <KP_5> <KP_4>		: "←"
-
-<Multi_key> <KP_5> <KP_6>		: "→"
-<Multi_key> <KP_5> <KP_7>		: "↖"
-<Multi_key> <KP_5> <KP_8>		: "↑"
-<Multi_key> <KP_5> <KP_9>		: "↗"
-
-<Multi_key> <KP_2> <KP_8>		: "↕"
-<Multi_key> <KP_8> <KP_2>		: "↕"
-<Multi_key> <KP_4> <KP_6>		: "↔"
-<Multi_key> <KP_6> <KP_4>		: "↔"
-
-# box drawing and stuff
-
-<Multi_key> <numbersign> <1>		: "░"
-<Multi_key> <numbersign> <2>		: "▒"
-<Multi_key> <numbersign> <3>		: "▓"
-<Multi_key> <numbersign> <4>		: "█"
-
-# box drawing numpad
-
-<Multi_key> <KP_1> <KP_1>		: "└"
-<Multi_key> <KP_2> <KP_2>		: "─"
-<Multi_key> <KP_3> <KP_3>		: "┘"
-<Multi_key> <KP_4> <KP_4>		: "│"
-<Multi_key> <KP_5> <KP_5>		: "┼"
-<Multi_key> <KP_6> <KP_6>		: "│"
-<Multi_key> <KP_7> <KP_7>		: "┌"
-<Multi_key> <KP_8> <KP_8>		: "─"
-<Multi_key> <KP_9> <KP_9>		: "┐"
-
-<Multi_key> <KP_2> <KP_5>		: "┴"
-<Multi_key> <KP_4> <KP_5>		: "├"
-<Multi_key> <KP_6> <KP_5>		: "┤"
-<Multi_key> <KP_8> <KP_5>		: "┬"
-
-<Multi_key> <Multi_key> <KP_1> <KP_1>		: "╚"
-<Multi_key> <Multi_key> <KP_2> <KP_2>		: "═"
-<Multi_key> <Multi_key> <KP_3> <KP_3>		: "╝"
-<Multi_key> <Multi_key> <KP_4> <KP_4>		: "║"
-<Multi_key> <Multi_key> <KP_5> <KP_5>		: "┼"
-<Multi_key> <Multi_key> <KP_6> <KP_6>		: "║"
-<Multi_key> <Multi_key> <KP_7> <KP_7>		: "╔"
-<Multi_key> <Multi_key> <KP_8> <KP_8>		: "═"
-<Multi_key> <Multi_key> <KP_9> <KP_9>		: "╗"
-
-<Multi_key> <Multi_key> <KP_2> <KP_5>		: "╩"
-<Multi_key> <Multi_key> <KP_4> <KP_5>		: "╠"
-<Multi_key> <Multi_key> <KP_6> <KP_5>		: "╣"
-<Multi_key> <Multi_key> <KP_8> <KP_5>		: "╦"
+<Multi_key> <l> <f>         : "«"   guillemotleft # LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
+<Multi_key> <r> <f>         : "»"   guillemotright # RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
