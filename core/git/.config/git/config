@@ -97,6 +97,9 @@
 	status = never
 	tag = auto dense
 
+[commit]
+	gpgsign = true
+
 [core]
 	excludefiles = ~/.config/git/ignore
 	askpass =
