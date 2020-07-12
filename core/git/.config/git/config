@@ -162,6 +162,7 @@
 
 [rebase]
 	autosquash = true
+	autoStash = true
 
 [receive]
 	denyCurrentBranch = refuse
