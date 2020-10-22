@@ -51,12 +51,11 @@ export XDG_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
 # ${XDG_CONFIG_HOME}/profile/profile-${HOSTNAME}
 # default: emacs > nvim > vim > vi
 EDITOR='vi'
+
 if is_cmd emacsclient; then
 	EDITOR='emacsclient -qc -a emacs'
 elif is_cmd nvim; then
 	EDITOR='nvim'
-	# solarized8_flat or OceanicNext
-	export NVIM_THEME='solarized8_flat'
 elif is_cmd vim; then
 	EDITOR='vim'
 fi

@@ -1,18 +1,19 @@
 # profile-polaris sourced by ~/.profile
-CARGO_HOME="${XDG_DATA_HOME}/cargo"
-RUSTUP_HOME="${XDG_DATA_HOME}/rustup"
-PYLINTHOME="${XDG_CACHE_HOME}/pylint"
 SQLITE_HISTORY="${XDG_DATA_HOME}/sqlite_history"
-export CARGO_HOME RUSTUP_HOME PYLINTHOME
+MOZ_X11_EGL=1
+LIBVA_DRIVER_NAME=vdpau
+export SQLITE_HISTORY MOZ_X11_EGL LIBVA_DRIVER_NAME
 
 path_exports+=( "${CARGO_HOME}/bin" '/usr/share/bcc/tools' )
-pam_exports+=( CARGO_HOME RUSTUP_HOME PYLINTHOME SQLITE_HISTORY )
+pam_exports+=( SQLITE_HISTORY MOZ_X11_EGL LIBVA_DRIVER_NAME )
+env_exports+=( SQLITE_HISTORY MOZ_X11_EGL LIBVA_DRIVER_NAME )
 
-env_exports+=( CARGO_HOME RUSTUP_HOME PYLINTHOME SQLITE_HISTORY )
-
-# override generic settings
-export EDITOR='code -w'
-export VISUAL="${EDITOR}"
+if is_cmd code; then
+	EDITOR='code -w'
+	VISUAL=${EDITOR}
+	SUDO_EDITOR=${EDITOR}
+	export EDITOR VISUAL SUDO_EDITOR
+fi
 
 # debug
 if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
