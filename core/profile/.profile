@@ -1,38 +1,43 @@
-#!/usr/bin/env bash
-
 # ~/.profile
 # you can override exported variables in host specific profiles
 # in ${XDG_CONFIG_HOME}/profile/profile-${HOSTNAME}
 # shellcheck disable=2155
+
+# DEBUG
+if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
+	printf '%d%s\n' "${EPOCHSECONDS}" ': .profile' >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
+fi
+
+export PROFILE_SOURCED=true
 
 is_cmd() {
 	hash "$1" &>/dev/null
 }
 
 is_in_exp () { 
-    local haystack="$1[@]"
-    local needle=$2
-    local in=1
-    for e in "${!haystack}"; do
-        if [[ $e == "$needle" ]]; then
-            in=0
-            break
-        fi
-    done
-    return $in
+	local haystack="$1[@]"
+	local needle=$2
+	local in=1
+	for e in "${!haystack}"; do
+		if [[ $e == "$needle" ]]; then
+			in=0
+			break
+		fi
+	done
+	return $in
 }
 
 is_in_ref () { 
-    local -n haystack="$1"
-    local needle=$2
-    local in=1
-    for e in "${haystack[@]}"; do
-        if [[ $e == "$needle" ]]; then
-            in=0
-            break
-        fi
-    done
-    return $in
+	local -n haystack="$1"
+	local needle=$2
+	local in=1
+	for e in "${haystack[@]}"; do
+		if [[ $e == "$needle" ]]; then
+			in=0
+			break
+		fi
+	done
+	return $in
 }
 
 #################################################
@@ -175,14 +180,6 @@ write_env_export() {
 	fi
 }
 write_env_export
-
-#################################################
-export PROFILE_SOURCED=true
-
-# DEBUG
-if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
-	printf '%d%s\n' "${EPOCHSECONDS}" ': .profile' >> "${HOME}/shell_debug.log"
-fi
 
 # vim: ts=4:sw=4:noet:ft=sh
 # EOF

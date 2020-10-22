@@ -1,4 +1,5 @@
 zenofile/fish-misc
-zenofile/fish-skim
+zenofile/fish-fzf
 jethrokuan/z
-zenofile/fish-skim-nonfree
+jethrokuan/fzf
+halostatue/fish-fzf

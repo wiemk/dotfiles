@@ -305,7 +305,7 @@
 	mouse = true
 
 	# [diff opts]
-	diff-highlight = diff-highlight
+	#diff-highlight = diff-highlight
 
 [tig "bind"]
 	generic = <Backspace> view-close
