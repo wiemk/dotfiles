@@ -1,4 +1,4 @@
-# shellcheck shell=bash
+# .bashrc
 
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
@@ -42,8 +42,6 @@ alias tma='fish -c tma'
 
 set +H
 shopt -s extglob
-shopt -s lastpipe
 
-bashquote() { printf '%q\n' "$(</dev/stdin)"; }
-
-# vim: ft=bash ts=4 sw=4 noet
+# vim: ts=4:sw=4:noet:ft=sh
+# EOF
