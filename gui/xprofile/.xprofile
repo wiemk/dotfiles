@@ -1,7 +1,7 @@
 # .xprofile
 # debug
-if [[ -e "${XDG_CONFIG_HOME}/xprofile/_debug" ]]; then
-	echo "$(date +%s): .xprofile" >> "${HOME}/shell_debug.log"
+if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
+	printf '%d%s\n' "${EPOCHSECONDS}" ': .xprofile'>> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
 fi
 
 if [[ -r "${HOME}/.profile" && -z $PROFILE_SOURCED ]]; then
