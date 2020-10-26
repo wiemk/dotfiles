@@ -43,5 +43,7 @@ alias tma='fish -c tma'
 set +H
 shopt -s extglob
 
+bashquote() { printf '%q\n' "$(</dev/stdin)"; }
+
 # vim: ts=4:sw=4:noet:ft=sh
 # EOF
