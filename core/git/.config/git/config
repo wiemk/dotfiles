@@ -35,6 +35,7 @@
 	ls = ls-files
 	lsf = ls-files
 	lsr = "!_() { [ \"$1\" ] || set -- HEAD; git ls-tree -r \"$@\"; }; _"
+	lsb = "!git ls-tree -r -t -l --full-name HEAD | sort -n -k 4 | tail -n 10"
 	mend = commit --amend --reuse-message HEAD
 	mkobject = hash-object --stdin -w
 	out = log --oneline --decorate @{upstream}..
