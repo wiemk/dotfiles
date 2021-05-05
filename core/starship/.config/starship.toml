@@ -63,9 +63,6 @@ disabled = true
 [elm]
 disabled = true
 
-[haskell]
-disabled = true
-
 [kubernetes]
 disabled = true
 
