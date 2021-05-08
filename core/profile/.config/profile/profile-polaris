@@ -17,11 +17,9 @@ XCURSOR_THEME=Breeze_Snow
 XCURSOR_SIZE=16
 #QT_QPA_PLATFORM='xcb;wayland'
 NQDIR="${HOME}/tmpfs/nq"
-export SQLITE_HISTORY LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE
+MPC_HOST="${XDG_RUNTIME_DIR}/mpc/socket"
 
-path_exports+=( "${CARGO_HOME}/bin" '/usr/share/bcc/tools' )
-pam_exports+=( SQLITE_HISTORY LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE )
-env_exports+=( SQLITE_HISTORY LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE )
+export SQLITE_HISTORY LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE MPC_HOST NQDIR
 
 if is_cmd vim; then
 	EDITOR='vim'
@@ -30,7 +28,11 @@ if is_cmd vim; then
 	export EDITOR VISUAL SUDO_EDITOR
 fi
 
-export NQDIR
+path_exports+=( "${CARGO_HOME}/bin" )
+# leads to regenerating environment.d/50-profile.conf for systemd-environment-d-generator
+# and session-wide availability
+pam_exports+=( LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE )
+env_exports+=( LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE )
 
 # vim: ts=4:sw=4:noet:ft=sh
 # EOF
