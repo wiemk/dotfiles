@@ -17,3 +17,5 @@ gui/mpv/.config/mpv/*
 gui/pulse/.config/pulse/*
 !gui/pulse/.config/pulse/daemon.conf
 !gui/pulse/.config/pulse/pulse.pa
+# non fisher user drop-ins
+!core/fish/.config/fish/conf.d/_*.fish
