@@ -19,6 +19,7 @@ alias tms='fish -c tms'
 
 set +H
 shopt -s extglob
+shopt -s lastpipe
 
 bashquote() { printf '%q\n' "$(</dev/stdin)"; }
 

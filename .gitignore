@@ -1,21 +1,26 @@
-# blacklist
+# fish
 core/fish/.config/fish/fishd.*
 core/fish/.config/fish/functions/*
 core/fish/.config/fish/conf.d/*
 core/fish/.config/fish/functions/fish_prompt.fish
 core/fish/.config/fish/completions
 core/fish/.config/fish/fish_variables
+!core/fish/.config/fish/conf.d/_*.fish
+# systemd
 core/systemd/user/telegram-notification@.service.d/override.conf
-gui/kitt/.config/kitty/theme.conf
-
-# whitelist
+# neovim
+core/nvim/.config/nvim/*
+!core/nvim/.config/nvim/init.lua
+# kitty
+gui/kitty/.config/kitty/theme.conf
+# gnupg
 core/gnupg/.gnupg/*
 !core/gnupg/.gnupg/*.conf
+# mpv
 gui/mpv/.config/mpv/*
 !gui/mpv/.config/mpv/input.conf
 !gui/mpv/.config/mpv/mpv.conf
+# pulseaudio
 gui/pulse/.config/pulse/*
 !gui/pulse/.config/pulse/daemon.conf
 !gui/pulse/.config/pulse/pulse.pa
-# non fisher user drop-ins
-!core/fish/.config/fish/conf.d/_*.fish
