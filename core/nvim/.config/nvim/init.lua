@@ -1,14 +1,11 @@
 -- https://github.com/mjlbach/defaults.nvim/blob/master/init.lua
 --
 -- Install packer
-local execute = vim.api.nvim_command
-local fn = vim.fn
+local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 
-local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
-
-if fn.empty(fn.glob(install_path)) > 0 then
-    fn.system({'git', 'clone', 'https://github.com/wbthomason/packer.nvim', install_path})
-    execute 'packadd packer.nvim'
+if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
+    vim.fn.system({'git', 'clone', 'https://github.com/wbthomason/packer.nvim', install_path})
+    vim.api.nvim_command 'packadd packer.nvim'
 end
 
 vim.api.nvim_exec([[
@@ -66,6 +63,7 @@ vim.o.mouse = "a"
 --Indentation
 vim.bo.tabstop = 4;
 vim.o.tabstop = 4;
+vim.bo.shiftwidth = 4;
 vim.o.shiftwidth = 4;
 vim.bo.expandtab = true;
 vim.o.expandtab = true;
@@ -80,10 +78,10 @@ vim.o.autoread = true
 vim.o.breakindent = true
 
 -- Save undo history
-vim.o.undodir = fn.stdpath('cache') .. '/undo'
+vim.o.undodir = vim.fn.stdpath('cache') .. '/undo'
 vim.bo.undofile = true
 
-vim.o.directory = fn.stdpath('cache') .. '/swap'
+vim.o.directory = vim.fn.stdpath('cache') .. '/swap'
 vim.o.backup = false
 vim.o.writebackup = true
 vim.o.swapfile = true
@@ -111,7 +109,7 @@ vim.wo.signcolumn = "no"
 -- Set colorscheme (order is important here)
 vim.o.termguicolors = true
 vim.g.onedark_terminal_italics = 2
-vim.cmd[[colorscheme onedark]]
+vim.api.nvim_command([[colorscheme onedark]])
 
 -- Set statusbar
 vim.g.lightline = { colorscheme = 'onedark';
@@ -153,14 +151,14 @@ local wlistbak = vim.wo.list
 
 ToggleMouse = function()
     if vim.o.mouse == 'a' then
-        vim.cmd[[IndentBlanklineDisable]]
+        vim.api.nvim_command([[IndentBlanklineDisable]])
         vim.wo.signcolumn = 'no'
         vim.o.mouse = 'v'
         vim.wo.number = false
         vim.wo.list = false
         print("Mouse disabled")
     else
-        vim.cmd[[IndentBlanklineEnable]]
+        vim.api.nvim_command([[IndentBlanklineEnable]])
         vim.wo.signcolumn = signbak
         vim.o.mouse = 'a'
         vim.wo.number = numbak
@@ -170,6 +168,24 @@ ToggleMouse = function()
 end
 
 vim.api.nvim_set_keymap('n', '<F10>', '<cmd>lua ToggleMouse()<cr>', { noremap = true })
+
+KeepState = function(callback, ...)
+    local view = vim.fn.winsaveview()
+    callback(...)
+    vim.fn.winrestview(view)
+end
+
+WhiteTrimLines = function()
+    KeepState(vim.api.nvim_command, [[keeppatterns %s/\s\+$//e]])
+end
+WhiteTrimEmpty = function()
+    KeepState(vim.api.nvim_command, [[keeppatterns :v/\_s*\S/d]])
+end
+
+-- White handling
+vim.cmd([[command! TrimLines lua WhiteTrimLines()]])
+vim.cmd([[command! TrimEmpty lua WhiteTrimEmpty()]])
+vim.cmd([[command! TrimWhite lua WhiteTrimEmpty(); WhiteTrimLines()]])
 
 -- Do not copy when pasting
 vim.api.nvim_set_keymap("x", "p", "pgvy", { noremap = true })
@@ -197,13 +213,6 @@ vim.api.nvim_set_keymap("n", "U", ":redo<CR>", { noremap = true })
 -- Create splits with s and S
 vim.api.nvim_set_keymap("n", "<C-w>s", ":vsplit<CR>:wincmd l<CR>", { noremap = true })
 
--- Move between splits.
---vim.g.tmux_navigator_no_mappings = 1
---vim.api.nvim_set_keymap("n", "<M-h>", "TmuxNavigateLeft<CR>", { noremap = true })
---vim.api.nvim_set_keymap("n", "<M-j>", "TmuxNavigateDown<CR>", { noremap = true })
---vim.api.nvim_set_keymap("n", "<M-k>", "TmuxNavigateUp<CR>", { noremap = true })
---vim.api.nvim_set_keymap("n", "<M-l>", "TmuxNavigateRight<CR>", { noremap = true })
-
 -- Create, close, and move between tabs
 vim.api.nvim_set_keymap("n", "<M-N>", ":tabnew<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<M-n>", ":tabprevious<CR>", { noremap = true })
@@ -214,23 +223,15 @@ vim.api.nvim_set_keymap("n", "<M-M>", ":tabclose<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<C-M-s>", ":wa<CR>", { noremap = true })
 
 -- Hide cmdline after entering a command
-vim.cmd([[
+vim.api.nvim_exec([[
     augroup cmdline
         autocmd!
         autocmd CmdlineLeave : echo ""
     augroup end
-]])
-
--- Disable filetype detection.
---vim.cmd [[
---  filetype off
---  filetype plugin indent off
---]]
+]], false)
 
 -- Show diagnostics on CursorHold
-vim.cmd [[
-    autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics()
-]]
+vim.cmd([[autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics()]])
 
 -- Telescope
 require'telescope'.setup {
@@ -338,7 +339,7 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 )
 
 -- Lua language server
-local sumneko_root_path = fn.getenv("HOME").."/.local/bin/sumneko_lua" -- Change to your sumneko root installation
+local sumneko_root_path = vim.fn.getenv("HOME").."/.local/bin/sumneko_lua" -- Change to your sumneko root installation
 local sumneko_binary_path = "/bin/linux/lua-language-server" -- Change to your OS specific output folder
 nvim_lsp.sumneko_lua.setup {
     cmd = {sumneko_root_path .. sumneko_binary_path, "-E", sumneko_root_path.."/main.lua" };
@@ -354,8 +355,8 @@ nvim_lsp.sumneko_lua.setup {
             },
             workspace = {
                 library = {
-                    [fn.expand('$VIMRUNTIME/lua')] = true,
-                    [fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
+                    [vim.fn.expand('$VIMRUNTIME/lua')] = true,
+                    [vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
                 },
             },
         },
@@ -363,10 +364,10 @@ nvim_lsp.sumneko_lua.setup {
 }
 
 -- Map :Format to vim.lsp.buf.formatting()
-vim.cmd([[ command! Format execute 'lua vim.lsp.buf.formatting()' ]])
+vim.cmd([[command! Format vim.api.nvim_command 'lua vim.lsp.buf.formatting()']])
 
 -- gutentags setup
-vim.g.gutentags_cache_dir = fn.stdpath('cache') .. '/tags' 
+vim.g.gutentags_cache_dir = vim.fn.stdpath('cache') .. '/tags'
 
 -- Set completeopt to have a better completion experience
 vim.o.completeopt="menuone,noinsert"
@@ -398,8 +399,8 @@ local t = function(str)
 end
 
 local check_back_space = function()
-    local col = fn.col('.') - 1
-    if col == 0 or fn.getline('.'):sub(col, col):match('%s') then
+    local col = vim.fn.col('.') - 1
+    if col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
         return true
     else
         return false
@@ -410,16 +411,16 @@ end
 --- move to prev/next item in completion menuone
 --- jump to prev/next snippet's placeholder
 _G.tab_complete = function()
-    if fn.pumvisible() == 1 then
+    if vim.fn.pumvisible() == 1 then
         return t "<C-n>"
     elseif check_back_space() then
         return t "<Tab>"
     else
-        return fn['compe#complete']()
+        return vim.fn['compe#complete']()
     end
 end
 _G.s_tab_complete = function()
-    if fn.pumvisible() == 1 then
+    if vim.fn.pumvisible() == 1 then
         return t "<C-p>"
     else
         return t "<S-Tab>"
@@ -509,4 +510,3 @@ vim.g.nvim_tree_icons = {
 vim.api.nvim_set_keymap("n", "<C-n>", ":NvimTreeToggle<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>r", ":NvimTreeRefresh<CR>", { noremap = true })
 vim.api.nvim_set_keymap("n", "<leader>n", ":NvimTreeFindFile<CR>", { noremap = true })
-
