@@ -1,11 +1,18 @@
 -- https://github.com/mjlbach/defaults.nvim/blob/master/init.lua
 --
+-- vim: ft=lua ts=4 sw=4 sts=-1 et
+--
 -- Install packer
 local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 
 if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
     vim.fn.system({'git', 'clone', 'https://github.com/wbthomason/packer.nvim', install_path})
     vim.api.nvim_command 'packadd packer.nvim'
+end
+
+function _G.dump(...)
+    local objects = vim.tbl_map(vim.inspect, {...})
+    print(unpack(objects))
 end
 
 vim.api.nvim_exec([[
@@ -19,22 +26,19 @@ local use = require('packer').use
 require('packer').startup(function()
     use 'wbthomason/packer.nvim'          -- Package manager
     use 'tpope/vim-fugitive'              -- Git commands in nvim
-    use 'tpope/vim-rhubarb'               -- Fugitive-companion to interact with github
     use 'tpope/vim-commentary'            -- "gc" to comment visual regions/lines
     use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
     -- UI to select things (files, grep results, open buffers...)
     use {'nvim-telescope/telescope.nvim', requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}} }
     use 'joshdick/onedark.vim'            -- Theme inspired by Atom
-    use 'itchyny/lightline.vim'           -- Fancier statusline
-    -- Add indentation guides even on blank lines
-    use { 'lukas-reineke/indent-blankline.nvim', branch="lua" }
+    use { 'hoob3rt/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true} }
     -- Add git related info in the signs columns and popups
     use {'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'} }
     use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
     use 'hrsh7th/nvim-compe'              -- Autocompletion plugin
     use 'nvim-treesitter/nvim-treesitter' -- Language parser
     use 'mfussenegger/nvim-lint'          -- External linter support
-    use 'kyazdani42/nvim-tree.lua'        -- File explorer
+	use 'glepnir/indent-guides.nvim'      -- Indent guides for spaces
 end)
 
 -- Do not show the startup message
@@ -65,8 +69,8 @@ vim.bo.tabstop = 4;
 vim.o.tabstop = 4;
 vim.bo.shiftwidth = 4;
 vim.o.shiftwidth = 4;
-vim.bo.expandtab = true;
-vim.o.expandtab = true;
+vim.bo.expandtab = false;
+vim.o.expandtab = false;
 vim.bo.softtabstop = -1;
 vim.o.softtabstop = -1;
 vim.bo.copyindent = true;
@@ -76,6 +80,13 @@ vim.o.autoread = true
 
 -- Enable break indent
 vim.o.breakindent = true
+
+-- Enable line wrapping
+vim.wo.wrap = true
+vim.wo.linebreak = true
+vim.bo.textwidth = 100
+vim.o.textwidth = 100
+vim.wo.colorcolumn = "+1"
 
 -- Save undo history
 vim.o.undodir = vim.fn.stdpath('cache') .. '/undo'
@@ -88,7 +99,8 @@ vim.o.swapfile = true
 
 -- Show whitespace characters
 vim.wo.list = true
-vim.o.listchars = "space:·,tab:» ,eol:¬"
+vim.o.listchars = "tab:→ ,eol:↲,nbsp:␣,trail:•,extends:⟩,precedes:⟨"
+vim.o.showbreak = "↪ "
 
 -- Case insensitive searching UNLESS /C or capital in search
 vim.o.ignorecase = true
@@ -109,174 +121,40 @@ vim.wo.signcolumn = "no"
 -- Set colorscheme (order is important here)
 vim.o.termguicolors = true
 vim.g.onedark_terminal_italics = 2
+vim.wo.cursorline = true
+vim.wo.cursorcolumn = true
 vim.api.nvim_command([[colorscheme onedark]])
-
--- Set statusbar
-vim.g.lightline = { colorscheme = 'onedark';
-    active = { left = { { 'mode', 'paste' }, { 'gitbranch', 'readonly', 'filename', 'modified' } } };
-    component_function = { gitbranch = 'fugitive#head', };
-}
-
--- Remap space as leader key
-vim.api.nvim_set_keymap('', '<Space>', '<Nop>', { noremap = true, silent=true})
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-
--- Remap for dealing with word wrap
-vim.api.nvim_set_keymap('n', 'k', "v:count == 0 ? 'gk' : 'k'", {noremap=true, expr = true, silent = true})
-vim.api.nvim_set_keymap('n', 'j', "v:count == 0 ? 'gj' : 'j'", {noremap= true, expr = true, silent = true})
-
--- Remap escape to leave terminal mode
-vim.api.nvim_exec([[
-    augroup Terminal
-        autocmd!
-        au TermOpen * tnoremap <buffer> <Esc> <c-\><c-n>
-        au TermOpen * set nonu
-    augroup end
-]], false)
 
 -- Add map to enter paste mode
 vim.o.pastetoggle="<F3>"
-
--- Map blankline
-vim.g.indent_blankline_char = "┊"
-vim.g.indent_blankline_filetype_exclude = { 'help', 'packer' }
-vim.g.indent_blankline_buftype_exclude = { 'terminal', 'nofile'}
-vim.g.indent_blankline_char_highlight = 'LineNr'
 
 -- Toggle to disable mouse mode and indentlines for easier paste
 local signbak = vim.wo.signcolumn
 local numbak = vim.wo.number
 local wlistbak = vim.wo.list
+local nomouse = false
 
 ToggleMouse = function()
     if vim.o.mouse == 'a' then
-        vim.api.nvim_command([[IndentBlanklineDisable]])
         vim.wo.signcolumn = 'no'
         vim.o.mouse = 'v'
         vim.wo.number = false
         vim.wo.list = false
-        print("Mouse disabled")
+        nomouse = true
     else
-        vim.api.nvim_command([[IndentBlanklineEnable]])
         vim.wo.signcolumn = signbak
         vim.o.mouse = 'a'
         vim.wo.number = numbak
         vim.wo.list = wlistbak
-        print("Mouse enabled")
+        nomouse = false
     end
 end
 
-vim.api.nvim_set_keymap('n', '<F10>', '<cmd>lua ToggleMouse()<cr>', { noremap = true })
-
-KeepState = function(callback, ...)
-    local view = vim.fn.winsaveview()
-    callback(...)
-    vim.fn.winrestview(view)
-end
-
-WhiteTrimLines = function()
-    KeepState(vim.api.nvim_command, [[keeppatterns %s/\s\+$//e]])
-end
-WhiteTrimEmpty = function()
-    KeepState(vim.api.nvim_command, [[keeppatterns :v/\_s*\S/d]])
-end
-
--- White handling
-vim.cmd([[command! TrimLines lua WhiteTrimLines()]])
-vim.cmd([[command! TrimEmpty lua WhiteTrimEmpty()]])
-vim.cmd([[command! TrimWhite lua WhiteTrimEmpty(); WhiteTrimLines()]])
-
--- Do not copy when pasting
-vim.api.nvim_set_keymap("x", "p", "pgvy", { noremap = true })
-
--- J and K to move up and down
-vim.api.nvim_set_keymap("n", "J", "}", { noremap = true })
-vim.api.nvim_set_keymap("n", "K", "{", { noremap = true })
-vim.api.nvim_set_keymap("v", "J", "}", { noremap = true })
-vim.api.nvim_set_keymap("v", "K", "{", { noremap = true })
-
--- H and L to move to the beginning and end of a line
-vim.api.nvim_set_keymap("n", "H", "_", { noremap = true })
-vim.api.nvim_set_keymap("n", "L", "$", { noremap = true })
-vim.api.nvim_set_keymap("v", "H", "_", { noremap = true })
-vim.api.nvim_set_keymap("v", "L", "$", { noremap = true })
-
-vim.api.nvim_set_keymap("n", "<C-f>", "/", { noremap = true })
-vim.api.nvim_set_keymap("n", "<C-g>", ":Rg<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<C-q>", ":q<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<C-s>", ":w<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<C-t>", ":Telescope fd<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "u", ":undo<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "U", ":redo<CR>", { noremap = true })
-
--- Create splits with s and S
-vim.api.nvim_set_keymap("n", "<C-w>s", ":vsplit<CR>:wincmd l<CR>", { noremap = true })
-
--- Create, close, and move between tabs
-vim.api.nvim_set_keymap("n", "<M-N>", ":tabnew<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<M-n>", ":tabprevious<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<M-m>", ":tabnext<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<M-M>", ":tabclose<CR>", { noremap = true })
-
--- Save all.
-vim.api.nvim_set_keymap("n", "<C-M-s>", ":wa<CR>", { noremap = true })
-
--- Hide cmdline after entering a command
-vim.api.nvim_exec([[
-    augroup cmdline
-        autocmd!
-        autocmd CmdlineLeave : echo ""
-    augroup end
-]], false)
-
--- Show diagnostics on CursorHold
-vim.cmd([[autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics()]])
-
--- Telescope
-require'telescope'.setup {
-    defaults = {
-        mappings = {
-            i = {
-                ["<C-u>"] = false,
-                ["<C-d>"] = false,
-            },
-        },
-        generic_sorter =  require'telescope.sorters'.get_fzy_sorter,
-        file_sorter =  require'telescope.sorters'.get_fzy_sorter,
-    }
-}
--- Add leader shortcuts
-vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('telescope.builtin').find_files()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader><space>', [[<cmd>lua require('telescope.builtin').buffers()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>l', [[<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>t', [[<cmd>lua require('telescope.builtin').tags()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>sd', [[<cmd>lua require('telescope.builtin').grep_string()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>sp', [[<cmd>lua require('telescope.builtin').live_grep()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>o', [[<cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>gc', [[<cmd>lua require('telescope.builtin').git_commits()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>gb', [[<cmd>lua require('telescope.builtin').git_branches()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>gs', [[<cmd>lua require('telescope.builtin').git_status()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>gp', [[<cmd>lua require('telescope.builtin').git_bcommits()<cr>]], { noremap = true, silent = true})
-
--- Change preview window location
-vim.g.splitbelow = true
-
--- Highlight on yank
-vim.api.nvim_exec([[
-    augroup YankHighlight
-        autocmd!
-        autocmd TextYankPost * silent! lua vim.highlight.on_yank()
-    augroup end
-]], false)
-
--- Y yank until the end of line
-vim.api.nvim_set_keymap('n', 'Y', 'y$', { noremap = true})
+vim.api.nvim_set_keymap('n', '<F4>', '<cmd>lua ToggleMouse()<cr>', { noremap = true })
 
 -- LSP settings
 local nvim_lsp = require('lspconfig')
-local on_attach = function(_client, bufnr)
+local on_attach = function(client, bufnr)
     vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
     local function buf_set_keymap(...)
@@ -310,6 +188,7 @@ local on_attach = function(_client, bufnr)
     elseif client.resolved_capabilities.document_range_formatting then
         buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
     end
+
 end
 
 -- Enable the following language servers
@@ -339,10 +218,10 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 )
 
 -- Lua language server
-local sumneko_root_path = vim.fn.getenv("HOME").."/.local/bin/sumneko_lua" -- Change to your sumneko root installation
-local sumneko_binary_path = "/bin/linux/lua-language-server" -- Change to your OS specific output folder
+local sumneko_root_path = vim.fn.getenv("XDG_DATA_HOME") .. "/lua-language-server"
+local sumneko_binary_path = "/bin/Linux/lua-language-server" -- Change to your OS specific output folder
 nvim_lsp.sumneko_lua.setup {
-    cmd = {sumneko_root_path .. sumneko_binary_path, "-E", sumneko_root_path.."/main.lua" };
+    cmd = {sumneko_root_path .. sumneko_binary_path, "-E", sumneko_root_path .. "/main.lua" };
     on_attach = on_attach,
     settings = {
         Lua = {
@@ -365,72 +244,6 @@ nvim_lsp.sumneko_lua.setup {
 
 -- Map :Format to vim.lsp.buf.formatting()
 vim.cmd([[command! Format vim.api.nvim_command 'lua vim.lsp.buf.formatting()']])
-
--- gutentags setup
-vim.g.gutentags_cache_dir = vim.fn.stdpath('cache') .. '/tags'
-
--- Set completeopt to have a better completion experience
-vim.o.completeopt="menuone,noinsert"
-
--- Compe setup
-require'compe'.setup {
-    enabled = true;
-    autocomplete = true;
-    debug = false;
-    min_length = 1;
-    preselect = 'enable';
-    throttle_time = 80;
-    source_timeout = 200;
-    incomplete_delay = 400;
-    max_abbr_width = 100;
-    max_kind_width = 100;
-    max_menu_width = 100;
-    documentation = true;
-
-    source = {
-        buffer = true;
-        path = true;
-        nvim_lsp = true;
-    };
-}
-
-local t = function(str)
-    return vim.api.nvim_replace_termcodes(str, true, true, true)
-end
-
-local check_back_space = function()
-    local col = vim.fn.col('.') - 1
-    if col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
-        return true
-    else
-        return false
-    end
-end
-
--- Use (s-)tab to:
---- move to prev/next item in completion menuone
---- jump to prev/next snippet's placeholder
-_G.tab_complete = function()
-    if vim.fn.pumvisible() == 1 then
-        return t "<C-n>"
-    elseif check_back_space() then
-        return t "<Tab>"
-    else
-        return vim.fn['compe#complete']()
-    end
-end
-_G.s_tab_complete = function()
-    if vim.fn.pumvisible() == 1 then
-        return t "<C-p>"
-    else
-        return t "<S-Tab>"
-    end
-end
-
-vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
 
 -- Treesitter
 require'nvim-treesitter.configs'.setup {
@@ -467,46 +280,243 @@ vim.api.nvim_exec([[
     augroup end
 ]], false)
 
--- nvim-tree
-vim.g.nvim_tree_side = "left"
-vim.g.nvim_tree_width = 24
-vim.g.nvim_tree_ignore = {".git", "node_modules", ".cache"}
-vim.g.nvim_tree_auto_open = 0
-vim.g.nvim_tree_auto_close = 0
-vim.g.nvim_tree_quit_on_open = 0
-vim.g.nvim_tree_follow = 1
-vim.g.nvim_tree_indent_markers = 1
-vim.g.nvim_tree_hide_dotfiles = 0
-vim.g.nvim_tree_git_hl = 1
-vim.g.nvim_tree_root_folder_modifier = ":~"
-vim.g.nvim_tree_tab_open = 1
-vim.g.nvim_tree_allow_resize = 1
-vim.g.nvim_tree_add_trailing = 1
-
-vim.g.nvim_tree_show_icons = {
-    git = 1,
-    folders = 1,
-    files = 1,
-    folder_arrows = 1
-}
-
-vim.g.nvim_tree_icons = {
-    default = "",
-    symlink = "",
-    git = {
-        unstaged = "✗",
-        staged = "✓",
-        unmerged = "",
-        renamed = "➜",
-        untracked = "★"
+-- Set statusbar
+require('lualine').setup({
+    options = {
+        theme = 'onedark';
+        icons_enabled = false,
+        padding = 1,
+        left_padding = 1,
+        right_padding = 1,
+        upper = false,
+        lower = true
     },
-    folder = {
-        default = "",
-        open = "",
-        symlink = ""
+    sections = {
+        lualine_a = { 'mode' },
+        lualine_b = {
+            {
+                (function() return [[NOMOUSE]]; end),
+                condition = (function() return nomouse; end),
+                lower = false
+            },
+            {
+                (function() return [[PASTE]]; end),
+                condition = (function() return vim.o.paste; end),
+                lower = false
+            }
+        },
+        lualine_c = {
+            { 'filename', file_status = true },
+            { 'fugitive#head'},
+            { 'diff', color_added = 'green', color_modified = 'yellow', color_removed = 'red' }},
+        lualine_y = { 'progress', 'hostname' }
+    },
+    extension = { 'fzf', 'fugitive' }
+})
+
+-- Remap space as leader key
+vim.api.nvim_set_keymap('', '<Space>', '<Nop>', {noremap = true, silent = true})
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
+-- Remap for dealing with word wrap
+vim.api.nvim_set_keymap('n', 'k', "v:count == 0 ? 'gk' : 'k'", {noremap=true, expr = true, silent = true})
+vim.api.nvim_set_keymap('n', 'j', "v:count == 0 ? 'gj' : 'j'", {noremap= true, expr = true, silent = true})
+
+-- Remap escape to leave terminal mode
+vim.api.nvim_exec([[
+    augroup Terminal
+        autocmd!
+        au TermOpen * tnoremap <buffer> <Esc> <c-\><c-n>
+        au TermOpen * set nonu
+    augroup end
+]], false)
+
+KeepState = function(callback, ...)
+    local view = vim.fn.winsaveview()
+    callback(...)
+    vim.fn.winrestview(view)
+end
+
+WhiteTrimLines = function()
+    KeepState(vim.api.nvim_command, [[keeppatterns %s/\s\+$//e]])
+end
+WhiteTrimEmpty = function()
+    KeepState(vim.api.nvim_command, [[keeppatterns :v/\_s*\S/d]])
+end
+
+-- White handling
+vim.cmd([[command! TrimTrailingWhite lua WhiteTrimLines()]])
+vim.cmd([[command! TrimTralingLines lua WhiteTrimEmpty()]])
+vim.cmd([[command! TrimAll lua WhiteTrimEmpty(); WhiteTrimLines()]])
+
+-- Do not copy when pasting
+vim.api.nvim_set_keymap("x", "p", "pgvy", { noremap = true })
+
+-- J and K to move up and down
+vim.api.nvim_set_keymap("n", "J", "}", { noremap = true })
+vim.api.nvim_set_keymap("n", "K", "{", { noremap = true })
+vim.api.nvim_set_keymap("v", "J", "}", { noremap = true })
+vim.api.nvim_set_keymap("v", "K", "{", { noremap = true })
+
+-- H and L to move to the beginning and end of a line
+vim.api.nvim_set_keymap("n", "H", "_", { noremap = true })
+vim.api.nvim_set_keymap("n", "L", "$", { noremap = true })
+vim.api.nvim_set_keymap("v", "H", "_", { noremap = true })
+vim.api.nvim_set_keymap("v", "L", "$", { noremap = true })
+
+vim.api.nvim_set_keymap("n", "<C-f>", "/", { noremap = true })
+vim.api.nvim_set_keymap("n", "<C-g>", ":Rg<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<C-q>", ":q<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<C-s>", ":w<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<C-t>", ":Telescope fd<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "u", ":undo<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "U", ":redo<CR>", { noremap = true })
+
+-- Create splits with s and S
+vim.api.nvim_set_keymap("n", "<C-w>s", ":vsplit<CR>:wincmd l<CR>", { noremap = true })
+
+-- Create, close, and move between tabs
+vim.api.nvim_set_keymap("n", "<M-N>", ":tabnew<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<M-n>", ":tabprevious<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<M-m>", ":tabnext<CR>", { noremap = true })
+vim.api.nvim_set_keymap("n", "<M-M>", ":tabclose<CR>", { noremap = true })
+
+-- Cycle through open buffers
+vim.api.nvim_set_keymap("n", "<leader>.", ":bnext<CR>", { noremap = true})
+vim.api.nvim_set_keymap("n", "<leader>,", ":bprevious<CR>", { noremap = true})
+vim.api.nvim_set_keymap("n", "<leader>- ", ":bdelete<CR>", { noremap = true})
+
+-- Save all.
+vim.api.nvim_set_keymap("n", "<C-M-s>", ":wa<CR>", { noremap = true })
+
+-- Hide cmdline after entering a command
+vim.api.nvim_exec([[
+    augroup cmdline
+        autocmd!
+        autocmd CmdlineLeave : echo ""
+    augroup end
+]], false)
+
+-- Show diagnostics on CursorHold
+vim.cmd([[autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics()]])
+
+-- Telescope
+require'telescope'.setup {
+    defaults = {
+        mappings = {
+            i = {
+                ["<C-u>"] = false,
+                ["<C-d>"] = false,
+            },
+        },
+        generic_sorter =  require'telescope.sorters'.get_fzy_sorter,
+        file_sorter =  require'telescope.sorters'.get_fzy_sorter,
     }
 }
+-- Add leader shortcuts
+vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('telescope.builtin').find_files()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader><space>', [[<cmd>lua require('telescope.builtin').buffers()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>r', [[<cmd>lua require('telescope.builtin').registers()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>l', [[<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>t', [[<cmd>lua require('telescope.builtin').tags()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>sd', [[<cmd>lua require('telescope.builtin').grep_string()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>sp', [[<cmd>lua require('telescope.builtin').live_grep()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>o', [[<cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>gc', [[<cmd>lua require('telescope.builtin').git_commits()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>gb', [[<cmd>lua require('telescope.builtin').git_branches()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>gs', [[<cmd>lua require('telescope.builtin').git_status()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>gp', [[<cmd>lua require('telescope.builtin').git_bcommits()<cr>]], { noremap = true, silent = true})
 
-vim.api.nvim_set_keymap("n", "<C-n>", ":NvimTreeToggle<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<leader>r", ":NvimTreeRefresh<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<leader>n", ":NvimTreeFindFile<CR>", { noremap = true })
+-- Change preview window location
+vim.g.splitbelow = true
+
+-- Highlight on yank
+vim.api.nvim_exec([[
+    augroup YankHighlight
+        autocmd!
+        autocmd TextYankPost * silent! lua vim.highlight.on_yank()
+    augroup end
+]], false)
+
+-- Y yank until the end of line
+vim.api.nvim_set_keymap('n', 'Y', 'y$', { noremap = true})
+
+-- gutentags setup
+vim.g.gutentags_cache_dir = vim.fn.stdpath('cache') .. '/tags'
+
+-- Set completeopt to have a better completion experience
+vim.o.completeopt="menuone,noinsert"
+vim.o.shortmess = vim.o.shortmess .. "c"
+
+-- Compe setup
+require'compe'.setup {
+    enabled = true;
+    autocomplete = true;
+    debug = false;
+    min_length = 1;
+    preselect = 'enable';
+    throttle_time = 80;
+    source_timeout = 200;
+    incomplete_delay = 400;
+    max_abbr_width = 100;
+    max_kind_width = 100;
+    max_menu_width = 100;
+    documentation = true;
+
+    source = {
+        buffer = true;
+        nvim_lsp = true;
+        path = true;
+    };
+}
+
+local t = function(str)
+    return vim.api.nvim_replace_termcodes(str, true, true, true)
+end
+
+local check_back_space = function()
+    local col = vim.fn.col('.') - 1
+    return col == 0 or vim.fn.getline('.'):sub(col, col):match('%s')
+end
+
+-- Use (s-)tab to:
+--- move to prev/next item in completion menuone
+--- jump to prev/next snippet's placeholder
+_G.tab_complete = function()
+    if vim.fn.pumvisible() == 1 then
+        return t "<C-n>"
+    elseif check_back_space() then
+        return t "<Tab>"
+    else
+        return vim.fn['compe#complete']()
+    end
+end
+_G.s_tab_complete = function()
+    if vim.fn.pumvisible() == 1 then
+        return t "<C-p>"
+    else
+        return t "<S-Tab>"
+    end
+end
+
+vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+
+-- indent-guides
+require('indent_guides').setup({
+    indent_guide_size = 1;
+    indent_start_level = 1;
+    indent_levels = 16;
+    indent_enable = true;
+    indent_space_guides = true;
+    indent_tab_guides = true;
+    indent_soft_pattern = '\\s';
+    exclude_filetypes = {'help','dashboard','dashpreview','NvimTree','vista','sagahover'};
+    -- even_colors = { fg ='#2a3834',bg='#332b36' };
+    -- odd_colors = { fg='#332b36',bg='#2a3834' };
+})
+
