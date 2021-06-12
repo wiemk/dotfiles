@@ -41,6 +41,9 @@ require('packer').startup(function()
 	use 'glepnir/indent-guides.nvim'      -- Indent guides for spaces
 end)
 
+-- Disable netrw
+vim.g.loaded_netrwPlugin = 1
+
 -- Do not show the startup message
 vim.o.shortmess = vim.o.shortmess .. "I"
 
@@ -416,9 +419,11 @@ require'telescope'.setup {
 }
 -- Add leader shortcuts
 vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('telescope.builtin').find_files()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader><space>', [[<cmd>lua require('telescope.builtin').buffers()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>b', [[<cmd>lua require('telescope.builtin').buffers()<cr>]], { noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<leader>r', [[<cmd>lua require('telescope.builtin').registers()<cr>]], { noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<leader>l', [[<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader><space>', [[<cmd>lua require('telescope.builtin').marks()<cr>]], { noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<leader>m', [[<cmd>lua require('telescope.builtin').marks()<cr>]], { noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<leader>t', [[<cmd>lua require('telescope.builtin').tags()<cr>]], { noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<cr>]], { noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<leader>sd', [[<cmd>lua require('telescope.builtin').grep_string()<cr>]], { noremap = true, silent = true})
