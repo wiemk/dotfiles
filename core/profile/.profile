@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # ~/.profile
 # you can override exported variables in host specific profiles
 # in ${XDG_CONFIG_HOME}/profile/profile-${HOSTNAME}
@@ -181,5 +182,4 @@ write_env_export() {
 }
 write_env_export
 
-# vim: ts=4:sw=4:noet:ft=sh
-# EOF
+# vim: ft=bash ts=4 sw=4 noet

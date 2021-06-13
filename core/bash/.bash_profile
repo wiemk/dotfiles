@@ -1,8 +1,8 @@
-# .bash_profile
+# shellcheck shell=bash
 
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
-	printf '%d%s\n' "${EPOCHSECONDS}" ': .bash_profile' >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
+	printf '%d%s\n' "${EPOCHSECONDS}" ': .bash_profile' >> "${XDG_RUNTIME_DIR:-/run/user/${LOGNAME}}/profile_dbg.log"
 fi
 
 # load .profile since .bash_profile takes priority
@@ -15,5 +15,4 @@ if [[ -f ~/.bashrc ]]; then
 	source ~/.bashrc
 fi
 
-# vim: ts=4:sw=4:noet:ft=sh
-# EOF
+# vim: ft=bash ts=4 sw=4 noet

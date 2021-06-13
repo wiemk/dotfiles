@@ -153,7 +153,25 @@ ToggleMouse = function()
     end
 end
 
-vim.api.nvim_set_keymap('n', '<F4>', '<cmd>lua ToggleMouse()<cr>', { noremap = true })
+-- Local utility functions
+local _bindkey = function(table, bind, action, special)
+    if special == nil then
+        special = { noremap = true }
+    end
+    vim.api.nvim_set_keymap(table, bind, action, special)
+end
+local nn = function(bind, action, special)
+    _bindkey('n', bind, action, special)
+end
+local vn = function(bind, action, special)
+    _bindkey('v', bind, action, special)
+end
+local xn = function(bind, action, special)
+    _bindkey('x', bind, action, special)
+end
+
+
+nn('<F4>', '<CMD>lua ToggleMouse()<CR>')
 
 -- LSP settings
 local nvim_lsp = require('lspconfig')
@@ -196,14 +214,14 @@ end
 
 -- Enable the following language servers
 local servers = {
-    'clangd',
-    'dockerls',
-    'bashls',
-    'cmake',
-    'gopls',
-    'rust_analyzer',
-    'pyright',
-    'tsserver'
+--    'clangd',
+--    'dockerls',
+--    'bashls',
+--    'cmake',
+--    'gopls',
+--    'rust_analyzer',
+--    'pyright',
+--    'tsserver'
 }
 for _, lsp in ipairs(servers) do
     nvim_lsp[lsp].setup {
@@ -271,9 +289,10 @@ require'nvim-treesitter.configs'.setup {
 }
 
 -- nvim-lint for external linting
-require('lint').linters_by_ft = {
+local lint = require('lint')
+lint.linters_by_ft = {
     sh = {'shellcheck',},
-    bash = {'shellcheck',}
+    bash = {'shellcheck',},
 }
 
 vim.api.nvim_exec([[
@@ -323,8 +342,9 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 -- Remap for dealing with word wrap
-vim.api.nvim_set_keymap('n', 'k', "v:count == 0 ? 'gk' : 'k'", {noremap=true, expr = true, silent = true})
-vim.api.nvim_set_keymap('n', 'j', "v:count == 0 ? 'gj' : 'j'", {noremap= true, expr = true, silent = true})
+local special = { noremap = true, expr = true, silent = true }
+nn('k', "v:count == 0 ? 'gk' : 'k'", special)
+nn('j', "v:count == 0 ? 'gj' : 'j'", special) 
 
 -- Remap escape to leave terminal mode
 vim.api.nvim_exec([[
@@ -354,44 +374,50 @@ vim.cmd([[command! TrimTralingLines lua WhiteTrimEmpty()]])
 vim.cmd([[command! TrimAll lua WhiteTrimEmpty(); WhiteTrimLines()]])
 
 -- Do not copy when pasting
-vim.api.nvim_set_keymap("x", "p", "pgvy", { noremap = true })
+xn("p", "pgvy")
 
 -- J and K to move up and down
-vim.api.nvim_set_keymap("n", "J", "}", { noremap = true })
-vim.api.nvim_set_keymap("n", "K", "{", { noremap = true })
-vim.api.nvim_set_keymap("v", "J", "}", { noremap = true })
-vim.api.nvim_set_keymap("v", "K", "{", { noremap = true })
+nn("J", "}")
+nn("K", "{")
+vn("J", "}")
+vn("K", "{")
 
 -- H and L to move to the beginning and end of a line
-vim.api.nvim_set_keymap("n", "H", "_", { noremap = true })
-vim.api.nvim_set_keymap("n", "L", "$", { noremap = true })
-vim.api.nvim_set_keymap("v", "H", "_", { noremap = true })
-vim.api.nvim_set_keymap("v", "L", "$", { noremap = true })
+nn("H", "_")
+nn("L", "$")
+vn("H", "_")
+vn("L", "$")
 
-vim.api.nvim_set_keymap("n", "<C-f>", "/", { noremap = true })
-vim.api.nvim_set_keymap("n", "<C-g>", ":Rg<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<C-q>", ":q<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<C-s>", ":w<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<C-t>", ":Telescope fd<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "u", ":undo<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "U", ":redo<CR>", { noremap = true })
+nn("<C-f>", "/")
+nn("<C-g>", ":Rg<CR>")
+nn("<C-q>", ":q<CR>")
+nn("<C-s>", ":w<CR>")
+nn("<C-t>", ":Telescope fd<CR>")
+nn("u", ":undo<CR>")
+nn("U", ":redo<CR>")
 
 -- Create splits with s and S
-vim.api.nvim_set_keymap("n", "<C-w>s", ":vsplit<CR>:wincmd l<CR>", { noremap = true })
+nn("<C-w>s", ":vsplit<CR>:wincmd l<CR>")
 
 -- Create, close, and move between tabs
-vim.api.nvim_set_keymap("n", "<M-N>", ":tabnew<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<M-n>", ":tabprevious<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<M-m>", ":tabnext<CR>", { noremap = true })
-vim.api.nvim_set_keymap("n", "<M-M>", ":tabclose<CR>", { noremap = true })
+nn("<M-N>", ":tabnew<CR>")
+nn("<M-n>", ":tabprevious<CR>")
+nn("<M-m>", ":tabnext<CR>")
+nn("<M-M>", ":tabclose<CR>")
 
 -- Cycle through open buffers
-vim.api.nvim_set_keymap("n", "<leader>.", ":bnext<CR>", { noremap = true})
-vim.api.nvim_set_keymap("n", "<leader>,", ":bprevious<CR>", { noremap = true})
-vim.api.nvim_set_keymap("n", "<leader>- ", ":bdelete<CR>", { noremap = true})
+nn("<leader>.", ":bnext<CR>")
+nn("<leader>,", ":bprevious<CR>")
+nn("<leader>- ", ":bdelete<CR>")
+
+-- Change to file directory in current window
+nn("<leader>cd", ":lcd %:p:h<CR>:pwd<CR>")
 
 -- Save all.
-vim.api.nvim_set_keymap("n", "<C-M-s>", ":wa<CR>", { noremap = true })
+nn("<C-M-s>", ":wa<CR>")
+
+-- Search and replace using marked text
+vn("<C-r>", "\"hy:%s/<C-r>h//gc<left><left><left>")
 
 -- Hide cmdline after entering a command
 vim.api.nvim_exec([[
@@ -418,21 +444,22 @@ require'telescope'.setup {
     }
 }
 -- Add leader shortcuts
-vim.api.nvim_set_keymap('n', '<leader>f', [[<cmd>lua require('telescope.builtin').find_files()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>b', [[<cmd>lua require('telescope.builtin').buffers()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>r', [[<cmd>lua require('telescope.builtin').registers()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>l', [[<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader><space>', [[<cmd>lua require('telescope.builtin').marks()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>m', [[<cmd>lua require('telescope.builtin').marks()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>t', [[<cmd>lua require('telescope.builtin').tags()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>sd', [[<cmd>lua require('telescope.builtin').grep_string()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>sp', [[<cmd>lua require('telescope.builtin').live_grep()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>o', [[<cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>gc', [[<cmd>lua require('telescope.builtin').git_commits()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>gb', [[<cmd>lua require('telescope.builtin').git_branches()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>gs', [[<cmd>lua require('telescope.builtin').git_status()<cr>]], { noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<leader>gp', [[<cmd>lua require('telescope.builtin').git_bcommits()<cr>]], { noremap = true, silent = true})
+special = { noremap = true, silent = true }
+nn('<leader>f', [[<cmd>lua require('telescope.builtin').find_files()<cr>]], special)
+nn('<leader>b', [[<cmd>lua require('telescope.builtin').buffers()<cr>]], special)
+nn('<leader>r', [[<cmd>lua require('telescope.builtin').registers()<cr>]], special)
+nn('<leader>l', [[<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<cr>]], special)
+nn('<leader><space>', [[<cmd>lua require('telescope.builtin').marks()<cr>]], special)
+nn('<leader>m', [[<cmd>lua require('telescope.builtin').marks()<cr>]], special)
+nn('<leader>t', [[<cmd>lua require('telescope.builtin').tags()<cr>]], special)
+nn('<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<cr>]], special)
+nn('<leader>sd', [[<cmd>lua require('telescope.builtin').grep_string()<cr>]], special)
+nn('<leader>sp', [[<cmd>lua require('telescope.builtin').live_grep()<cr>]], special)
+nn('<leader>o', [[<cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<cr>]], special)
+nn('<leader>gc', [[<cmd>lua require('telescope.builtin').git_commits()<cr>]], special)
+nn('<leader>gb', [[<cmd>lua require('telescope.builtin').git_branches()<cr>]], special)
+nn('<leader>gs', [[<cmd>lua require('telescope.builtin').git_status()<cr>]], special)
+nn('<leader>gp', [[<cmd>lua require('telescope.builtin').git_bcommits()<cr>]], special)
 
 -- Change preview window location
 vim.g.splitbelow = true

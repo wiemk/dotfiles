@@ -1,4 +1,6 @@
+# shellcheck shell=bash
 # profile-electra sourced by ~/.profile
+
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
 	printf '%d%s\n' "${EPOCHSECONDS}" ': profile-electra' >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
@@ -7,5 +9,4 @@ fi
 export DOTFILES="${HOME}/repos/working/dotfiles"
 path_exports+=( "${HOME}/.local/share/node_modules/.bin" )
 
-# vim: ts=4:sw=4:noet:ft=sh
-# EOF
+# vim: ft=bash ts=4 sw=4 noet

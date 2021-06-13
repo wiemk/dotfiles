@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # profile-polaris sourced by ~/.profile
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
@@ -34,5 +35,4 @@ path_exports+=( "${CARGO_HOME}/bin" )
 pam_exports+=( LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE )
 env_exports+=( LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE )
 
-# vim: ts=4:sw=4:noet:ft=sh
-# EOF
+# vim: ft=bash ts=4 sw=4 noet
