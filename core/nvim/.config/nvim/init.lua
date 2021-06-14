@@ -85,11 +85,12 @@ vim.o.autoread = true
 vim.o.breakindent = true
 
 -- Enable line wrapping
-vim.wo.wrap = true
-vim.wo.linebreak = true
-vim.bo.textwidth = 100
-vim.o.textwidth = 100
-vim.wo.colorcolumn = "+1"
+vim.wo.wrap = false
+vim.wo.linebreak = false
+vim.o.sidescroll = 5
+--vim.bo.textwidth = 100
+--vim.o.textwidth = 100
+vim.wo.colorcolumn = "120"
 
 -- Save undo history
 vim.o.undodir = vim.fn.stdpath('cache') .. '/undo'
