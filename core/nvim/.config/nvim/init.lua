@@ -87,7 +87,7 @@ vim.o.breakindent = true
 -- Enable line wrapping
 vim.wo.wrap = false
 vim.wo.linebreak = false
-vim.o.sidescroll = 5
+vim.o.sidescroll = 10
 --vim.bo.textwidth = 100
 --vim.o.textwidth = 100
 vim.wo.colorcolumn = "120"
