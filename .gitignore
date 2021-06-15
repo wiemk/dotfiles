@@ -21,6 +21,6 @@ gui/mpv/.config/mpv/*
 !gui/mpv/.config/mpv/input.conf
 !gui/mpv/.config/mpv/mpv.conf
 # pulseaudio
-gui/pulse/.config/pulse/*
-!gui/pulse/.config/pulse/daemon.conf
-!gui/pulse/.config/pulse/pulse.pa
+staging/pulse/.config/pulse/*
+!staging/pulse/.config/pulse/daemon.conf
+!staging/pulse/.config/pulse/pulse.pa
