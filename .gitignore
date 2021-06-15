@@ -12,7 +12,7 @@ core/systemd/user/telegram-notification@.service.d/override.conf
 core/nvim/.config/nvim/*
 !core/nvim/.config/nvim/init.lua
 # kitty
-gui/kitty/.config/kitty/theme.conf
+staging/kitty/.config/kitty/theme.conf
 # gnupg
 core/gnupg/.gnupg/*
 !core/gnupg/.gnupg/*.conf
@@ -24,3 +24,7 @@ gui/mpv/.config/mpv/*
 staging/pulse/.config/pulse/*
 !staging/pulse/.config/pulse/daemon.conf
 !staging/pulse/.config/pulse/pulse.pa
+# tmux
+core/tmux/.config/tmux/hooks/_*.hook
+core/tmux/.config/tmux/hooks/_*.sh
+
