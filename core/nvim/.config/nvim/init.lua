@@ -447,10 +447,10 @@ require'telescope'.setup {
 -- Add leader shortcuts
 special = { noremap = true, silent = true }
 nn('<leader>f', [[<cmd>lua require('telescope.builtin').find_files()<cr>]], special)
+nn('<leader><space>', [[<cmd>lua require('telescope.builtin').buffers()<cr>]], special)
 nn('<leader>b', [[<cmd>lua require('telescope.builtin').buffers()<cr>]], special)
 nn('<leader>r', [[<cmd>lua require('telescope.builtin').registers()<cr>]], special)
 nn('<leader>l', [[<cmd>lua require('telescope.builtin').current_buffer_fuzzy_find()<cr>]], special)
-nn('<leader><space>', [[<cmd>lua require('telescope.builtin').marks()<cr>]], special)
 nn('<leader>m', [[<cmd>lua require('telescope.builtin').marks()<cr>]], special)
 nn('<leader>t', [[<cmd>lua require('telescope.builtin').tags()<cr>]], special)
 nn('<leader>?', [[<cmd>lua require('telescope.builtin').oldfiles()<cr>]], special)
@@ -549,7 +549,7 @@ require('indent_guides').setup({
     indent_tab_guides = true;
     indent_soft_pattern = '\\s';
     exclude_filetypes = {'help','dashboard','dashpreview','NvimTree','vista','sagahover'};
-    -- even_colors = { fg ='#2a3834',bg='#332b36' };
-    -- odd_colors = { fg='#332b36',bg='#2a3834' };
+    even_colors = { fg ='#2a3834',bg='#332b36' };
+    odd_colors = { fg='#332b36',bg='#2a3834' };
 })
 
