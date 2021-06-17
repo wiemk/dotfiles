@@ -56,6 +56,7 @@ vim.o.incsearch = true
 
 -- Make line numbers default
 vim.wo.number = true
+vim.wo.relativenumber = true
 
 -- Do not save when switching buffers
 vim.o.hidden = true
@@ -428,7 +429,22 @@ vim.api.nvim_exec([[
 ]], false)
 
 -- Show diagnostics on CursorHold
-vim.cmd([[autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics()]])
+ShowLineDiagnostics = function()
+    local diag = vim.lsp.diagnostic.get_line_diagnostics()
+    if not next(diag) then
+        return
+    end
+    local last = diag[#diag]
+    if last.message ~= nil then
+       print(last.message) 
+       vim.api.nvim_exec([[
+           augroup cleardiag
+               autocmd CursorMoved * : echo "" | autocmd! cleardiag
+           augroup end
+        ]], false)
+    end
+end
+vim.cmd([[autocmd CursorHold * lua ShowLineDiagnostics()]])
 
 -- Telescope
 require'telescope'.setup {
