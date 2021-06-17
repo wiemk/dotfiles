@@ -171,7 +171,6 @@ local xn = function(bind, action, special)
     _bindkey('x', bind, action, special)
 end
 
-
 nn('<F4>', '<CMD>lua ToggleMouse()<CR>')
 
 -- LSP settings
@@ -200,8 +199,8 @@ local on_attach = function(client, bufnr)
     buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
     buf_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
     buf_set_keymap('n', '<leader>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-    buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-    buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+    buf_set_keymap('n', 'ö', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+    buf_set_keymap('n', 'ä', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
     buf_set_keymap('n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 
     -- Set some keybinds conditional on server capabilities
@@ -345,7 +344,7 @@ vim.g.maplocalleader = " "
 -- Remap for dealing with word wrap
 local special = { noremap = true, expr = true, silent = true }
 nn('k', "v:count == 0 ? 'gk' : 'k'", special)
-nn('j', "v:count == 0 ? 'gj' : 'j'", special) 
+nn('j', "v:count == 0 ? 'gj' : 'j'", special)
 
 -- Remap escape to leave terminal mode
 vim.api.nvim_exec([[
@@ -500,6 +499,8 @@ require'compe'.setup {
 
     source = {
         buffer = true;
+        calc = true;
+        nvim_lua = true;
         nvim_lsp = true;
         path = true;
     };

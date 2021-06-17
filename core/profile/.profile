@@ -151,8 +151,8 @@ is_identical_sha() {
 	local file="$1" nbuf="$2"
 	if [[ -f "${file}" ]]; then
 		local obuf="$(<"${file}")"
-		local ohash=$(printf '%s' "${obuf}" | command sha1sum | cut -d ' ' -f1)
-		local nhash=$(printf '%s' "${nbuf}" | command sha1sum | cut -d ' ' -f1)
+		local ohash=$(printf '%s' "${obuf}" | command b2sum | cut -d ' ' -f1)
+		local nhash=$(printf '%s' "${nbuf}" | command b2sum | cut -d ' ' -f1)
 		test "$ohash" == "$nhash"
 	fi
 }
