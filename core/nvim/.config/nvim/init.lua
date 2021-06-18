@@ -1,6 +1,5 @@
+-- vim: ft=lua ts=4 sw=4 noet
 -- https://github.com/mjlbach/defaults.nvim/blob/master/init.lua
---
--- vim: ft=lua ts=4 sw=4 sts=-1 et
 --
 -- Install packer
 local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
@@ -445,6 +444,20 @@ ShowLineDiagnostics = function()
     end
 end
 vim.cmd([[autocmd CursorHold * lua ShowLineDiagnostics()]])
+
+-- Insert modeline
+GenerateModeline = function()
+    local expand
+    local expand_option = vim.bo.expandtab
+    if expand_option ~= "noexpandtab" then
+        expand = "noet"
+    else
+        expand = "et"
+    end
+    local ml = "# vim: ft="..vim.bo.filetype.." ts="..vim.bo.tabstop.." sw="..vim.bo.shiftwidth.." "..expand
+    vim.fn.append(vim.fn.line('.'), ml)
+end
+nn('<leader>ml', [[<cmd>lua GenerateModeline()<cr>]])
 
 -- Telescope
 require'telescope'.setup {
