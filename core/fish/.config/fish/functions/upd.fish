@@ -1,3 +1,4 @@
+# vim: ft=fish ts=4 sw=4 noet
 function upd --description 'shortcut for upgrading the system'
 	set os (grep -oP '(?<=^ID_LIKE=).+' /etc/os-release | tr -d '"')
 	if [ -z "$os" ]

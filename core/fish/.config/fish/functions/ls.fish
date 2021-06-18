@@ -1,4 +1,4 @@
-#
+# vim: ft=fish ts=4 sw=4 noet
 # Make ls use colors if we are on a system that supports that feature and writing to stdout.
 #
 if command ls --version >/dev/null 2>/dev/null
