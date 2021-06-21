@@ -16,7 +16,6 @@
 	bra = branch -vv
 	ci = commit
 	ci-m = commit -m
-	clone-svnsync = svn clone --use-svnsync-props
 	co = checkout
 	di = diff
 	emerge = merge --edit --no-ff
@@ -71,6 +70,7 @@
 	ci = commit
 	cr = reset HEAD~1
 	co = checkout
+	inc = log --name-status origin/master..
 	d = diff --summary --stat --patch
 	dc = diff --cached
 	ff = merge --ff-only

@@ -16,6 +16,7 @@ local use = require'packer'.use
 require'packer'.startup(function()
 	use 'wbthomason/packer.nvim'          -- Package manager
 	use 'norcalli/nvim.lua'               -- Magic functions
+	use 'norcalli/nvim_utils'             -- More magic
 	use 'tpope/vim-fugitive'              -- Git commands in nvim
 	use 'tpope/vim-commentary'            -- "gc" to comment visual regions/lines
 	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
@@ -34,7 +35,7 @@ require'packer'.startup(function()
 	use 'rafcamlet/nvim-luapad'           -- Lua scratchpad
 end)
 -- }}}
--- {{{ utility functions
+-- {{{ Utility functions
 local nvim = require'nvim'
 
 function _G.dump(...)
@@ -86,19 +87,21 @@ function util.tok(s, sep)
 	return t
 end
 
-local map = (function(modes)
+local globals = (function(modes)
 	local map = {}
 	modes:gsub(".", function(c)
-		f = function(bind, action, special)
-			if special == nil then
-				special = { noremap = true }
+		f = function(key, action, opts)
+			if opts == nil then
+				opts = { noremap = true }
 			end
-			nvim.set_keymap(c, bind, action, special)
+			nvim.set_keymap(c, key, action, opts)
 		end
-		rawset(map, c, f)
+		local fn = c .. 'map'
+		rawset(_G, fn, f)
+		table.insert(map, fn)
 	end)
 	return map
-end)("nvxc")
+end)("cinostvx")
 -- }}}
 -- {{{ Generic options
 -- Disable netrw
@@ -188,15 +191,13 @@ vim.o.ttimeoutlen = 0
 vim.o.updatetime = 250
 
 -- Always show diagnostics column
-vim.wo.signcolumn = "no"
+vim.wo.signcolumn = "number"
 
 -- Set colorscheme (order is important here)
 vim.o.termguicolors = true
--- vim.g.onedark_terminal_italics = 2
 vim.wo.cursorline = true
 vim.wo.cursorcolumn = true
-nvim.ex.colorscheme([[dracula]])
-
+-- vim.g.onedark_terminal_italics = 2
 -- Add map to enter paste mode
 vim.o.pastetoggle="<F3>"
 -- }}}
@@ -205,36 +206,43 @@ local nvim_lsp = require'lspconfig'
 local on_attach = function(client, bufnr)
 	nvim.buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-	local function buf_set_keymap(...)
-		nvim.buf_set_keymap(bufnr, ...)
-	end
-	local function buf_set_option(...)
-		nvim.buf_set_option(bufnr, ...)
-	end
+	local map = (function(modes)
+		local map = {}
+		modes:gsub(".", function(c)
+			f = function(key, action, opts)
+				if opts == nil then
+					opts = { noremap = true }
+				end
+				nvim.buf_set_keymap(bufnr, c, key, action, opts)
+			end
+			rawset(map, c, f)
+		end)
+		return map
+	end)("nvic")
 
 	local opts = { noremap=true, silent=true }
-	buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-	buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-	buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-	buf_set_keymap('n', 'gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-	buf_set_keymap('n', '<C-k>', '<Cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-	buf_set_keymap('n', '<leader>wa', '<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-	buf_set_keymap('n', '<leader>wr', '<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-	buf_set_keymap('n', '<leader>wl', '<Cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-	buf_set_keymap('n', '<leader>D', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-	buf_set_keymap('n', '<leader>rn', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
-	buf_set_keymap('n', 'gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
-	buf_set_keymap('n', '<leader>ca', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-	buf_set_keymap('n', '<leader>e', '<Cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-	buf_set_keymap('n', 'ö', '<Cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-	buf_set_keymap('n', 'ä', '<Cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-	buf_set_keymap('n', '<leader>q', '<Cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+	map.n('gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+	map.n('gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+	map.n('K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+	map.n('gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+	map.n('<C-k>', '<Cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+	map.n('<leader>wa', '<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+	map.n('<leader>wr', '<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+	map.n('<leader>wl', '<Cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+	map.n('<leader>D', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+	map.n('<leader>rn', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
+	map.n('gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
+	map.n('<leader>ca', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+	map.n('<leader>e', '<Cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+	map.n('ö', '<Cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+	map.n('ä', '<Cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+	map.n('<leader>q', '<Cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 
 	-- Set some keybinds conditional on server capabilities
 	if client.resolved_capabilities.document_formatting then
-		buf_set_keymap("n", "<space>f", "<Cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+		map.n("<space>f", "<Cmd>lua vim.lsp.buf.formatting()<CR>", opts)
 	elseif client.resolved_capabilities.document_range_formatting then
-		buf_set_keymap("n", "<space>f", "<Cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
+		map.n("<space>f", "<Cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
 	end
 end
 
@@ -257,22 +265,6 @@ end
 	end
 end)()
 -- }}}
--- vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
---   vim.lsp.diagnostic.on_publish_diagnostics, {
---     -- Enable underline, use default values
---     underline = true,
---     -- Enable virtual text, override spacing to 4
---     virtual_text = {
---       spacing = 4,
---     },
---     -- Use a function to dynamically turn signs off
---     -- and on, using buffer local variables
---     signs = function(bufnr, client_id)
---       return vim.bo[bufnr].show_signs == false
---     end,
---     -- Disable a feature
---     update_in_insert = false,
---   }
 -- {{{ LSP features
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 	vim.lsp.diagnostic.on_publish_diagnostics, {
@@ -280,13 +272,13 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 		virtual_text = true,
 		signs = true,
 		update_in_insert = false,
-	}
-)
+	})
 -- }}}
 -- {{{ Lua language server
-
 local sumneko_root_path = vim.fn.getenv("XDG_DATA_HOME") .. "/lua-language-server"
-local sumneko_binary_path = "/bin/Linux/lua-language-server" -- Change to your OS specific output folder
+local sumneko_binary_path = "/bin/Linux/lua-language-server"
+
+table.insert(globals, 'vim')
 local settings = {
 	Lua = {
 		runtime = {
@@ -299,7 +291,7 @@ local settings = {
 		},
 		diagnostics = {
 			enable = true,
-			globals = {'vim'},
+			globals = globals,
 			disable = {'lowercase-global'}
 		},
 		workspace = {
@@ -312,13 +304,6 @@ local settings = {
 		}
 	}
 }
--- local luadev = require'lua-dev'.setup {
--- 	lspconfig = {
--- 		cmd = {sumneko_root_path .. sumneko_binary_path, "-E", sumneko_root_path .. "/main.lua" };
--- 		on_attach = on_attach,
--- 		settings = settings
--- }
--- nvim_lsp.sumneko_lua.setup(luadev) 
 
 nvim_lsp.sumneko_lua.setup {
 	cmd = { sumneko_root_path .. sumneko_binary_path, "-E", sumneko_root_path .. "/main.lua" };
@@ -408,7 +393,7 @@ toggle_mouse = function()
 	nomouse.status = not nomouse.status
 end
 
-map.n('<F4>', '<Cmd>lua toggle_mouse()<CR>')
+nmap('<F4>', '<Cmd>lua toggle_mouse()<CR>')
 -- }}}
 -- {{{ Treesitter
 require'nvim-treesitter.configs'.setup {
@@ -442,7 +427,7 @@ require'nvim-treesitter.configs'.setup {
 			' setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()', false)
 	end
 end)()
-map.n('<F5>', '<Cmd>setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()<CR>')
+nmap('<F5>', '<Cmd>setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()<CR>')
 -- }}}
 -- {{{ nvim-lint
 local lint = require'lint'
@@ -509,63 +494,71 @@ vim.cmd([[command! TrimAll :lua trim_lines(); delete_empty()]])
 nvim.set_keymap('', '<Space>', '<Nop>', {noremap = true, silent = true})
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
-
 -- Remap for dealing with word wrap
-map.opt = { noremap = true, expr = true, silent = true }
+opts = { noremap = true, expr = true, silent = true }
 
-map.n('k', "v:count == 0 ? 'gk' : 'k'", map.opt)
-map.n('j', "v:count == 0 ? 'gj' : 'j'", map.opt)
+nmap('k', "v:count == 0 ? 'gk' : 'k'", opts)
+nmap('j', "v:count == 0 ? 'gj' : 'j'", opts)
 
 -- Do not copy when pasting
-map.x("p", "pgvy")
+xmap("p", "pgvy")
 
 -- J and K to move up and down
-map.n("J", "}")
-map.n("K", "{")
-map.v("J", "}")
-map.v("K", "{")
+nmap("J", "}")
+nmap("K", "{")
+vmap("J", "}")
+vmap("K", "{")
 
 -- H and L to move to the beginning and end of a line
-map.n("H", "_")
-map.n("L", "$")
-map.v("H", "_")
-map.v("L", "$")
+nmap("H", "_")
+nmap("L", "$")
+vmap("H", "_")
+vmap("L", "$")
 
-map.n("<C-f>", "/")
-map.n("<C-g>", ":Rg<CR>")
-map.n("<C-q>", ":q<CR>")
-map.n("<C-s>", ":w<CR>")
-map.n("<C-t>", ":Telescope fd<CR>")
-map.n("u", ":undo<CR>")
-map.n("U", ":redo<CR>")
+nmap("<C-f>", "/")
+nmap("<C-g>", ":Rg<CR>")
+nmap("<C-q>", ":q<CR>")
+nmap("<C-s>", ":w<CR>")
+nmap("<C-t>", ":Telescope fd<CR>")
+nmap("u", ":undo<CR>")
+nmap("U", ":redo<CR>")
 
 -- Create splits with s and S
-map.n("<C-w>s", ":vsplit<CR>:wincmd l<CR>")
+nmap("<C-w>s", ":vsplit<CR>:wincmd l<CR>")
 
 -- Create, close, and move between tabs
-map.n("<M-N>", ":tabnew<CR>")
-map.n("<M-n>", ":tabprevious<CR>")
-map.n("<M-m>", ":tabnext<CR>")
-map.n("<M-M>", ":tabclose<CR>")
+nmap("<M-N>", ":tabnew<CR>")
+nmap("<M-n>", ":tabprevious<CR>")
+nmap("<M-m>", ":tabnext<CR>")
+nmap("<M-M>", ":tabclose<CR>")
 
 -- Cycle through open buffers
-map.n("<leader>.", ":bnext<CR>")
-map.n("<leader>,", ":bprevious<CR>")
+nmap("<leader>.", ":bnext<CR>")
+nmap("<leader>,", ":bprevious<CR>")
 
 -- Change to file directory in current window
-map.n("<leader>cd", ":lcd %:p:h<CR>:pwd<CR>")
+nmap("<leader>cd", ":lcd %:p:h<CR>:pwd<CR>")
 
 -- Save all.
-map.n("<C-M-s>", ":wa<CR>")
+nmap("<C-M-s>", ":wa<CR>")
 
 -- Search and replace using marked text
-map.v("<C-r>", "\"hy:%s/<C-r>h//gc<left><left><left>")
+vmap("<C-r>", "\"hy:%s/<C-r>h//gc<left><left><left>")
 
 -- Don't yank when using delete
-map.n('<del>', '"_x')
+nmap('<del>', '"_x')
 
 -- Y yank until the end of line
-map.n('Y', 'y$');
+nmap('Y', 'y$')
+
+-- Transpose lines
+opts = { noremap = true, silent = true }
+nmap('<S-Up>', '<Cmd>move .-2<CR>', opts)
+nmap('<S-Down>', '<Cmd>move .+1<CR>', opts)
+-- need to leave visual mode (:) for the mark to be set
+vmap('<S-Up>', ':move \'<-2<CR>gv=gv', opts)
+vmap('<S-Down>', ':move \'>+1<CR>gv=gv', opts);
+-- }}}
 -- {{{ Abbreviations
 -- Force write with sudo
 (function()
@@ -609,9 +602,9 @@ GenerateModeline = function()
 	end
 	local ml = cin .. " vi:set ft=" .. vim.bo.filetype .. " ts=" .. vim.bo.tabstop ..
 		" sw=" .. vim.bo.shiftwidth .. " " .. expand .. " " .. autoindent .. ": " .. cout
-	vim.fn.setline('.', util.trim(ml))
+	nvim.put({ util.trim(ml) }, 'l', true, false)
 end
-map.n('<leader>M', [[<Cmd>lua GenerateModeline()<CR>]])
+nmap('<leader>M', [[<Cmd>lua GenerateModeline()<CR>]])
 -- }}}
 -- {{{ Telescope
 require'telescope'.setup {
@@ -627,22 +620,22 @@ require'telescope'.setup {
 	}
 }
 -- Add leader shortcuts
-special = { noremap = true, silent = true }
-map.n('<leader>f', [[<Cmd>lua require'telescope.builtin'.find_files()<CR>]], special)
-map.n('<leader><space>', [[<Cmd>lua require'telescope.builtin'.buffers()<CR>]], special)
-map.n('<leader>b', [[<Cmd>lua require'telescope.builtin'.buffers()<CR>]], special)
-map.n('<leader>r', [[<Cmd>lua require'telescope.builtin'.registers()<CR>]], special)
-map.n('<leader>l', [[<Cmd>lua require'telescope.builtin'.current_buffer_fuzzy_find()<CR>]], special)
-map.n('<leader>m', [[<Cmd>lua require'telescope.builtin'.marks()<CR>]], special)
-map.n('<leader>t', [[<Cmd>lua require'telescope.builtin'.tags()<CR>]], special)
-map.n('<leader>?', [[<Cmd>lua require'telescope.builtin'.oldfiles()<CR>]], special)
-map.n('<leader>sd', [[<Cmd>lua require'telescope.builtin'.grep_string()<CR>]], special)
-map.n('<leader>sp', [[<Cmd>lua require'telescope.builtin'.live_grep()<CR>]], special)
-map.n('<leader>o', [[<Cmd>lua require'telescope.builtin'.tags{ only_current_buffer = true }<CR>]], special)
-map.n('<leader>gc', [[<Cmd>lua require'telescope.builtin'.git_commits()<CR>]], special)
-map.n('<leader>gb', [[<Cmd>lua require'telescope.builtin'.git_branches()<CR>]], special)
-map.n('<leader>gs', [[<Cmd>lua require'telescope.builtin'.git_status()<CR>]], special)
-map.n('<leader>gp', [[<Cmd>lua require'telescope.builtin'.git_bcommits()<CR>]], special)
+opts = { noremap = true, silent = true }
+nmap('<leader>f', [[<Cmd>lua require'telescope.builtin'.find_files()<CR>]], opts)
+nmap('<leader><space>', [[<Cmd>lua require'telescope.builtin'.buffers()<CR>]], opts)
+nmap('<leader>b', [[<Cmd>lua require'telescope.builtin'.buffers()<CR>]], opts)
+nmap('<leader>r', [[<Cmd>lua require'telescope.builtin'.registers()<CR>]], opts)
+nmap('<leader>l', [[<Cmd>lua require'telescope.builtin'.current_buffer_fuzzy_find()<CR>]], opts)
+nmap('<leader>m', [[<Cmd>lua require'telescope.builtin'.marks()<CR>]], opts)
+nmap('<leader>t', [[<Cmd>lua require'telescope.builtin'.tags()<CR>]], opts)
+nmap('<leader>?', [[<Cmd>lua require'telescope.builtin'.oldfiles()<CR>]], opts)
+nmap('<leader>sd', [[<Cmd>lua require'telescope.builtin'.grep_string()<CR>]], opts)
+nmap('<leader>sp', [[<Cmd>lua require'telescope.builtin'.live_grep()<CR>]], opts)
+nmap('<leader>o', [[<Cmd>lua require'telescope.builtin'.tags{ only_current_buffer = true }<CR>]], opts)
+nmap('<leader>gc', [[<Cmd>lua require'telescope.builtin'.git_commits()<CR>]], opts)
+nmap('<leader>gb', [[<Cmd>lua require'telescope.builtin'.git_branches()<CR>]], opts)
+nmap('<leader>gs', [[<Cmd>lua require'telescope.builtin'.git_status()<CR>]], opts)
+nmap('<leader>gp', [[<Cmd>lua require'telescope.builtin'.git_bcommits()<CR>]], opts)
 
 -- Change preview window location
 vim.g.splitbelow = true
@@ -735,14 +728,14 @@ require'luapad'.config {
 	eval_on_move = true,
 	error_highlight = 'WarningMsg',
 	on_init = function()
-		print 'Hello from Luapad!'
+		print('Luapad initialized.')
 	end,
 	context = {
 		shout = function(str) return(string.upper(str) .. '!') end
 	}
 }
 -- }}}
--- {{{ Loose autocmd
+-- {{{ Loose autocmds
 -- Hide cmdline after entering a command
 nvim.exec([[
 	augroup cmdline
@@ -764,13 +757,22 @@ nvim.exec([[
 		au TermOpen * tnoremap <buffer> <Esc> <c-\><c-n>
 		au TermOpen * set nonu
 	augroup end
-]], false)
--- Override parenthese highlighting
+]], false);
+-- }}}
+-- {{{ Theme
+-- Override highlighting
 nvim.exec([[
+	function! ColorOverride() abort
+		highlight clear MatchParen
+		highlight MatchParen cterm=underline ctermfg=84 gui=underline guifg=#50FA7B guibg=#ff79c6
+		highlight link String DraculaPurple
+	endfunction
 	augroup hloverride
 		autocmd!
-		autocmd VimEnter * highlight MatchParen cterm=underline ctermfg=84 gui=underline guifg=#50FA7B guibg=#ff79c6
+		autocmd ColorScheme dracula call ColorOverride()
 	augroup end
-]], false)
+]], false);
+nvim.ex.colorscheme([[dracula]])
 -- }}}
-
+-- {{{ Staging area
+-- }}}
