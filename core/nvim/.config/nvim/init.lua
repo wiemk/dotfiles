@@ -21,7 +21,16 @@ require'packer'.startup(function()
 	use 'tpope/vim-commentary'            -- "gc" to comment visual regions/lines
 	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
 	-- UI to select things (files, grep results, open buffers...)
-	use {'nvim-telescope/telescope.nvim', requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}} }
+	use {'nvim-telescope/telescope.nvim',
+		requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
+	}
+	use {'nvim-telescope/telescope-frecency.nvim',
+		requires= {{'nvim-telescope/telescope.nvim'},
+			{'tami5/sql.nvim', config = "vim.g.sql_clib_path = [[/usr/lib64/libsqlite3.so.0]]"}},
+		config = function()
+			require"telescope".load_extension("frecency")
+		end
+	}
 	-- use 'joshdick/onedark.vim'            -- Theme inspired by Atom
 	use 'dracula/vim'                     -- Popular dracula theme
 	use { 'hoob3rt/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true} }
@@ -205,7 +214,6 @@ vim.o.pastetoggle="<F3>"
 local nvim_lsp = require'lspconfig'
 local on_attach = function(client, bufnr)
 	nvim.buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
-
 	local map = (function(modes)
 		local map = {}
 		modes:gsub(".", function(c)
@@ -233,7 +241,7 @@ local on_attach = function(client, bufnr)
 	map.n('<leader>rn', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
 	map.n('gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
 	map.n('<leader>ca', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-	map.n('<leader>e', '<Cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+	map.n('<leader>e', '<Cmd>lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})<CR>', opts)
 	map.n('ö', '<Cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
 	map.n('ä', '<Cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
 	map.n('<leader>q', '<Cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
@@ -349,7 +357,8 @@ end
 nvim.exec([[
 	augroup linediag
 		autocmd!
-		autocmd CursorHold * lua show_line_diagnostics()
+" 		autocmd CursorHold * lua show_line_diagnostics()
+		autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
 	augroup end
 ]], false)
 -- }}}
@@ -637,6 +646,9 @@ nmap('<leader>gb', [[<Cmd>lua require'telescope.builtin'.git_branches()<CR>]], o
 nmap('<leader>gs', [[<Cmd>lua require'telescope.builtin'.git_status()<CR>]], opts)
 nmap('<leader>gp', [[<Cmd>lua require'telescope.builtin'.git_bcommits()<CR>]], opts)
 
+-- Frecency extension
+nmap('<leader><Tab>', [[<Cmd>lua require'telescope'.extensions.frecency.frecency()<CR>]], opts)
+
 -- Change preview window location
 vim.g.splitbelow = true
 -- }}}
@@ -766,12 +778,14 @@ nvim.exec([[
 		highlight clear MatchParen
 		highlight MatchParen cterm=underline ctermfg=84 gui=underline guifg=#50FA7B guibg=#ff79c6
 		highlight link String DraculaPurple
+		highlight iCursor guifg=white guibg=#50FA7B
 	endfunction
 	augroup hloverride
 		autocmd!
 		autocmd ColorScheme dracula call ColorOverride()
 	augroup end
 ]], false);
+vim.o.guicursor = vim.o.guicursor .. ",i:ver100-iCursor,i:blinkon2"
 nvim.ex.colorscheme([[dracula]])
 -- }}}
 -- {{{ Staging area
