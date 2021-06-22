@@ -27,4 +27,6 @@ staging/pulse/.config/pulse/*
 # tmux
 core/tmux/.config/tmux/hooks/_*.hook
 core/tmux/.config/tmux/hooks/_*.sh
-
+# alacritty
+gui/alacritty/.config/alacritty/*
+!gui/alacritty/.config/alacritty/alacritty.yml
