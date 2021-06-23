@@ -15,15 +15,31 @@ vim.api.nvim_exec([[
 local use = require'packer'.use
 require'packer'.startup(function()
 	use 'wbthomason/packer.nvim'          -- Package manager
-	use 'norcalli/nvim.lua'               -- Magic functions
-	use 'norcalli/nvim_utils'             -- More magic
 	use 'tpope/vim-fugitive'              -- Git commands in nvim
 	use 'tpope/vim-commentary'            -- "gc" to comment visual regions/lines
 	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
+	use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
+	use 'hrsh7th/nvim-compe'              -- Autocompletion plugin
+	use 'nvim-treesitter/nvim-treesitter' -- Language parser
+	use 'mfussenegger/nvim-lint'          -- External linter support
+	use 'glepnir/indent-guides.nvim'      -- Indent guides for spaces
+	use 'rafcamlet/nvim-luapad'           -- Lua scratchpad
+	use 'dracula/vim'                     -- Popular dracula theme
+	-- use 'joshdick/onedark.vim'         -- Theme inspired by Atom
+	use { 'hoob3rt/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true} }
+	-- Keymap wrapper functions
+	use 'tjdevries/astronauta.nvim'
+	-- Add git related info in the signs columns and popups
+	use {'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'},
+		config = function()
+			require'gitsigns'.setup()
+		end
+	}
 	-- UI to select things (files, grep results, open buffers...)
 	use {'nvim-telescope/telescope.nvim',
 		requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
 	}
+	-- Frecency algorithm support for telescope
 	use {'nvim-telescope/telescope-frecency.nvim',
 		requires= {{'nvim-telescope/telescope.nvim'},
 			{'tami5/sql.nvim', config = "vim.g.sql_clib_path = [[/usr/lib64/libsqlite3.so.0]]"}},
@@ -31,21 +47,19 @@ require'packer'.startup(function()
 			require"telescope".load_extension("frecency")
 		end
 	}
-	-- use 'joshdick/onedark.vim'            -- Theme inspired by Atom
-	use 'dracula/vim'                     -- Popular dracula theme
-	use { 'hoob3rt/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true} }
-	-- Add git related info in the signs columns and popups
-	use {'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'} }
-	use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
-	use 'hrsh7th/nvim-compe'              -- Autocompletion plugin
-	use 'nvim-treesitter/nvim-treesitter' -- Language parser
-	use 'mfussenegger/nvim-lint'          -- External linter support
-	use 'glepnir/indent-guides.nvim'      -- Indent guides for spaces
-	use 'rafcamlet/nvim-luapad'           -- Lua scratchpad
 end)
 -- }}}
 -- {{{ Utility functions
-local nvim = require'nvim'
+ex = setmetatable({}, {
+	__index = function(t, k)
+		local command = k:gsub("_$", "!")
+		local f = function(...)
+			return vim.api.nvim_command(table.concat(vim.tbl_flatten {command, ...}, " "))
+		end
+		rawset(t, k, f)
+		return f
+	end
+});
 
 function _G.dump(...)
 	local objects = vim.tbl_map(vim.inspect, {...})
@@ -96,6 +110,7 @@ function util.tok(s, sep)
 	return t
 end
 
+-- create mapping functions
 local globals = (function(modes)
 	local map = {}
 	modes:gsub(".", function(c)
@@ -103,14 +118,24 @@ local globals = (function(modes)
 			if opts == nil then
 				opts = { noremap = true }
 			end
-			nvim.set_keymap(c, key, action, opts)
+			vim.api.nvim_set_keymap(c, key, action, opts)
 		end
 		local fn = c .. 'map'
 		rawset(_G, fn, f)
 		table.insert(map, fn)
 	end)
 	return map
-end)("cinostvx")
+end)("cinostvx");
+
+(function()
+	local km = require'astronauta.keymap'
+	for k,v in pairs(km) do
+		if string.match(k, "%Dnoremap") then
+			table.insert(globals, k)
+			rawset(_G, k, v)
+		end
+	end
+end)()
 -- }}}
 -- {{{ Generic options
 -- Disable netrw
@@ -213,7 +238,7 @@ vim.o.pastetoggle="<F3>"
 -- {{{ LSP
 local nvim_lsp = require'lspconfig'
 local on_attach = function(client, bufnr)
-	nvim.buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
+	vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 	local map = (function(modes)
 		local map = {}
 		modes:gsub(".", function(c)
@@ -221,7 +246,7 @@ local on_attach = function(client, bufnr)
 				if opts == nil then
 					opts = { noremap = true }
 				end
-				nvim.buf_set_keymap(bufnr, c, key, action, opts)
+				vim.api.nvim_buf_set_keymap(bufnr, c, key, action, opts)
 			end
 			rawset(map, c, f)
 		end)
@@ -253,7 +278,6 @@ local on_attach = function(client, bufnr)
 		map.n("<space>f", "<Cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
 	end
 end
-
 -- {{{ Enable the following language servers
 (function()
 	local servers = {
@@ -285,7 +309,6 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 -- {{{ Lua language server
 local sumneko_root_path = vim.fn.getenv("XDG_DATA_HOME") .. "/lua-language-server"
 local sumneko_binary_path = "/bin/Linux/lua-language-server"
-
 table.insert(globals, 'vim')
 local settings = {
 	Lua = {
@@ -346,7 +369,7 @@ show_line_diagnostics = function()
 	end
 	if diag[index].message ~= nil then
 		print(diag[index].message)
-		nvim.exec([[
+		vim.api.nvim_exec([[
 			augroup cleardiag
 				autocmd!
 				autocmd CursorMoved * : echo "" | autocmd!
@@ -354,7 +377,7 @@ show_line_diagnostics = function()
 		]], false)
 	end
 end
-nvim.exec([[
+vim.api.nvim_exec([[
 	augroup linediag
 		autocmd!
 " 		autocmd CursorHold * lua show_line_diagnostics()
@@ -376,16 +399,16 @@ local nomouse = {
 }
 toggle_mouse = function()
 	local backup = function(t)
-		t.window = nvim.get_current_win()
+		t.window = vim.api.nvim_get_current_win()
 		t.backup = {}
 		for k,v in pairs(t.target) do
-			nomouse.backup[k] = nvim.win_get_option(t.window, k)
+			nomouse.backup[k] = vim.api.nvim_win_get_option(t.window, k)
 		end
 	end
 	local setopt = function(t)
 		if next(t) ~= nil then
 			for k,v in pairs(t) do
-				nvim.win_set_option(t.window, k, v)
+				vim.api.nvim_win_set_option(t.window, k, v)
 			end
 		end
 	end
@@ -432,7 +455,7 @@ require'nvim-treesitter.configs'.setup {
 		'markdown',
 	}
 	for _, value in pairs(fold_whitelist) do
-		nvim.exec('augroup fold | autocmd! fold FileType ' .. value ..
+		vim.api.nvim_exec('augroup fold | autocmd! fold FileType ' .. value ..
 			' setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()', false)
 	end
 end)()
@@ -445,7 +468,7 @@ lint.linters_by_ft = {
 	bash = {'shellcheck',},
 }
 
-nvim.exec([[
+vim.api.nvim_exec([[
 	augroup Linter
 		autocmd!
 		autocmd BufWritePost <buffer> lua require'lint'.try_lint()
@@ -468,7 +491,7 @@ require'lualine'.setup {
 		lualine_b = {
 			{
 				(function() return [[NOMOUSE]]; end),
-				condition = (function() return nomouse; end),
+				condition = (function() return nomouse.status; end),
 				lower = false
 			},
 			{
@@ -488,10 +511,10 @@ require'lualine'.setup {
 -- }}}
 -- {{{ Whitespace handling
 trim_lines = function()
-	util.keep_state(nvim.command, [[keeppatterns %s/\s\+$//e]])
+	util.keep_state(vim.api.nvim_command, [[keeppatterns %s/\s\+$//e]])
 end
 delete_empty = function()
-	util.keep_state(nvim.command, [[keeppatterns :v/\_s*\S/d]])
+	util.keep_state(vim.api.nvim_command, [[keeppatterns :v/\_s*\S/d]])
 end
 
 vim.cmd([[command! TrimTrailingWhite :lua trim_lines()]])
@@ -499,12 +522,17 @@ vim.cmd([[command! TrimTrailingLines :lua delete_empty()]])
 vim.cmd([[command! TrimAll :lua trim_lines(); delete_empty()]])
 -- }}}
 -- {{{ Custom key bindings
+-- Test mapping with lua callback
+nnoremap { '<F2>', function() print('"hello world!" from lua!') end }
+
 -- Remap space as leader key
-nvim.set_keymap('', '<Space>', '<Nop>', {noremap = true, silent = true})
+vim.api.nvim_set_keymap('', '<Space>', '<Nop>', {noremap = true, silent = true})
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
--- Remap for dealing with word wrap
+
 opts = { noremap = true, expr = true, silent = true }
+
+-- Lua test mapping
 
 nmap('k', "v:count == 0 ? 'gk' : 'k'", opts)
 nmap('j', "v:count == 0 ? 'gj' : 'j'", opts)
@@ -577,7 +605,7 @@ vmap('<S-Down>', ':move \'>+1<CR>gv=gv', opts);
 	}
 	for _, v in ipairs(askpass) do
 		if vim.fn.executable(v) then
-			nvim.ex.abbrev('w!!', 'w !SUDO_ASKPASS=' .. v .. ' sudo -A tee > /dev/null %')
+			ex.abbrev('w!!', 'w !SUDO_ASKPASS=' .. v .. ' sudo -A tee > /dev/null %')
 			return
 		end
 	end
@@ -611,7 +639,7 @@ GenerateModeline = function()
 	end
 	local ml = cin .. " vi:set ft=" .. vim.bo.filetype .. " ts=" .. vim.bo.tabstop ..
 		" sw=" .. vim.bo.shiftwidth .. " " .. expand .. " " .. autoindent .. ": " .. cout
-	nvim.put({ util.trim(ml) }, 'l', true, false)
+	vim.api.nvim_put({ util.trim(ml) }, 'l', true, false)
 end
 nmap('<leader>M', [[<Cmd>lua GenerateModeline()<CR>]])
 -- }}}
@@ -640,7 +668,7 @@ nmap('<leader>t', [[<Cmd>lua require'telescope.builtin'.tags()<CR>]], opts)
 nmap('<leader>?', [[<Cmd>lua require'telescope.builtin'.oldfiles()<CR>]], opts)
 nmap('<leader>sd', [[<Cmd>lua require'telescope.builtin'.grep_string()<CR>]], opts)
 nmap('<leader>sp', [[<Cmd>lua require'telescope.builtin'.live_grep()<CR>]], opts)
-nmap('<leader>o', [[<Cmd>lua require'telescope.builtin'.tags{ only_current_buffer = true }<CR>]], opts)
+nmap('<leader>o', [[<Cmd>lua require'telescope.builtin'.tags{ only_current_buffer = true)<CR>]], opts)
 nmap('<leader>gc', [[<Cmd>lua require'telescope.builtin'.git_commits()<CR>]], opts)
 nmap('<leader>gb', [[<Cmd>lua require'telescope.builtin'.git_branches()<CR>]], opts)
 nmap('<leader>gs', [[<Cmd>lua require'telescope.builtin'.git_status()<CR>]], opts)
@@ -657,7 +685,7 @@ vim.g.splitbelow = true
 -- }}}
 -- {{{ Compe
 -- Set completeopt to have a better completion experience
-vim.o.completeopt="menuone,noinsert"
+vim.o.completeopt="menuone,noselect"
 vim.o.shortmess = vim.o.shortmess .. "c"
 
 require'compe'.setup {
@@ -682,9 +710,18 @@ require'compe'.setup {
 		path = false;
 	};
 }
+
+-- Insert mode mappings
+opts = { silent = true, expr = true  }
+imap('<C-Space>', 'compe#complete()', opts)
+imap('<CR>', "compe#confirm('<CR>')", opts)
+imap('<C-e>', "compe#close('<C-e>')", opts)
+imap('<C-f>', "compe#scroll({ 'delta': +4 }", opts)
+imap('<C-d>', "compe#scroll({ 'delta': -4 }", opts)
+
 -- {{{ Tab completion
 local t = function(str)
-	return nvim.replace_termcodes(str, true, true, true)
+	return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
 
 local check_back_space = function()
@@ -713,10 +750,10 @@ _G.s_tab_complete = function()
 	end
 end
 
-nvim.set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
-nvim.set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
-nvim.set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
-nvim.set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+imap('<Tab>', 'v:lua.tab_complete()', {expr = true})
+smap('<Tab>', 'v:lua.tab_complete()', {expr = true})
+imap('<S-Tab>', 'v:lua.s_tab_complete()', {expr = true})
+smap('<S-Tab>', 'v:lua.s_tab_complete()', {expr = true})
 -- }}}
 -- }}}
 -- {{{ Indent guides
@@ -749,21 +786,21 @@ require'luapad'.config {
 -- }}}
 -- {{{ Loose autocmds
 -- Hide cmdline after entering a command
-nvim.exec([[
+vim.api.nvim_exec([[
 	augroup cmdline
 		autocmd!
 		autocmd CmdlineLeave : echo ""
 	augroup end
 ]], false)
 -- Highlight on yank
-nvim.exec([[
+vim.api.nvim_exec([[
 	augroup YankHighlight
 		autocmd!
 		autocmd TextYankPost * silent! lua vim.highlight.on_yank()
 	augroup end
 ]], false)
 -- Remap escape to leave terminal mode
-nvim.exec([[
+vim.api.nvim_exec([[
 	augroup Terminal
 		autocmd!
 		au TermOpen * tnoremap <buffer> <Esc> <c-\><c-n>
@@ -773,7 +810,7 @@ nvim.exec([[
 -- }}}
 -- {{{ Theme
 -- Override highlighting
-nvim.exec([[
+vim.api.nvim_exec([[
 	function! ColorOverride() abort
 		highlight clear MatchParen
 		highlight MatchParen cterm=underline ctermfg=84 gui=underline guifg=#50FA7B guibg=#ff79c6
@@ -786,7 +823,7 @@ nvim.exec([[
 	augroup end
 ]], false);
 vim.o.guicursor = vim.o.guicursor .. ",i:ver100-iCursor,i:blinkon2"
-nvim.ex.colorscheme([[dracula]])
+ex.colorscheme([[dracula]])
 -- }}}
 -- {{{ Staging area
 -- }}}
