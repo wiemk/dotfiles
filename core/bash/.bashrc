@@ -12,6 +12,18 @@ fi
 
 if hash starship &>/dev/null; then
     eval "$(starship init bash)"
+else
+	PS4='+ ${BASH_SOURCE:-}:${FUNCNAME[0]:-}:L${LINENO:-}:   '
+	displayPS1() {
+		local rval=$?
+		if (( rval == 0 )); then
+			unset rval
+		else
+			printf -v rval '(%s) ' $rval
+		fi
+		PS1="\A \w\n$rval\\$ \[$(tput sgr0)\]"
+	}
+	export PROMPT_COMMAND=displayPS1
 fi
 
 alias tma='fish -c tma'
