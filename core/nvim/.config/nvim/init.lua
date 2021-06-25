@@ -523,7 +523,7 @@ vim.cmd([[command! TrimAll :lua trim_lines(); delete_empty()]])
 -- }}}
 -- {{{ Custom key bindings
 -- Test mapping with lua callback
-nnoremap { '<F2>', function() print('"hello world!" from lua!') end }
+-- nnoremap { '<leader>hello', function() print('"hello world!" from lua!') end }
 
 -- Remap space as leader key
 vim.api.nvim_set_keymap('', '<Space>', '<Nop>', {noremap = true, silent = true})
@@ -783,6 +783,7 @@ require'luapad'.config {
 		shout = function(str) return(string.upper(str) .. '!') end
 	}
 }
+nmap('<F2>', '<Cmd>Luapad<CR>')
 -- }}}
 -- {{{ Loose autocmds
 -- Hide cmdline after entering a command
