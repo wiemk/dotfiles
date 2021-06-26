@@ -854,5 +854,5 @@ key_bindings:
 
 # imports
 import:
-  - ~/.config/alacritty/imports.yml
+  - ~/.config/alacritty/theme.yml
 

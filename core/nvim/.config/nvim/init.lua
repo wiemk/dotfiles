@@ -25,7 +25,16 @@ require'packer'.startup(function()
 	use 'glepnir/indent-guides.nvim'      -- Indent guides for spaces
 	use 'rafcamlet/nvim-luapad'           -- Lua scratchpad
 	use 'dracula/vim'                     -- Popular dracula theme
-	-- use 'joshdick/onedark.vim'         -- Theme inspired by Atom
+	-- use 'folke/tokyonight.nvim'
+	-- use 'joshdick/onedark.vim'
+	-- Interactive keybind overview
+	use { 'folke/which-key.nvim',
+		config = function()
+			require'which-key'.setup {
+				triggers = {"<leader>"}
+			}
+		end
+	}
 	use { 'hoob3rt/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true} }
 	-- Keymap wrapper functions
 	use 'tjdevries/astronauta.nvim'
@@ -216,8 +225,8 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 
 -- Eliminate delays
-vim.o.timeout = false
-vim.o.timeoutlen = 0
+vim.o.timeout = true
+vim.o.timeoutlen = 500
 vim.o.ttimeout = false
 vim.o.ttimeoutlen = 0
 
@@ -232,6 +241,7 @@ vim.o.termguicolors = true
 vim.wo.cursorline = true
 vim.wo.cursorcolumn = true
 -- vim.g.onedark_terminal_italics = 2
+-- vim.g.tokyonight_style="storm"
 -- Add map to enter paste mode
 vim.o.pastetoggle="<F3>"
 -- }}}
@@ -809,7 +819,7 @@ vim.api.nvim_exec([[
 	augroup end
 ]], false);
 -- }}}
--- {{{ Theme
+-- {{{ Theme/GUI
 -- Override highlighting
 vim.api.nvim_exec([[
 	function! ColorOverride() abort
@@ -823,8 +833,15 @@ vim.api.nvim_exec([[
 		autocmd ColorScheme dracula call ColorOverride()
 	augroup end
 ]], false);
-vim.o.guicursor = vim.o.guicursor .. ",i:ver100-iCursor,i:blinkon2"
 ex.colorscheme([[dracula]])
+-- {{{ GUI Options
+vim.o.guicursor = vim.o.guicursor .. ",i:ver100-iCursor,i:blinkon2"
+vim.o.guifont = "Fira Code:h14"
+-- }}}
 -- }}}
 -- {{{ Staging area
+-- Neovide
+vim.g.neovide_refresh_rate = 60
+vim.g.neovide_cursor_antialiasing = false
+vim.g.neovide_cursor_vfx_mode = "pixiedust"
 -- }}}
