@@ -147,7 +147,7 @@ create_env_export() {
 	printf '%s' "${buf[*]}"
 }
 
-is_identical_sha() {
+is_identical_hash() {
 	local file="$1" nbuf="$2"
 	if [[ -f "${file}" ]]; then
 		local obuf="$(<"${file}")"

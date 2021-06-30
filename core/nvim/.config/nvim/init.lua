@@ -390,7 +390,7 @@ end
 vim.api.nvim_exec([[
 	augroup linediag
 		autocmd!
-" 		autocmd CursorHold * lua show_line_diagnostics()
+ 	"	autocmd CursorHold * lua show_line_diagnostics()
 		autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
 	augroup end
 ]], false)
@@ -472,16 +472,15 @@ end)()
 nmap('<F5>', '<Cmd>setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()<CR>')
 -- }}}
 -- {{{ nvim-lint
-local lint = require'lint'
-lint.linters_by_ft = {
+require'lint'.linters_by_ft = {
 	sh = {'shellcheck',},
 	bash = {'shellcheck',},
 }
 
 vim.api.nvim_exec([[
 	augroup Linter
-		autocmd!
-		autocmd BufWritePost <buffer> lua require'lint'.try_lint()
+		autocmd! * <buffer>
+		autocmd BufWritePost * lua require'lint'.try_lint()
 	augroup end
 ]], false)
 -- }}}
@@ -814,8 +813,15 @@ vim.api.nvim_exec([[
 vim.api.nvim_exec([[
 	augroup Terminal
 		autocmd!
-		au TermOpen * tnoremap <buffer> <Esc> <c-\><c-n>
-		au TermOpen * set nonu
+		autocmd TermOpen * tnoremap <buffer> <Esc> <c-\><c-n>
+		autocmd TermOpen * set nonu
+	augroup end
+]], false);
+-- Markdown filetype for bare textfiles
+vim.api.nvim_exec([[
+	augroup MarkdownText
+		autocmd!
+		autocmd BufNewFile,BufRead *.txt setlocal ft=markdown
 	augroup end
 ]], false);
 -- }}}
