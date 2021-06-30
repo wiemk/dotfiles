@@ -16,22 +16,31 @@ local use = require'packer'.use
 require'packer'.startup(function()
 	use 'wbthomason/packer.nvim'          -- Package manager
 	use 'tpope/vim-fugitive'              -- Git commands in nvim
-	use 'tpope/vim-commentary'            -- "gc" to comment visual regions/lines
+	use 'tpope/vim-commentary'            -- 'gc' to comment visual regions/lines
 	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
 	use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
 	use 'hrsh7th/nvim-compe'              -- Autocompletion plugin
 	use 'nvim-treesitter/nvim-treesitter' -- Language parser
-	use 'mfussenegger/nvim-lint'          -- External linter support
 	use 'glepnir/indent-guides.nvim'      -- Indent guides for spaces
 	use 'rafcamlet/nvim-luapad'           -- Lua scratchpad
 	use 'dracula/vim'                     -- Popular dracula theme
-	-- use 'folke/tokyonight.nvim'
-	-- use 'joshdick/onedark.vim'
+	-- Session management
+	use { 'Shatur/neovim-session-manager',
+		config = function()
+			vim.g.autosave_last_session = false
+			vim.g.sessions_dir = vim.fn.stdpath('cache') .. '/sessions/'
+			require'telescope'.load_extension('session_manager')
+		end
+	}
+	-- External linter support
+	use { 'mfussenegger/nvim-lint', ft = {'sh', 'bash'},
+		config = function() lint_init(); end
+	}
 	-- Interactive keybind overview
 	use { 'folke/which-key.nvim',
 		config = function()
 			require'which-key'.setup {
-				triggers = {"<leader>"}
+				triggers = {'<leader>'}
 			}
 		end
 	}
@@ -51,9 +60,9 @@ require'packer'.startup(function()
 	-- Frecency algorithm support for telescope
 	use {'nvim-telescope/telescope-frecency.nvim',
 		requires= {{'nvim-telescope/telescope.nvim'},
-			{'tami5/sql.nvim', config = "vim.g.sql_clib_path = [[/usr/lib64/libsqlite3.so.0]]"}},
+			{'tami5/sql.nvim', config = 'vim.g.sql_clib_path = [[/usr/lib64/libsqlite3.so.0]]'}},
 		config = function()
-			require"telescope".load_extension("frecency")
+			require'telescope'.load_extension('frecency')
 		end
 	}
 end)
@@ -61,9 +70,9 @@ end)
 -- {{{ Utility functions
 ex = setmetatable({}, {
 	__index = function(t, k)
-		local command = k:gsub("_$", "!")
+		local command = k:gsub('_$', '!')
 		local f = function(...)
-			return vim.api.nvim_command(table.concat(vim.tbl_flatten {command, ...}, " "))
+			return vim.api.nvim_command(table.concat(vim.tbl_flatten {command, ...}, ' '))
 		end
 		rawset(t, k, f)
 		return f
@@ -91,29 +100,29 @@ function util.dump(t, indent, done)
 	indent = indent or 0
 	done[t] = true
 	for key, value in pairs(t) do
-		print(string.rep("\t", indent))
-		if type(value) == "table" and not done[value] then
+		print(string.rep('\t', indent))
+		if type(value) == 'table' and not done[value] then
 			done[value] = true
-			print(key, ":\n")
+			print(key, ':\n')
 			dump(value, indent + 2, done)
 			done[value] = nil
 		else
-			print(key, "\t=\t", value, "\n")
+			print(key, '\t=\t', value, '\n')
 		end
 	end
 end
 
 function util.trim(s)
-	local b = s:find"%S"
-	return b and s:match(".*%S", b) or ""
+	local b = s:find'%S'
+	return b and s:match('.*%S', b) or ''
 end
 
 function util.tok(s, sep)
 	if sep == nil then
-		sep = "%s"
+		sep = '%s'
 	end
 	local t = {}
-	for str in s:gmatch("([^"..sep.."]+)") do
+	for str in s:gmatch('([^'..sep..']+)') do
 		table.insert(t, str)
 	end
 	return t
@@ -122,7 +131,7 @@ end
 -- create mapping functions
 local globals = (function(modes)
 	local map = {}
-	modes:gsub(".", function(c)
+	modes:gsub('.', function(c)
 		f = function(key, action, opts)
 			if opts == nil then
 				opts = { noremap = true }
@@ -134,12 +143,12 @@ local globals = (function(modes)
 		table.insert(map, fn)
 	end)
 	return map
-end)("cinostvx");
+end)('cinostvx');
 
 (function()
 	local km = require'astronauta.keymap'
 	for k,v in pairs(km) do
-		if string.match(k, "%Dnoremap") then
+		if string.match(k, '%Dnoremap') then
 			table.insert(globals, k)
 			rawset(_G, k, v)
 		end
@@ -150,14 +159,14 @@ end)()
 -- Disable netrw
 vim.g.loaded_netrwPlugin = 1
 
--- Do not show the startup message
-vim.o.shortmess = vim.o.shortmess .. "I"
+-- Disable welcome text
+vim.opt.shortmess:append({ c = true })
 
 -- Incremental live completion
-vim.o.inccommand = "nosplit"
+vim.o.inccommand = 'nosplit'
 
 -- Set highlight on search
-vim.o.hlsearch = false
+vim.o.hlsearch = true
 vim.o.incsearch = true
 
 -- Keep cursor away from screen edge
@@ -175,10 +184,10 @@ vim.o.showmode = false
 vim.o.showcmd = false
 
 --Enable mouse mode
-vim.o.mouse = "a"
+vim.o.mouse = 'a'
 
 -- Use primary clipboard
-vim.o.clipboard = "unnamed"
+vim.o.clipboard = 'unnamed'
 
 --Indentation
 vim.bo.tabstop = 4;
@@ -201,7 +210,7 @@ vim.o.breakindent = true
 vim.wo.wrap = false
 vim.wo.linebreak = false
 vim.o.sidescroll = 10
-vim.wo.colorcolumn = "120"
+vim.wo.colorcolumn = '120'
 
 -- Save undo history
 vim.o.undodir = vim.fn.stdpath('cache') .. '/undo'
@@ -214,11 +223,12 @@ vim.o.swapfile = true
 
 -- Show whitespace characters
 vim.wo.list = true
-vim.o.listchars = "tab:→ ,eol:↲,nbsp:␣,trail:•,extends:⟩,precedes:⟨"
-vim.o.showbreak = "↪ "
+vim.o.listchars = 'tab:→ ,eol:↲,nbsp:␣,trail:•,extends:⟩,precedes:⟨'
+
+vim.o.showbreak = '↪ '
 
 -- Fold method, may be changed by treesitter
-vim.o.foldmethod = "marker"
+vim.o.foldmethod = 'marker'
 
 -- Case insensitive searching UNLESS /C or capital in search
 vim.o.ignorecase = true
@@ -234,16 +244,16 @@ vim.o.ttimeoutlen = 0
 vim.o.updatetime = 250
 
 -- Always show diagnostics column
-vim.wo.signcolumn = "number"
+vim.wo.signcolumn = 'number'
 
 -- Set colorscheme (order is important here)
 vim.o.termguicolors = true
 vim.wo.cursorline = true
 vim.wo.cursorcolumn = true
 -- vim.g.onedark_terminal_italics = 2
--- vim.g.tokyonight_style="storm"
+-- vim.g.tokyonight_style='storm'
 -- Add map to enter paste mode
-vim.o.pastetoggle="<F3>"
+vim.o.pastetoggle='<F3>'
 -- }}}
 -- {{{ LSP
 local nvim_lsp = require'lspconfig'
@@ -251,7 +261,7 @@ local on_attach = function(client, bufnr)
 	vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 	local map = (function(modes)
 		local map = {}
-		modes:gsub(".", function(c)
+		modes:gsub('.', function(c)
 			f = function(key, action, opts)
 				if opts == nil then
 					opts = { noremap = true }
@@ -261,7 +271,7 @@ local on_attach = function(client, bufnr)
 			rawset(map, c, f)
 		end)
 		return map
-	end)("nvic")
+	end)('nvic')
 
 	local opts = { noremap=true, silent=true }
 	map.n('gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
@@ -277,15 +287,15 @@ local on_attach = function(client, bufnr)
 	map.n('gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
 	map.n('<leader>ca', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
 	map.n('<leader>e', '<Cmd>lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})<CR>', opts)
-	map.n('ö', '<Cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-	map.n('ä', '<Cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+	map.n('ö', '<Cmd>lua vim.lsp.diagnostic.goto_prev({popup_opts = {focusable = false}})<CR>', opts)
+	map.n('ä', '<Cmd>lua vim.lsp.diagnostic.goto_next({popup_opts = {focusable = false}})<CR>', opts)
 	map.n('<leader>q', '<Cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 
 	-- Set some keybinds conditional on server capabilities
 	if client.resolved_capabilities.document_formatting then
-		map.n("<space>f", "<Cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+		map.n('<space>f', '<Cmd>lua vim.lsp.buf.formatting()<CR>', opts)
 	elseif client.resolved_capabilities.document_range_formatting then
-		map.n("<space>f", "<Cmd>lua vim.lsp.buf.range_formatting()<CR>", opts)
+		map.n('<space>f', '<Cmd>lua vim.lsp.buf.range_formatting()<CR>', opts)
 	end
 end
 -- {{{ Enable the following language servers
@@ -302,13 +312,16 @@ end
 	}
 	for _, lsp in ipairs(servers) do
 		nvim_lsp[lsp].setup {
-			on_attach = on_attach
+			on_attach = on_attach,
+			flags = {
+				debounce_text_changes = 150,
+			}
 		}
 	end
 end)()
 -- }}}
 -- {{{ LSP features
-vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
 	vim.lsp.diagnostic.on_publish_diagnostics, {
 		underline = true,
 		virtual_text = true,
@@ -317,8 +330,8 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
 	})
 -- }}}
 -- {{{ Lua language server
-local sumneko_root_path = vim.fn.getenv("XDG_DATA_HOME") .. "/lua-language-server"
-local sumneko_binary_path = "/bin/Linux/lua-language-server"
+local sumneko_root_path = vim.fn.getenv('XDG_DATA_HOME') .. '/lua-language-server'
+local sumneko_binary_path = '/bin/Linux/lua-language-server'
 table.insert(globals, 'vim')
 local settings = {
 	Lua = {
@@ -328,7 +341,7 @@ local settings = {
 		},
 		completion = {
 			enable = true,
-			callSnippet = "Both"
+			callSnippet = 'Both'
 		},
 		diagnostics = {
 			enable = true,
@@ -347,7 +360,7 @@ local settings = {
 }
 
 nvim_lsp.sumneko_lua.setup {
-	cmd = { sumneko_root_path .. sumneko_binary_path, "-E", sumneko_root_path .. "/main.lua" };
+	cmd = { sumneko_root_path .. sumneko_binary_path, '-E', sumneko_root_path .. '/main.lua' };
 	on_attach = on_attach,
 	settings = settings
 }
@@ -390,11 +403,30 @@ end
 vim.api.nvim_exec([[
 	augroup linediag
 		autocmd!
- 	"	autocmd CursorHold * lua show_line_diagnostics()
 		autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
 	augroup end
 ]], false)
 -- }}}
+-- }}}
+-- {{{ Linter
+lint_init = function()
+	require'lint'.linters.shellcheck.args = {
+		'--format', 'json',
+		'-s', 'bash',
+		'-x',
+		'-',
+	}
+	require'lint'.linters_by_ft = {
+		sh = {'shellcheck',},
+		bash = {'shellcheck',},
+	}
+	vim.api.nvim_exec([[
+		augroup Linter
+			autocmd! * <buffer>
+			autocmd BufWritePost * lua require'lint'.try_lint()
+		augroup end
+	]], false)
+end
 -- }}}
 -- {{{ Mouse toggle
 local nomouse = {
@@ -440,19 +472,19 @@ nmap('<F4>', '<Cmd>lua toggle_mouse()<CR>')
 -- {{{ Treesitter
 require'nvim-treesitter.configs'.setup {
 	-- debatable whether this should be commented or not
-	-- ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-	ensure_installed = "maintained",
+	-- ensure_installed = 'maintained', -- one of 'all', 'maintained' (parsers with maintainers), or a list of languages
+	ensure_installed = 'maintained',
 	highlight = {
 		enable = true,              -- false will disable the whole extension
-		-- disable = { "lua" }
+		-- disable = { 'lua' }
 	},
 	incremental_selection = {
 		enable = true,
 		keymaps = {
-			init_selection = "gnn",
-			node_incremental = "grn",
-			scope_incremental = "grc",
-			node_decremental = "grm",
+			init_selection = 'gnn',
+			node_incremental = 'grn',
+			scope_incremental = 'grc',
+			node_decremental = 'grm',
 		},
 	},
 	indent = {
@@ -470,19 +502,6 @@ require'nvim-treesitter.configs'.setup {
 	end
 end)()
 nmap('<F5>', '<Cmd>setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()<CR>')
--- }}}
--- {{{ nvim-lint
-require'lint'.linters_by_ft = {
-	sh = {'shellcheck',},
-	bash = {'shellcheck',},
-}
-
-vim.api.nvim_exec([[
-	augroup Linter
-		autocmd! * <buffer>
-		autocmd BufWritePost * lua require'lint'.try_lint()
-	augroup end
-]], false)
 -- }}}
 -- {{{ lualine statusbar
 require'lualine'.setup {
@@ -536,8 +555,8 @@ vim.cmd([[command! TrimAll :lua trim_lines(); delete_empty()]])
 
 -- Remap space as leader key
 vim.api.nvim_set_keymap('', '<Space>', '<Nop>', {noremap = true, silent = true})
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
 
 opts = { noremap = true, expr = true, silent = true }
 
@@ -547,55 +566,64 @@ nmap('k', "v:count == 0 ? 'gk' : 'k'", opts)
 nmap('j', "v:count == 0 ? 'gj' : 'j'", opts)
 
 -- Do not copy when pasting
-xmap("p", "pgvy")
+xmap('p', 'pgvy')
 
 -- J and K to move up and down
-nmap("J", "}")
-nmap("K", "{")
-vmap("J", "}")
-vmap("K", "{")
+nmap('J', '}')
+nmap('K', '{')
+vmap('J', '}')
+vmap('K', '{')
 
 -- H and L to move to the beginning and end of a line
-nmap("H", "_")
-nmap("L", "$")
-vmap("H", "_")
-vmap("L", "$")
+nmap('H', '_')
+nmap('L', '$')
+vmap('H', '_')
+vmap('L', '$')
 
-nmap("<C-f>", "/")
-nmap("<C-g>", ":Rg<CR>")
-nmap("<C-q>", ":q<CR>")
-nmap("<C-s>", ":w<CR>")
-nmap("<C-t>", ":Telescope fd<CR>")
-nmap("u", ":undo<CR>")
-nmap("U", ":redo<CR>")
+nmap('<C-f>', '/')
+nmap('<C-g>', ':Rg<CR>')
+-- nmap('<C-q>', ':q<CR>')
+nmap('<C-s>', ':w<CR>')
+nmap('<C-t>', ':Telescope fd<CR>')
+nmap('u', ':undo<CR>')
+nmap('U', ':redo<CR>')
+
+-- clear hls
+nmap('<C-h>', ':noh<CR>')
 
 -- Create splits with s and S
-nmap("<C-w>s", ":vsplit<CR>:wincmd l<CR>")
+nmap('<C-w>s', ':vsplit<CR>:wincmd l<CR>')
 
 -- Create, close, and move between tabs
-nmap("<M-N>", ":tabnew<CR>")
-nmap("<M-n>", ":tabprevious<CR>")
-nmap("<M-m>", ":tabnext<CR>")
-nmap("<M-M>", ":tabclose<CR>")
+nmap('<M-N>', ':tabnew<CR>')
+nmap('<M-M>', ':tabclose<CR>')
+nmap('<M-b>', ':tabprevious<CR>')
+nmap('<M-n>', ':tabnext<CR>')
 
 -- Cycle through open buffers
-nmap("<leader>.", ":bnext<CR>")
-nmap("<leader>,", ":bprevious<CR>")
+nmap('<leader>.', ':bnext<CR>')
+nmap('<leader>,', ':bprevious<CR>')
+nmap('<M-.>', ':bnext<CR>')
+nmap('<M-,>', ':bprevious<CR>')
 
 -- Change to file directory in current window
-nmap("<leader>cd", ":lcd %:p:h<CR>:pwd<CR>")
+nmap('<leader>cd', ':lcd %:p:h<CR>:pwd<CR>')
 
 -- Save all.
-nmap("<C-M-s>", ":wa<CR>")
+nmap('<C-M-s>', ':wa<CR>')
 
 -- Search and replace using marked text
-vmap("<C-r>", "\"hy:%s/<C-r>h//gc<left><left><left>")
+vmap('<C-r>', '"hy:%s/<C-r>h//gc<left><left><left>')
 
 -- Don't yank when using delete
 nmap('<del>', '"_x')
 
 -- Y yank until the end of line
 nmap('Y', 'y$')
+
+-- Save session
+-- nmap('<F6>', '<Cmd>wa<Bar>exe "mksession! " . v:this_session<CR><Cmd>echo "Session saved!"<CR>')
+nmap('<F6>', '<Cmd>SaveSession<CR><Cmd>echo "Session saved!"<CR>')
 
 -- Transpose lines
 opts = { noremap = true, silent = true }
@@ -625,20 +653,20 @@ end)();
 -- {{{ Insert modeline
 GenerateModeline = function()
 	local expand
-	if vim.bo.expandtab ~= "noexpandtab" then
-		expand = "noet"
+	if vim.bo.expandtab ~= 'noexpandtab' then
+		expand = 'noet'
 	else
-		expand = "et"
+		expand = 'et'
 	end
 	local autoindent
-	if vim.bo.autoindent ~= "noautoindent" then
-		autoindent = "noai"
+	if vim.bo.autoindent ~= 'noautoindent' then
+		autoindent = 'noai'
 	else
-		autoindent = "ai"
+		autoindent = 'ai'
 	end
-	local cin = ""; local cout = ""
+	local cin = ''; local cout = ''
 	if vim.o.commentstring ~= nil then
-		local ctok = util.tok(vim.o.commentstring, "%%s")
+		local ctok = util.tok(vim.o.commentstring, '%%s')
 		if next(ctok) ~= nil then
 			cin = util.trim(ctok[1])
 			if next(ctok, 1) ~= nil then
@@ -646,8 +674,8 @@ GenerateModeline = function()
 			end
 		end
 	end
-	local ml = cin .. " vi:set ft=" .. vim.bo.filetype .. " ts=" .. vim.bo.tabstop ..
-		" sw=" .. vim.bo.shiftwidth .. " " .. expand .. " " .. autoindent .. ": " .. cout
+	local ml = cin .. ' vi:set ft=' .. vim.bo.filetype .. ' ts=' .. vim.bo.tabstop ..
+		' sw=' .. vim.bo.shiftwidth .. ' ' .. expand .. ' ' .. autoindent .. ': ' .. cout
 	vim.api.nvim_put({ util.trim(ml) }, 'l', true, false)
 end
 nmap('<leader>M', [[<Cmd>lua GenerateModeline()<CR>]])
@@ -657,8 +685,8 @@ require'telescope'.setup {
 	defaults = {
 		mappings = {
 			i = {
-				["<C-u>"] = false,
-				["<C-d>"] = false,
+				['<C-u>'] = false,
+				['<C-d>'] = false,
 			},
 		},
 		generic_sorter =  require'telescope.sorters'.get_fzy_sorter,
@@ -667,7 +695,7 @@ require'telescope'.setup {
 }
 -- Add leader shortcuts
 opts = { noremap = true, silent = true }
-nmap('<leader>f', [[<Cmd>lua require'telescope.builtin'.find_files()<CR>]], opts)
+nmap('<leader>F', [[<Cmd>lua require'telescope.builtin'.find_files()<CR>]], opts)
 nmap('<leader><space>', [[<Cmd>lua require'telescope.builtin'.buffers()<CR>]], opts)
 nmap('<leader>b', [[<Cmd>lua require'telescope.builtin'.buffers()<CR>]], opts)
 nmap('<leader>r', [[<Cmd>lua require'telescope.builtin'.registers()<CR>]], opts)
@@ -675,27 +703,33 @@ nmap('<leader>l', [[<Cmd>lua require'telescope.builtin'.current_buffer_fuzzy_fin
 nmap('<leader>m', [[<Cmd>lua require'telescope.builtin'.marks()<CR>]], opts)
 nmap('<leader>t', [[<Cmd>lua require'telescope.builtin'.tags()<CR>]], opts)
 nmap('<leader>?', [[<Cmd>lua require'telescope.builtin'.oldfiles()<CR>]], opts)
-nmap('<leader>sd', [[<Cmd>lua require'telescope.builtin'.grep_string()<CR>]], opts)
-nmap('<leader>sp', [[<Cmd>lua require'telescope.builtin'.live_grep()<CR>]], opts)
-nmap('<leader>o', [[<Cmd>lua require'telescope.builtin'.tags{ only_current_buffer = true)<CR>]], opts)
-nmap('<leader>gc', [[<Cmd>lua require'telescope.builtin'.git_commits()<CR>]], opts)
-nmap('<leader>gb', [[<Cmd>lua require'telescope.builtin'.git_branches()<CR>]], opts)
-nmap('<leader>gs', [[<Cmd>lua require'telescope.builtin'.git_status()<CR>]], opts)
-nmap('<leader>gp', [[<Cmd>lua require'telescope.builtin'.git_bcommits()<CR>]], opts)
+nmap('<leader>i', [[<Cmd>lua require'telescope.builtin'.live_grep()<CR>]], opts)
+nmap('<leader>I', [[<Cmd>lua require'telescope.builtin'.grep_string()<CR>]], opts)
+nmap('<leader>o', [[<Cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<CR>]], opts)
+nmap('<leader>Gc', [[<Cmd>lua require'telescope.builtin'.git_commits()<CR>]], opts)
+nmap('<leader>Gb', [[<Cmd>lua require'telescope.builtin'.git_branches()<CR>]], opts)
+nmap('<leader>Gs', [[<Cmd>lua require'telescope.builtin'.git_status()<CR>]], opts)
+nmap('<leader>Gp', [[<Cmd>lua require'telescope.builtin'.git_bcommits()<CR>]], opts)
+nmap('<leader>f', [[<Cmd>lua require'telescope.builtin'.current_buffer_fuzzy_find()<CR>]], opts)
+nmap('<leader>g', [[<Cmd>lua require'telescope.builtin'.git_files()<CR>]], opts)
 
 -- Frecency extension
 nmap('<leader><Tab>', [[<Cmd>lua require'telescope'.extensions.frecency.frecency()<CR>]], opts)
+
+-- Session-Manager extension
+nmap('<leader>S', [[<Cmd>lua require'telescope'.extensions.session_manager.load()<CR>]], opts)
 
 -- Change preview window location
 vim.g.splitbelow = true
 -- }}}
 -- {{{ gutentags
 -- vim.g.gutentags_cache_dir = vim.fn.stdpath('cache') .. '/tags'
+vim.g.gutentags_ctags_tagfile = '.tags'
 -- }}}
 -- {{{ Compe
 -- Set completeopt to have a better completion experience
-vim.o.completeopt="menuone,noselect"
-vim.o.shortmess = vim.o.shortmess .. "c"
+vim.opt.completeopt = {'menuone', 'noselect'}
+vim.opt.shortmess:append({ I = true })
 
 require'compe'.setup {
 	enabled = true;
@@ -709,8 +743,14 @@ require'compe'.setup {
 	max_abbr_width = 100;
 	max_kind_width = 100;
 	max_menu_width = 100;
-	documentation = true;
-
+	documentation = {
+		border = { '', '' ,'', ' ', '', '', '', ' ' },
+		winhighlight = 'NormalFloat:CompeDocumentation,FloatBorder:CompeDocumentationBorder',
+		max_width = 120,
+		min_width = 60,
+		max_height = math.floor(vim.o.lines * 0.3),
+		min_height = 1,
+	};
 	source = {
 		buffer = true;
 		calc = false;
@@ -743,9 +783,9 @@ end
 --- jump to prev/next snippet's placeholder
 _G.tab_complete = function()
 	if vim.fn.pumvisible() == 1 then
-		return t "<C-n>"
+		return t '<C-n>'
 	elseif check_back_space() then
-		return t "<Tab>"
+		return t '<Tab>'
 	else
 		return vim.fn['compe#complete']()
 	end
@@ -753,9 +793,9 @@ end
 
 _G.s_tab_complete = function()
 	if vim.fn.pumvisible() == 1 then
-		return t "<C-p>"
+		return t '<C-p>'
 	else
-		return t "<S-Tab>"
+		return t '<S-Tab>'
 	end
 end
 
@@ -841,13 +881,13 @@ vim.api.nvim_exec([[
 ]], false);
 ex.colorscheme([[dracula]])
 -- {{{ GUI Options
-vim.o.guicursor = vim.o.guicursor .. ",i:ver100-iCursor,i:blinkon2"
-vim.o.guifont = "Fira Code:h14"
+vim.opt.guicursor:append({ 'i:ver100-iCursor', 'i:blinkon2' })
+vim.o.guifont = 'Fira Code:h14'
 -- }}}
 -- }}}
 -- {{{ Staging area
 -- Neovide
 vim.g.neovide_refresh_rate = 60
 vim.g.neovide_cursor_antialiasing = false
-vim.g.neovide_cursor_vfx_mode = "pixiedust"
+vim.g.neovide_cursor_vfx_mode = 'pixiedust'
 -- }}}

@@ -62,4 +62,5 @@ Thumbs.db
 
 # ctags
 tags
+.tags
 
