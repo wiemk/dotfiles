@@ -1,72 +1,4 @@
 -- vi:set ft=lua ts=4 sw=4 noet ai fdm=marker:
--- {{{ Packer plugin manager
-local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
-if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
-	vim.fn.system({'git', 'clone', 'https://github.com/wbthomason/packer.nvim', install_path})
-	vim.api.nvim_command 'packadd packer.nvim'
-end
-vim.api.nvim_exec([[
-	augroup Packer
-		autocmd!
-		autocmd BufWritePost init.lua PackerCompile
-	augroup end
-]], false)
-
-local use = require'packer'.use
-require'packer'.startup(function()
-	use 'wbthomason/packer.nvim'          -- Package manager
-	use 'tpope/vim-fugitive'              -- Git commands in nvim
-	use 'tpope/vim-commentary'            -- 'gc' to comment visual regions/lines
-	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
-	use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
-	use 'hrsh7th/nvim-compe'              -- Autocompletion plugin
-	use 'nvim-treesitter/nvim-treesitter' -- Language parser
-	use 'glepnir/indent-guides.nvim'      -- Indent guides for spaces
-	use 'rafcamlet/nvim-luapad'           -- Lua scratchpad
-	use 'dracula/vim'                     -- Popular dracula theme
-	-- Session management
-	use { 'Shatur/neovim-session-manager',
-		config = function()
-			vim.g.autosave_last_session = false
-			vim.g.sessions_dir = vim.fn.stdpath('cache') .. '/sessions/'
-			require'telescope'.load_extension('session_manager')
-		end
-	}
-	-- External linter support
-	use { 'mfussenegger/nvim-lint', ft = {'sh', 'bash'},
-		config = function() lint_init(); end
-	}
-	-- Interactive keybind overview
-	use { 'folke/which-key.nvim',
-		config = function()
-			require'which-key'.setup {
-				triggers = {'<leader>'}
-			}
-		end
-	}
-	use { 'hoob3rt/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true} }
-	-- Keymap wrapper functions
-	use 'tjdevries/astronauta.nvim'
-	-- Add git related info in the signs columns and popups
-	use {'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'},
-		config = function()
-			require'gitsigns'.setup()
-		end
-	}
-	-- UI to select things (files, grep results, open buffers...)
-	use {'nvim-telescope/telescope.nvim',
-		requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
-	}
-	-- Frecency algorithm support for telescope
-	use {'nvim-telescope/telescope-frecency.nvim',
-		requires= {{'nvim-telescope/telescope.nvim'},
-			{'tami5/sql.nvim', config = 'vim.g.sql_clib_path = [[/usr/lib64/libsqlite3.so.0]]'}},
-		config = function()
-			require'telescope'.load_extension('frecency')
-		end
-	}
-end)
--- }}}
 -- {{{ Utility functions
 ex = setmetatable({}, {
 	__index = function(t, k)
@@ -154,6 +86,91 @@ end)('cinostvx');
 		end
 	end
 end)()
+-- }}}
+-- {{{ Packer plugin manager
+local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
+if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
+	vim.fn.system({'git', 'clone', 'https://github.com/wbthomason/packer.nvim', install_path})
+	vim.api.nvim_command 'packadd packer.nvim'
+end
+vim.api.nvim_exec([[
+	augroup Packer
+		autocmd!
+		autocmd BufWritePost init.lua PackerCompile
+	augroup end
+]], false)
+
+local use = require'packer'.use
+require'packer'.startup(function()
+	use 'wbthomason/packer.nvim'          -- Package manager
+	use 'tpope/vim-fugitive'              -- Git commands in nvim
+	use 'tpope/vim-commentary'            -- 'gc' to comment visual regions/lines
+	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
+	use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
+	use 'hrsh7th/nvim-compe'              -- Autocompletion plugin
+	use 'nvim-treesitter/nvim-treesitter' -- Language parser
+	use 'glepnir/indent-guides.nvim'      -- Indent guides for spaces
+	use 'dracula/vim'                     -- Popular dracula theme
+	-- Lua scratchpad
+	use { 'rafcamlet/nvim-luapad',
+		cmd = 'Luapad',
+		config = function() luapad_init(); end
+	}
+	-- External linter support
+	use { 'mfussenegger/nvim-lint', ft = {'sh', 'bash'},
+		config = function() lint_init(); end
+	}
+	-- Interactive keybind overview
+	use { 'folke/which-key.nvim',
+		config = function()
+			require'which-key'.setup {
+				triggers = {'<leader>'}
+			}
+		end
+	}
+	use { 'hoob3rt/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true} }
+	-- Keymap wrapper functions
+	use 'tjdevries/astronauta.nvim'
+	-- Add git related info in the signs columns and popups
+	use {'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'},
+		config = function()
+			require'gitsigns'.setup()
+		end
+	}
+	-- UI to select things (files, grep results, open buffers...)
+	use {'nvim-telescope/telescope.nvim',
+		requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
+	}
+	-- Frecency algorithm support for telescope
+	use {'nvim-telescope/telescope-frecency.nvim',
+		requires = {{'nvim-telescope/telescope.nvim'},
+			{'tami5/sql.nvim', config = 'vim.g.sql_clib_path = [[/usr/lib64/libsqlite3.so.0]]'}},
+		config = function()
+			require'telescope'.load_extension('frecency')
+		end,
+	}
+	-- Session management
+	use { 'Shatur/neovim-session-manager',
+		requires = {'nvim-telescope/telescope.nvim'},
+		config = function()
+			vim.g.autosave_last_session = false
+			vim.g.sessions_dir = vim.fn.stdpath('cache') .. '/sessions/'
+			require'telescope'.load_extension('session_manager')
+		end,
+	}
+	-- Native telescope fuzzy sorter
+	use { 'nvim-telescope/telescope-fzy-native.nvim',
+		requires = {'nvim-telescope/telescope.nvim'},
+		cond = function()
+			if vim.fn.executable('fzy') == 1 then
+				return true
+			end
+		end,
+		config = function()
+			require'telescope'.load_extension('fzy_native')
+		end
+	}
+end)
 -- }}}
 -- {{{ Generic options
 -- Disable netrw
@@ -333,6 +350,7 @@ vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
 local sumneko_root_path = vim.fn.getenv('XDG_DATA_HOME') .. '/lua-language-server'
 local sumneko_binary_path = '/bin/Linux/lua-language-server'
 table.insert(globals, 'vim')
+table.insert(globals, 'use_rocks')
 local settings = {
 	Lua = {
 		runtime = {
@@ -617,13 +635,22 @@ vmap('<C-r>', '"hy:%s/<C-r>h//gc<left><left><left>')
 
 -- Don't yank when using delete
 nmap('<del>', '"_x')
+nmap('x', '"_x')
 
 -- Y yank until the end of line
 nmap('Y', 'y$')
 
+-- q as b
+nmap('q', 'b')
+nmap('Q', 'B')
+
 -- Save session
 -- nmap('<F6>', '<Cmd>wa<Bar>exe "mksession! " . v:this_session<CR><Cmd>echo "Session saved!"<CR>')
 nmap('<F6>', '<Cmd>SaveSession<CR><Cmd>echo "Session saved!"<CR>')
+
+-- Update Plugins
+nmap('<leader>U', '<Cmd>PackerUpdate<CR>')
+nmap('<leader>C', '<Cmd>PackerCompile<CR><Cmd>echo "Compiled!"<CR>')
 
 -- Transpose lines
 opts = { noremap = true, silent = true }
@@ -695,7 +722,7 @@ require'telescope'.setup {
 }
 -- Add leader shortcuts
 opts = { noremap = true, silent = true }
-nmap('<leader>F', [[<Cmd>lua require'telescope.builtin'.find_files()<CR>]], opts)
+nmap('<leader>f', [[<Cmd>lua require'telescope.builtin'.find_files()<CR>]], opts)
 nmap('<leader><space>', [[<Cmd>lua require'telescope.builtin'.buffers()<CR>]], opts)
 nmap('<leader>b', [[<Cmd>lua require'telescope.builtin'.buffers()<CR>]], opts)
 nmap('<leader>r', [[<Cmd>lua require'telescope.builtin'.registers()<CR>]], opts)
@@ -704,21 +731,16 @@ nmap('<leader>m', [[<Cmd>lua require'telescope.builtin'.marks()<CR>]], opts)
 nmap('<leader>t', [[<Cmd>lua require'telescope.builtin'.tags()<CR>]], opts)
 nmap('<leader>?', [[<Cmd>lua require'telescope.builtin'.oldfiles()<CR>]], opts)
 nmap('<leader>i', [[<Cmd>lua require'telescope.builtin'.live_grep()<CR>]], opts)
-nmap('<leader>I', [[<Cmd>lua require'telescope.builtin'.grep_string()<CR>]], opts)
+nmap('<leader>F', [[<Cmd>lua require'telescope.builtin'.grep_string()<CR>]], opts)
 nmap('<leader>o', [[<Cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<CR>]], opts)
 nmap('<leader>Gc', [[<Cmd>lua require'telescope.builtin'.git_commits()<CR>]], opts)
 nmap('<leader>Gb', [[<Cmd>lua require'telescope.builtin'.git_branches()<CR>]], opts)
 nmap('<leader>Gs', [[<Cmd>lua require'telescope.builtin'.git_status()<CR>]], opts)
 nmap('<leader>Gp', [[<Cmd>lua require'telescope.builtin'.git_bcommits()<CR>]], opts)
-nmap('<leader>f', [[<Cmd>lua require'telescope.builtin'.current_buffer_fuzzy_find()<CR>]], opts)
 nmap('<leader>g', [[<Cmd>lua require'telescope.builtin'.git_files()<CR>]], opts)
-
--- Frecency extension
+-- Extensions
 nmap('<leader><Tab>', [[<Cmd>lua require'telescope'.extensions.frecency.frecency()<CR>]], opts)
-
--- Session-Manager extension
 nmap('<leader>S', [[<Cmd>lua require'telescope'.extensions.session_manager.load()<CR>]], opts)
-
 -- Change preview window location
 vim.g.splitbelow = true
 -- }}}
@@ -820,19 +842,21 @@ require'indent_guides'.setup {
 }
 -- }}}
 -- {{{ Luapad
-require'luapad'.config {
-	count_limit = 150000,
-	error_indicator = false,
-	eval_on_move = true,
-	error_highlight = 'WarningMsg',
-	on_init = function()
-		print('Luapad initialized.')
-	end,
-	context = {
-		shout = function(str) return(string.upper(str) .. '!') end
+luapad_init = function()
+	require'luapad'.config {
+		count_limit = 150000,
+		error_indicator = false,
+		eval_on_move = true,
+		error_highlight = 'WarningMsg',
+		on_init = function()
+			print('Luapad initialized.')
+		end,
+		context = {
+			shout = function(str) return(string.upper(str) .. '!') end
+		}
 	}
-}
-nmap('<F2>', '<Cmd>Luapad<CR>')
+	nmap('<F2>', '<Cmd>Luapad<CR>')
+end
 -- }}}
 -- {{{ Loose autocmds
 -- Hide cmdline after entering a command
