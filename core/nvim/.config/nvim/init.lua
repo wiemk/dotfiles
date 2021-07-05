@@ -1,4 +1,99 @@
 -- vi:set ft=lua ts=4 sw=4 noet ai fdm=marker:
+-- {{{ Packer plugin manager
+local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
+if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
+	vim.fn.system({'git', 'clone', 'https://github.com/wbthomason/packer.nvim', install_path})
+	vim.api.nvim_command 'packadd packer.nvim'
+end
+vim.api.nvim_exec([[
+	augroup Packer
+		autocmd!
+		autocmd BufWritePost init.lua PackerCompile
+	augroup end
+]], false)
+
+local use = require'packer'.use
+require'packer'.startup(function()
+	use 'wbthomason/packer.nvim'          -- Package manager
+	use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
+	use 'dracula/vim'                     -- Popular dracula theme
+	use 'tpope/vim-commentary'            -- 'gc' to comment visual regions/lines
+	use 'tpope/vim-fugitive'              -- Git commands in nvim
+	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
+	use 'tjdevries/astronauta.nvim'       -- Keymap wrapper functions
+	-- Autocompletion plugin
+	use { 'hrsh7th/nvim-compe',
+		config = function()
+			vim.opt.completeopt = {'menuone', 'noselect'}
+			vim.opt.shortmess:append({ I = true })
+			compe_init()
+		end
+	}
+	-- Language parser
+	use { 'nvim-treesitter/nvim-treesitter',
+		config = function() treesitter_init(); end
+	}
+	use { 'glepnir/indent-guides.nvim',
+		config = function() indent_init(); end
+	}      -- Indent guides for spaces
+	-- Lua scratchpad
+	use { 'rafcamlet/nvim-luapad',
+		cmd = 'Luapad',
+		config = function() luapad_init(); end
+	}
+	-- External linter support
+	use { 'mfussenegger/nvim-lint', ft = {'sh', 'bash'},
+		config = function() lint_init(); end
+	}
+	-- Interactive keybind overview
+	use { 'folke/which-key.nvim',
+		config = function()
+			require'which-key'.setup {
+				triggers = {'<leader>'}
+			}
+		end
+	}
+	use { 'hoob3rt/lualine.nvim',
+		config = function() lualine_init(); end
+	}
+	-- Add git related info in the signs columns and popups
+	use {'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'},
+		config = function()	require'gitsigns'.setup(); end
+	}
+	-- UI to select things (files, grep results, open buffers...)
+	use {'nvim-telescope/telescope.nvim',
+		requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
+	}
+	-- Frecency algorithm support for telescope
+	use {'nvim-telescope/telescope-frecency.nvim',
+		requires = {{'nvim-telescope/telescope.nvim'},
+			{'tami5/sql.nvim', config = 'vim.g.sql_clib_path = [[/usr/lib64/libsqlite3.so.0]]'}},
+		config = function() require'telescope'.load_extension('frecency'); end
+	}
+	-- Session management
+	use { 'Shatur/neovim-session-manager',
+		requires = {'nvim-telescope/telescope.nvim'},
+		config = function()
+			vim.g.autosave_last_session = false
+			vim.g.sessions_dir = vim.fn.stdpath('cache') .. '/sessions/'
+			require'telescope'.load_extension('session_manager')
+		end,
+	}
+	-- Native telescope fuzzy sorter
+	use { 'nvim-telescope/telescope-fzy-native.nvim',
+		requires = {'nvim-telescope/telescope.nvim'},
+		cond = function()
+			if vim.fn.executable('fzy') == 1 then
+				return true
+			end
+		end,
+		config = function() require'telescope'.load_extension('fzy_native'); end
+	}
+	-- Automatically create parenthesis pairs
+	use { 'windwp/nvim-autopairs',
+		config = function() autopairs_init(); end }
+end)
+-- }}}
 -- {{{ Utility functions
 ex = setmetatable({}, {
 	__index = function(t, k)
@@ -87,91 +182,6 @@ end)('cinostvx');
 	end
 end)()
 -- }}}
--- {{{ Packer plugin manager
-local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
-if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
-	vim.fn.system({'git', 'clone', 'https://github.com/wbthomason/packer.nvim', install_path})
-	vim.api.nvim_command 'packadd packer.nvim'
-end
-vim.api.nvim_exec([[
-	augroup Packer
-		autocmd!
-		autocmd BufWritePost init.lua PackerCompile
-	augroup end
-]], false)
-
-local use = require'packer'.use
-require'packer'.startup(function()
-	use 'wbthomason/packer.nvim'          -- Package manager
-	use 'tpope/vim-fugitive'              -- Git commands in nvim
-	use 'tpope/vim-commentary'            -- 'gc' to comment visual regions/lines
-	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
-	use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
-	use 'hrsh7th/nvim-compe'              -- Autocompletion plugin
-	use 'nvim-treesitter/nvim-treesitter' -- Language parser
-	use 'glepnir/indent-guides.nvim'      -- Indent guides for spaces
-	use 'dracula/vim'                     -- Popular dracula theme
-	-- Lua scratchpad
-	use { 'rafcamlet/nvim-luapad',
-		cmd = 'Luapad',
-		config = function() luapad_init(); end
-	}
-	-- External linter support
-	use { 'mfussenegger/nvim-lint', ft = {'sh', 'bash'},
-		config = function() lint_init(); end
-	}
-	-- Interactive keybind overview
-	use { 'folke/which-key.nvim',
-		config = function()
-			require'which-key'.setup {
-				triggers = {'<leader>'}
-			}
-		end
-	}
-	use { 'hoob3rt/lualine.nvim', requires = {'kyazdani42/nvim-web-devicons', opt = true} }
-	-- Keymap wrapper functions
-	use 'tjdevries/astronauta.nvim'
-	-- Add git related info in the signs columns and popups
-	use {'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'},
-		config = function()
-			require'gitsigns'.setup()
-		end
-	}
-	-- UI to select things (files, grep results, open buffers...)
-	use {'nvim-telescope/telescope.nvim',
-		requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
-	}
-	-- Frecency algorithm support for telescope
-	use {'nvim-telescope/telescope-frecency.nvim',
-		requires = {{'nvim-telescope/telescope.nvim'},
-			{'tami5/sql.nvim', config = 'vim.g.sql_clib_path = [[/usr/lib64/libsqlite3.so.0]]'}},
-		config = function()
-			require'telescope'.load_extension('frecency')
-		end,
-	}
-	-- Session management
-	use { 'Shatur/neovim-session-manager',
-		requires = {'nvim-telescope/telescope.nvim'},
-		config = function()
-			vim.g.autosave_last_session = false
-			vim.g.sessions_dir = vim.fn.stdpath('cache') .. '/sessions/'
-			require'telescope'.load_extension('session_manager')
-		end,
-	}
-	-- Native telescope fuzzy sorter
-	use { 'nvim-telescope/telescope-fzy-native.nvim',
-		requires = {'nvim-telescope/telescope.nvim'},
-		cond = function()
-			if vim.fn.executable('fzy') == 1 then
-				return true
-			end
-		end,
-		config = function()
-			require'telescope'.load_extension('fzy_native')
-		end
-	}
-end)
--- }}}
 -- {{{ Generic options
 -- Disable netrw
 vim.g.loaded_netrwPlugin = 1
@@ -253,7 +263,7 @@ vim.o.smartcase = true
 
 -- Eliminate delays
 vim.o.timeout = true
-vim.o.timeoutlen = 500
+vim.o.timeoutlen = 300
 vim.o.ttimeout = false
 vim.o.ttimeoutlen = 0
 
@@ -394,6 +404,7 @@ local diagnostic_toggle_virtual_text = function()
 	vim.b.lsp_virtual_text_enabled = virtual_text
 	vim.lsp.diagnostic.display(vim.lsp.diagnostic.get(0, 1), 0, 1, { virtual_text = virtual_text })
 end
+-- }}}
 -- {{{ Show diagnostics on CursorHold
 show_line_diagnostics = function()
 	local diag = vim.lsp.diagnostic.get_line_diagnostics()
@@ -425,7 +436,6 @@ vim.api.nvim_exec([[
 	augroup end
 ]], false)
 -- }}}
--- }}}
 -- {{{ Linter
 lint_init = function()
 	require'lint'.linters.shellcheck.args = {
@@ -444,6 +454,54 @@ lint_init = function()
 			autocmd BufWritePost * lua require'lint'.try_lint()
 		augroup end
 	]], false)
+end
+-- }}}
+-- {{{ Indent guides
+indent_init = function()
+	require'indent_guides'.setup {
+		indent_guide_size = 1;
+		indent_start_level = 1;
+		indent_levels = 16;
+		indent_enable = true;
+		indent_space_guides = true;
+		indent_tab_guides = true;
+		indent_soft_pattern = '\\s';
+		exclude_filetypes = {'help','dashboard','dashpreview','NvimTree','vista','sagahover'};
+		even_colors = { fg='#2a3834',bg='#332b36' };
+		odd_colors = { fg='#332b36',bg='#2a3834' };
+	}
+end
+-- }}}
+-- {{{ Autopairs
+autopairs_init = function()
+	local npairs = require'nvim-autopairs'
+	npairs.setup({
+		check_ts = true,
+		ts_config = {
+			-- it will not add pair on that treesitter node
+			lua = {'string'},
+			javascript = {'template_string'},
+			-- don't check treesitter on java
+			java = false,
+		},
+		fast_wrap = {},
+	})
+	require('nvim-treesitter.configs').setup {
+		autopairs = {enable = true}
+	}
+	require("nvim-autopairs.completion.compe").setup({
+		map_cr = true,
+		map_complete = true
+	})
+	local ts_conds = require('nvim-autopairs.ts-conds')
+	local Rule = require('nvim-autopairs.rule')
+	-- press % => %% is only inside comment or string
+	npairs.add_rules({
+		Rule("%", "%", "lua")
+			:with_pair(ts_conds.is_ts_node({'string','comment'})),
+		Rule("$", "$", "lua")
+			:with_pair(ts_conds.is_not_ts_node({'function'}))
+	})
 end
 -- }}}
 -- {{{ Mouse toggle
@@ -488,27 +546,29 @@ end
 nmap('<F4>', '<Cmd>lua toggle_mouse()<CR>')
 -- }}}
 -- {{{ Treesitter
-require'nvim-treesitter.configs'.setup {
-	-- debatable whether this should be commented or not
-	-- ensure_installed = 'maintained', -- one of 'all', 'maintained' (parsers with maintainers), or a list of languages
-	ensure_installed = 'maintained',
-	highlight = {
-		enable = true,              -- false will disable the whole extension
-		-- disable = { 'lua' }
-	},
-	incremental_selection = {
-		enable = true,
-		keymaps = {
-			init_selection = 'gnn',
-			node_incremental = 'grn',
-			scope_incremental = 'grc',
-			node_decremental = 'grm',
+treesitter_init = function()
+	require'nvim-treesitter.configs'.setup {
+		-- debatable whether this should be commented or not
+		-- ensure_installed = 'maintained', -- one of 'all', 'maintained' (parsers with maintainers), or a list of languages
+		ensure_installed = 'maintained',
+		highlight = {
+			enable = true,              -- false will disable the whole extension
+			-- disable = { 'lua' }
 		},
-	},
-	indent = {
-		enable = true
+		incremental_selection = {
+			enable = true,
+			keymaps = {
+				init_selection = 'gnn',
+				node_incremental = 'grn',
+				scope_incremental = 'grc',
+				node_decremental = 'grm',
+			},
+		},
+		indent = {
+			enable = true
+		}
 	}
-};
+end
 -- Treesitter folding whitelist
 (function()
 	local fold_whitelist = {
@@ -522,38 +582,40 @@ end)()
 nmap('<F5>', '<Cmd>setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()<CR>')
 -- }}}
 -- {{{ lualine statusbar
-require'lualine'.setup {
-	options = {
-		theme = 'dracula';
-		icons_enabled = false,
-		padding = 1,
-		left_padding = 1,
-		right_padding = 1,
-		upper = false,
-		lower = true
-	},
-	sections = {
-		lualine_a = { 'mode' },
-		lualine_b = {
-			{
-				(function() return [[NOMOUSE]]; end),
-				condition = (function() return nomouse.status; end),
-				lower = false
-			},
-			{
-				(function() return [[PASTE]]; end),
-				condition = (function() return vim.o.paste; end),
-				lower = false
-			}
+lualine_init = function()
+	require'lualine'.setup {
+		options = {
+			theme = 'dracula';
+			icons_enabled = false,
+			padding = 1,
+			left_padding = 1,
+			right_padding = 1,
+			upper = false,
+			lower = true
 		},
-		lualine_c = {
-			{ 'filename', file_status = true },
-			{ 'fugitive#head'},
-			{ 'diff', color_added = 'green', color_modified = 'yellow', color_removed = 'red' }},
-		lualine_y = { 'progress', 'hostname' }
-	},
-	extension = { 'fzf', 'fugitive' }
-}
+		sections = {
+			lualine_a = { 'mode' },
+			lualine_b = {
+				{
+					(function() return [[NOMOUSE]]; end),
+					condition = (function() return nomouse.status; end),
+					lower = false
+				},
+				{
+					(function() return [[PASTE]]; end),
+					condition = (function() return vim.o.paste; end),
+					lower = false
+				}
+			},
+			lualine_c = {
+				{ 'filename', file_status = true },
+				{ 'fugitive#head'},
+				{ 'diff', color_added = 'green', color_modified = 'yellow', color_removed = 'red' }},
+			lualine_y = { 'progress', 'hostname' }
+		},
+		extension = { 'fzf', 'fugitive' }
+	}
+end
 -- }}}
 -- {{{ Whitespace handling
 trim_lines = function()
@@ -749,47 +811,46 @@ vim.g.splitbelow = true
 vim.g.gutentags_ctags_tagfile = '.tags'
 -- }}}
 -- {{{ Compe
--- Set completeopt to have a better completion experience
-vim.opt.completeopt = {'menuone', 'noselect'}
-vim.opt.shortmess:append({ I = true })
-
-require'compe'.setup {
-	enabled = true;
-	autocomplete = true;
-	debug = false;
-	min_length = 2;
-	preselect = 'enable';
-	throttle_time = 80;
-	source_timeout = 200;
-	incomplete_delay = 400;
-	max_abbr_width = 100;
-	max_kind_width = 100;
-	max_menu_width = 100;
-	documentation = {
-		border = { '', '' ,'', ' ', '', '', '', ' ' },
-		winhighlight = 'NormalFloat:CompeDocumentation,FloatBorder:CompeDocumentationBorder',
-		max_width = 120,
-		min_width = 60,
-		max_height = math.floor(vim.o.lines * 0.3),
-		min_height = 1,
-	};
-	source = {
-		buffer = true;
-		calc = false;
-		nvim_lua = true;
-		nvim_lsp = true;
-		path = false;
-	};
-}
+compe_init = function()
+	require'compe'.setup {
+		enabled = true;
+		autocomplete = true;
+		debug = false;
+		min_length = 2;
+		preselect = 'enable';
+		throttle_time = 80;
+		source_timeout = 200;
+		incomplete_delay = 400;
+		max_abbr_width = 100;
+		max_kind_width = 100;
+		max_menu_width = 100;
+		documentation = {
+			border = { '', '' ,'', ' ', '', '', '', ' ' },
+			winhighlight = 'NormalFloat:CompeDocumentation,FloatBorder:CompeDocumentationBorder',
+			max_width = 120,
+			min_width = 60,
+			max_height = math.floor(vim.o.lines * 0.3),
+			min_height = 1,
+		};
+		source = {
+			buffer = true;
+			calc = false;
+			nvim_lua = true;
+			nvim_lsp = true;
+			path = false;
+			tags = true;
+		};
+	}
+end
 
 -- Insert mode mappings
 opts = { silent = true, expr = true  }
 imap('<C-Space>', 'compe#complete()', opts)
-imap('<CR>', "compe#confirm('<CR>')", opts)
+-- imap('<CR>', "compe#confirm('<CR>')", opts)
 imap('<C-e>', "compe#close('<C-e>')", opts)
 imap('<C-f>', "compe#scroll({ 'delta': +4 }", opts)
 imap('<C-d>', "compe#scroll({ 'delta': -4 }", opts)
-
+-- }}}
 -- {{{ Tab completion
 local t = function(str)
 	return vim.api.nvim_replace_termcodes(str, true, true, true)
@@ -825,21 +886,6 @@ imap('<Tab>', 'v:lua.tab_complete()', {expr = true})
 smap('<Tab>', 'v:lua.tab_complete()', {expr = true})
 imap('<S-Tab>', 'v:lua.s_tab_complete()', {expr = true})
 smap('<S-Tab>', 'v:lua.s_tab_complete()', {expr = true})
--- }}}
--- }}}
--- {{{ Indent guides
-require'indent_guides'.setup {
-	indent_guide_size = 1;
-	indent_start_level = 1;
-	indent_levels = 16;
-	indent_enable = true;
-	indent_space_guides = true;
-	indent_tab_guides = true;
-	indent_soft_pattern = '\\s';
-	exclude_filetypes = {'help','dashboard','dashpreview','NvimTree','vista','sagahover'};
-	even_colors = { fg='#2a3834',bg='#332b36' };
-	odd_colors = { fg='#332b36',bg='#2a3834' };
-}
 -- }}}
 -- {{{ Luapad
 luapad_init = function()
@@ -904,10 +950,8 @@ vim.api.nvim_exec([[
 	augroup end
 ]], false);
 ex.colorscheme([[dracula]])
--- {{{ GUI Options
 vim.opt.guicursor:append({ 'i:ver100-iCursor', 'i:blinkon2' })
 vim.o.guifont = 'Fira Code:h14'
--- }}}
 -- }}}
 -- {{{ Staging area
 -- Neovide
