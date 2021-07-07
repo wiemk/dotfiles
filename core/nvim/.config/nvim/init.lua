@@ -250,7 +250,7 @@ vim.o.swapfile = true
 
 -- Show whitespace characters
 vim.wo.list = true
-vim.o.listchars = 'tab:→ ,eol:↲,nbsp:␣,trail:•,extends:⟩,precedes:⟨'
+vim.o.listchars = 'tab:→ ,eol:↲,nbsp:␣,trail:•,lead:_,extends:⟩,precedes:⟨'
 
 vim.o.showbreak = '↪ '
 
