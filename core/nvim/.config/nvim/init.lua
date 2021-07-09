@@ -21,6 +21,7 @@ require'packer'.startup(function()
 	use 'tpope/vim-fugitive'              -- Git commands in nvim
 	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
 	use 'tjdevries/astronauta.nvim'       -- Keymap wrapper functions
+	use 'antoinemadec/FixCursorHold.nvim' -- Temporary fix for neovim #12587
 	-- Autocompletion plugin
 	use { 'hrsh7th/nvim-compe',
 		config = function()
@@ -268,7 +269,7 @@ vim.o.ttimeout = false
 vim.o.ttimeoutlen = 0
 
 -- Decrease update time for CursorHold
-vim.o.updatetime = 250
+vim.o.updatetime = 150
 
 -- Always show diagnostics column
 vim.wo.signcolumn = 'number'
@@ -723,7 +724,20 @@ vmap('<S-Up>', ':move \'<-2<CR>gv=gv', opts)
 vmap('<S-Down>', ':move \'>+1<CR>gv=gv', opts);
 -- }}}
 -- {{{ Abbreviations
--- Force write with sudo
+-- Force write with sudo, two different approaches
+vim.cmd[[com! -bang W lua SudoWrite('<bang>' == '!')]]
+SudoWrite = function(bang)
+	if not bang then
+		print('Add ! to use sudo.')
+	else
+		vim.api.nvim_exec([[
+			w! /tmp/sudonvim
+			bel 2new
+			startinsert
+			te sudo tee #:S </tmp/sudonvim >/dev/null; rm /tmp/sudonvim
+		]], false)
+	end
+end
 (function()
 	local askpass = {
 		'/usr/libexec/seahorse/ssh-askpass',
