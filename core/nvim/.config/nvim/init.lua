@@ -22,6 +22,7 @@ require'packer'.startup(function()
 	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
 	use 'tjdevries/astronauta.nvim'       -- Keymap wrapper functions
 	use 'antoinemadec/FixCursorHold.nvim' -- Temporary fix for neovim #12587
+	use 'machakann/vim-sandwich'          -- Surround text objects
 	-- Autocompletion plugin
 	use { 'hrsh7th/nvim-compe',
 		config = function()
@@ -59,7 +60,7 @@ require'packer'.startup(function()
 	}
 	-- Add git related info in the signs columns and popups
 	use {'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'},
-		config = function()	require'gitsigns'.setup(); end
+		config = function() gitsigns_init(); end
 	}
 	-- UI to select things (files, grep results, open buffers...)
 	use {'nvim-telescope/telescope.nvim',
@@ -92,7 +93,8 @@ require'packer'.startup(function()
 	}
 	-- Automatically create parenthesis pairs
 	use { 'windwp/nvim-autopairs',
-		config = function() autopairs_init(); end }
+		config = function() autopairs_init(); end
+	}
 end)
 -- }}}
 -- {{{ Utility functions
@@ -272,7 +274,7 @@ vim.o.ttimeoutlen = 0
 vim.o.updatetime = 150
 
 -- Always show diagnostics column
-vim.wo.signcolumn = 'number'
+vim.wo.signcolumn = 'yes:1'
 
 -- Set colorscheme (order is important here)
 vim.o.termguicolors = true
@@ -283,7 +285,7 @@ vim.wo.cursorcolumn = true
 -- Add map to enter paste mode
 vim.o.pastetoggle='<F3>'
 -- }}}
--- {{{ LSP
+-- {{{ LSP attach
 local nvim_lsp = require'lspconfig'
 local on_attach = function(client, bufnr)
 	vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
@@ -326,8 +328,11 @@ local on_attach = function(client, bufnr)
 		map.n('<space>f', '<Cmd>lua vim.lsp.buf.range_formatting()<CR>', opts)
 	end
 end
--- {{{ Enable the following language servers
-(function()
+-- }}}
+-- {{{ LSP servers
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+;(function()
+	capabilities.textDocument.completion.completionItem.snippetSupport = false
 	local servers = {
 		-- 'clangd',
 		-- 'dockerls',
@@ -341,6 +346,7 @@ end
 	for _, lsp in ipairs(servers) do
 		nvim_lsp[lsp].setup {
 			on_attach = on_attach,
+			capabilities = capabilities,
 			flags = {
 				debounce_text_changes = 150,
 			}
@@ -356,46 +362,8 @@ vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
 		signs = true,
 		update_in_insert = false,
 	})
--- }}}
--- {{{ Lua language server
-local sumneko_root_path = vim.fn.getenv('XDG_DATA_HOME') .. '/lua-language-server'
-local sumneko_binary_path = '/bin/Linux/lua-language-server'
-table.insert(globals, 'vim')
-table.insert(globals, 'use_rocks')
-local settings = {
-	Lua = {
-		runtime = {
-			version = 'LuaJIT',
-			path = vim.split(package.path, ';'),
-		},
-		completion = {
-			enable = true,
-			callSnippet = 'Both'
-		},
-		diagnostics = {
-			enable = true,
-			globals = globals,
-			disable = {'lowercase-global'}
-		},
-		workspace = {
-			library = {
-				[vim.fn.expand('$VIMRUNTIME/lua')] = true,
-				[vim.fn.expand('$VIMRUNTIME/lua/vim/lsp')] = true,
-			},
-			maxPreload = 2000,
-			preloadFileSize = 1000
-		}
-	}
-}
-
-nvim_lsp.sumneko_lua.setup {
-	cmd = { sumneko_root_path .. sumneko_binary_path, '-E', sumneko_root_path .. '/main.lua' };
-	on_attach = on_attach,
-	settings = settings
-}
--- }}}
 -- Map :Format to vim.lsp.buf.formatting()
-vim.cmd([[command! Format :lua vim.lsp.buf.formatting()]])
+vim.cmd([[command! Format execute 'lua vim.lsp.buf.formatting()']])
 -- Allow for virtual text to be toggled
 vim.b.lsp_virtual_text_enabled = true
 
@@ -406,7 +374,50 @@ local diagnostic_toggle_virtual_text = function()
 	vim.lsp.diagnostic.display(vim.lsp.diagnostic.get(0, 1), 0, 1, { virtual_text = virtual_text })
 end
 -- }}}
--- {{{ Show diagnostics on CursorHold
+-- {{{ LSP Lua server
+;(function(lsp, cap, global, on_attach_cb)
+	local sumneko_root_path = vim.fn.getenv('XDG_DATA_HOME') .. '/lua-language-server'
+	local sumneko_binary_path = '/bin/Linux/lua-language-server'
+	table.insert(global, 'vim')
+	table.insert(global, 'use_rocks')
+	-- Make runtime files discoverable to the server
+	local runtime_path = vim.split(package.path, ';')
+	table.insert(runtime_path, 'lua/?.lua')
+	table.insert(runtime_path, 'lua/?/init.lua')
+	local settings = {
+		Lua = {
+			runtime = {
+				version = 'LuaJIT',
+				path = runtime_path,
+			},
+			completion = {
+				enable = true,
+				callSnippet = 'Both'
+			},
+			diagnostics = {
+				enable = true,
+				globals = global,
+				disable = {'lowercase-global'}
+			},
+			workspace = {
+				library = vim.api.nvim_get_runtime_file('', true),
+				maxPreload = 2000,
+				preloadFileSize = 1000
+			},
+			telemetry = {
+				enable = false,
+			}
+		}
+	}
+	lsp.sumneko_lua.setup {
+		cmd = { sumneko_root_path .. sumneko_binary_path, '-E', sumneko_root_path .. '/main.lua' };
+		on_attach = on_attach_cb,
+		capabilities = cap,
+		settings = settings
+	}
+end)(nvim_lsp, capabilities, globals, on_attach)
+-- }}}
+-- {{{ LSP diagnostics on CursorHold
 show_line_diagnostics = function()
 	local diag = vim.lsp.diagnostic.get_line_diagnostics()
 	if not next(diag) then
@@ -436,6 +447,75 @@ vim.api.nvim_exec([[
 		autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
 	augroup end
 ]], false)
+-- }}}
+-- {{{ Treesitter
+treesitter_init = function()
+	require'nvim-treesitter.configs'.setup {
+		-- debatable whether this should be commented or not
+		-- ensure_installed = 'maintained', -- one of 'all', 'maintained' (parsers with maintainers), or a list of languages
+		ensure_installed = 'maintained',
+		highlight = {
+			enable = true,              -- false will disable the whole extension
+			-- disable = { 'lua' }
+		},
+		incremental_selection = {
+			enable = true,
+			keymaps = {
+				init_selection = 'gnn',
+				node_incremental = 'grn',
+				scope_incremental = 'grc',
+				node_decremental = 'grm',
+			},
+		},
+		indent = {
+			enable = true
+		},
+		textobjects = {
+			select = {
+				enable = true,
+				lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+				keymaps = {
+					-- You can use the capture groups defined in textobjects.scm
+					['af'] = '@function.outer',
+					['if'] = '@function.inner',
+					['ac'] = '@class.outer',
+					['ic'] = '@class.inner',
+				},
+			},
+			move = {
+				enable = true,
+				set_jumps = true, -- whether to set jumps in the jumplist
+				goto_next_start = {
+					[']m'] = '@function.outer',
+					[']]'] = '@class.outer',
+				},
+				goto_next_end = {
+					[']M'] = '@function.outer',
+					[']['] = '@class.outer',
+				},
+				goto_previous_start = {
+					['[m'] = '@function.outer',
+					['[['] = '@class.outer',
+				},
+				goto_previous_end = {
+					['[M'] = '@function.outer',
+					['[]'] = '@class.outer',
+				},
+			},
+		},
+	}
+end
+-- Treesitter folding whitelist
+(function()
+	local fold_whitelist = {
+		'markdown',
+	}
+	for _, value in pairs(fold_whitelist) do
+		vim.api.nvim_exec('augroup fold | autocmd! fold FileType ' .. value ..
+			' setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()', false)
+	end
+end)()
+nmap('<F5>', '<Cmd>setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()<CR>')
 -- }}}
 -- {{{ Linter
 lint_init = function()
@@ -470,6 +550,24 @@ indent_init = function()
 		exclude_filetypes = {'help','dashboard','dashpreview','NvimTree','vista','sagahover'};
 		even_colors = { fg='#2a3834',bg='#332b36' };
 		odd_colors = { fg='#332b36',bg='#2a3834' };
+	}
+end
+-- }}}
+-- {{{ Gitsigns init
+gitsigns_init = function()
+	require'gitsigns'.setup{
+		signs = {
+			add = { hl = 'GitSignsAdd', text = '+', numhl='GitSignsAddNr' , linehl='GitSignsAddLn' },
+			change = { hl = 'GitSignsChange', text = '~', numhl='GitSignsChangeNr', linehl='GitSignsChangeLn' },
+			delete = { hl = 'GitSignsDelete', text = '_', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn' },
+			topdelete = { hl = 'GitSignsTopDelete', text = '‾', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn' },
+			changedelete = { hl = 'GitSignsChangeDelete', text = '~',  numhl='GitSignsChangeNr', linehl='GitSignsChangeLn' },
+		},
+		numhl = true,
+		linehl = false,
+		current_line_blame = false,
+		current_line_blame_delay = 1000,
+		current_line_blame_position = 'eol',
 	}
 end
 -- }}}
@@ -520,7 +618,7 @@ toggle_mouse = function()
 	local backup = function(t)
 		t.window = vim.api.nvim_get_current_win()
 		t.backup = {}
-		for k,v in pairs(t.target) do
+		for k,_ in pairs(t.target) do
 			nomouse.backup[k] = vim.api.nvim_win_get_option(t.window, k)
 		end
 	end
@@ -545,42 +643,6 @@ toggle_mouse = function()
 end
 
 nmap('<F4>', '<Cmd>lua toggle_mouse()<CR>')
--- }}}
--- {{{ Treesitter
-treesitter_init = function()
-	require'nvim-treesitter.configs'.setup {
-		-- debatable whether this should be commented or not
-		-- ensure_installed = 'maintained', -- one of 'all', 'maintained' (parsers with maintainers), or a list of languages
-		ensure_installed = 'maintained',
-		highlight = {
-			enable = true,              -- false will disable the whole extension
-			-- disable = { 'lua' }
-		},
-		incremental_selection = {
-			enable = true,
-			keymaps = {
-				init_selection = 'gnn',
-				node_incremental = 'grn',
-				scope_incremental = 'grc',
-				node_decremental = 'grm',
-			},
-		},
-		indent = {
-			enable = true
-		}
-	}
-end
--- Treesitter folding whitelist
-(function()
-	local fold_whitelist = {
-		'markdown',
-	}
-	for _, value in pairs(fold_whitelist) do
-		vim.api.nvim_exec('augroup fold | autocmd! fold FileType ' .. value ..
-			' setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()', false)
-	end
-end)()
-nmap('<F5>', '<Cmd>setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()<CR>')
 -- }}}
 -- {{{ lualine statusbar
 lualine_init = function()
@@ -827,17 +889,17 @@ vim.g.gutentags_ctags_tagfile = '.tags'
 -- {{{ Compe
 compe_init = function()
 	require'compe'.setup {
-		enabled = true;
-		autocomplete = true;
-		debug = false;
-		min_length = 2;
-		preselect = 'enable';
-		throttle_time = 80;
-		source_timeout = 200;
-		incomplete_delay = 400;
-		max_abbr_width = 100;
-		max_kind_width = 100;
-		max_menu_width = 100;
+		enabled = true,
+		autocomplete = true,
+		debug = false,
+		min_length = 2,
+		preselect = 'enable',
+		throttle_time = 80,
+		source_timeout = 200,
+		incomplete_delay = 400,
+		max_abbr_width = 100,
+		max_kind_width = 100,
+		max_menu_width = 100,
 		documentation = {
 			border = { '', '' ,'', ' ', '', '', '', ' ' },
 			winhighlight = 'NormalFloat:CompeDocumentation,FloatBorder:CompeDocumentationBorder',
@@ -845,15 +907,18 @@ compe_init = function()
 			min_width = 60,
 			max_height = math.floor(vim.o.lines * 0.3),
 			min_height = 1,
-		};
+		},
 		source = {
-			buffer = true;
-			calc = false;
-			nvim_lua = true;
-			nvim_lsp = true;
-			path = false;
-			tags = true;
-		};
+			buffer = true,
+			calc = false,
+			nvim_lua = true,
+			nvim_lsp = true,
+			path = false,
+			tags = true,
+			luasnip = false,
+			vsnip = false,
+			ultisnip = false,
+		},
 	}
 end
 
@@ -874,7 +939,6 @@ local check_back_space = function()
 	local col = vim.fn.col('.') - 1
 	return col == 0 or vim.fn.getline('.'):sub(col, col):match('%s')
 end
-
 -- Use (s-)tab to:
 --- move to prev/next item in completion menuone
 --- jump to prev/next snippet's placeholder
