@@ -17,12 +17,13 @@ require'packer'.startup(function()
 	use 'wbthomason/packer.nvim'          -- Package manager
 	use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
 	use 'dracula/vim'                     -- Popular dracula theme
+	use 'folke/tokyonight.nvim'            -- Gloomy colorful theme
+	use 'machakann/vim-sandwich'          -- Surround text objects
 	use 'tpope/vim-commentary'            -- 'gc' to comment visual regions/lines
 	use 'tpope/vim-fugitive'              -- Git commands in nvim
 	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
 	use 'tjdevries/astronauta.nvim'       -- Keymap wrapper functions
 	use 'antoinemadec/FixCursorHold.nvim' -- Temporary fix for neovim #12587
-	use 'machakann/vim-sandwich'          -- Surround text objects
 	-- Autocompletion plugin
 	use { 'hrsh7th/nvim-compe',
 		config = function()
@@ -281,7 +282,7 @@ vim.o.termguicolors = true
 vim.wo.cursorline = true
 vim.wo.cursorcolumn = true
 -- vim.g.onedark_terminal_italics = 2
--- vim.g.tokyonight_style='storm'
+vim.g.tokyonight_style='storm'
 -- Add map to enter paste mode
 vim.o.pastetoggle='<F3>'
 -- }}}
@@ -876,6 +877,7 @@ nmap('<leader>Gb', [[<Cmd>lua require'telescope.builtin'.git_branches()<CR>]], o
 nmap('<leader>Gs', [[<Cmd>lua require'telescope.builtin'.git_status()<CR>]], opts)
 nmap('<leader>Gp', [[<Cmd>lua require'telescope.builtin'.git_bcommits()<CR>]], opts)
 nmap('<leader>g', [[<Cmd>lua require'telescope.builtin'.git_files()<CR>]], opts)
+nmap('<leader>H', [[<Cmd>lua require'telescope.builtin'.help_tags()<CR>]], opts)
 -- Extensions
 nmap('<leader><Tab>', [[<Cmd>lua require'telescope'.extensions.frecency.frecency()<CR>]], opts)
 nmap('<leader>S', [[<Cmd>lua require'telescope'.extensions.session_manager.load()<CR>]], opts)
