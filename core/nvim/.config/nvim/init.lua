@@ -1,4 +1,41 @@
 -- vi:set ft=lua ts=4 sw=4 noet ai fdm=marker:
+-- {{{ Decrease start-up time
+vim.cmd([[
+	syntax off
+	filetype off
+	filetype plugin indent off
+]])
+-- Temporarily disable shada file to improve performance
+vim.opt.shadafile = 'NONE'
+-- Disable some unused built-in Neovim plugins
+vim.g.loaded_python_provider = false
+vim.g.loaded_man = false
+vim.g.loaded_gzip = false
+vim.g.loaded_netrwPlugin = false
+vim.g.loaded_tarPlugin = false
+vim.g.loaded_zipPlugin = false
+vim.g.loaded_2html_plugin = false
+vim.g.loaded_remote_plugins = false
+local async
+async = vim.loop.new_async(vim.schedule_wrap(function()
+	vim.defer_fn(function()
+		vim.opt.shadafile = ''
+		vim.defer_fn(function()
+			vim.cmd([[
+				rshada!
+				doautocmd BufRead
+				syntax on
+				filetype on
+				filetype plugin indent on
+				silent! bufdo e
+				colorscheme tokyonight
+			]])
+		end, 15)
+	end, 0)
+	async:close()
+end))
+async:send()
+-- }}}
 -- {{{ Packer plugin manager
 local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
@@ -16,8 +53,7 @@ local use = require'packer'.use
 require'packer'.startup(function()
 	use 'wbthomason/packer.nvim'          -- Package manager
 	use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
-	use 'dracula/vim'                     -- Popular dracula theme
-	use 'folke/tokyonight.nvim'            -- Gloomy colorful theme
+	use 'folke/tokyonight.nvim'           -- Gloomy colorful theme
 	use 'machakann/vim-sandwich'          -- Surround text objects
 	use 'tpope/vim-commentary'            -- 'gc' to comment visual regions/lines
 	use 'tpope/vim-fugitive'              -- Git commands in nvim
@@ -126,23 +162,6 @@ function util.keep_state(callback, ...)
 	vim.fn.winrestview(view)
 end
 
-function util.dump(t, indent, done)
-	done = done or {}
-	indent = indent or 0
-	done[t] = true
-	for key, value in pairs(t) do
-		print(string.rep('\t', indent))
-		if type(value) == 'table' and not done[value] then
-			done[value] = true
-			print(key, ':\n')
-			dump(value, indent + 2, done)
-			done[value] = nil
-		else
-			print(key, '\t=\t', value, '\n')
-		end
-	end
-end
-
 function util.trim(s)
 	local b = s:find'%S'
 	return b and s:match('.*%S', b) or ''
@@ -174,9 +193,9 @@ local globals = (function(modes)
 		table.insert(map, fn)
 	end)
 	return map
-end)('cinostvx');
-
-(function()
+end)('cinostvx')
+-- create astronauta mapping functions
+do
 	local km = require'astronauta.keymap'
 	for k,v in pairs(km) do
 		if string.match(k, '%Dnoremap') then
@@ -184,12 +203,9 @@ end)('cinostvx');
 			rawset(_G, k, v)
 		end
 	end
-end)()
+end
 -- }}}
 -- {{{ Generic options
--- Disable netrw
-vim.g.loaded_netrwPlugin = 1
-
 -- Disable welcome text
 vim.opt.shortmess:append({ c = true })
 
@@ -305,22 +321,22 @@ local on_attach = function(client, bufnr)
 	end)('nvic')
 
 	local opts = { noremap=true, silent=true }
-	map.n('gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-	map.n('gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-	map.n('K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-	map.n('gi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-	map.n('<C-k>', '<Cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-	map.n('<leader>wa', '<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-	map.n('<leader>wr', '<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-	map.n('<leader>wl', '<Cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-	map.n('<leader>D', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-	map.n('<leader>rn', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
-	map.n('gr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
-	map.n('<leader>ca', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-	map.n('<leader>e', '<Cmd>lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})<CR>', opts)
-	map.n('ö', '<Cmd>lua vim.lsp.diagnostic.goto_prev({popup_opts = {focusable = false}})<CR>', opts)
-	map.n('ä', '<Cmd>lua vim.lsp.diagnostic.goto_next({popup_opts = {focusable = false}})<CR>', opts)
-	map.n('<leader>q', '<Cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+	map.n('<leader>pgD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+	map.n('<leader>pgd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+	map.n('<leader>pk', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+	map.n('<leader>pK', '<Cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+	map.n('<leader>pgi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+	map.n('<leader>pwa', '<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+	map.n('<leader>pwr', '<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+	map.n('<leader>pwl', '<Cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+	map.n('<leader>pD', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+	map.n('<leader>prn', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
+	map.n('<leader>pgr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
+	map.n('<leader>pca', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+	map.n('<leader>pe', '<Cmd>lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})<CR>', opts)
+	map.n('<leader>pö', '<Cmd>lua vim.lsp.diagnostic.goto_prev({popup_opts = {focusable = false}})<CR>', opts)
+	map.n('<leader>pä', '<Cmd>lua vim.lsp.diagnostic.goto_next({popup_opts = {focusable = false}})<CR>', opts)
+	map.n('<leader>pq', '<Cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 
 	-- Set some keybinds conditional on server capabilities
 	if client.resolved_capabilities.document_formatting then
@@ -332,7 +348,7 @@ end
 -- }}}
 -- {{{ LSP servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-;(function()
+do
 	capabilities.textDocument.completion.completionItem.snippetSupport = false
 	local servers = {
 		-- 'clangd',
@@ -353,7 +369,7 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 			}
 		}
 	end
-end)()
+end
 -- }}}
 -- {{{ LSP features
 vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
@@ -376,11 +392,11 @@ local diagnostic_toggle_virtual_text = function()
 end
 -- }}}
 -- {{{ LSP Lua server
-;(function(lsp, cap, global, on_attach_cb)
+do
 	local sumneko_root_path = vim.fn.getenv('XDG_DATA_HOME') .. '/lua-language-server'
 	local sumneko_binary_path = '/bin/Linux/lua-language-server'
-	table.insert(global, 'vim')
-	table.insert(global, 'use_rocks')
+	table.insert(globals, 'vim')
+	table.insert(globals, 'use_rocks')
 	-- Make runtime files discoverable to the server
 	local runtime_path = vim.split(package.path, ';')
 	table.insert(runtime_path, 'lua/?.lua')
@@ -397,7 +413,7 @@ end
 			},
 			diagnostics = {
 				enable = true,
-				globals = global,
+				globals = globals,
 				disable = {'lowercase-global'}
 			},
 			workspace = {
@@ -410,42 +426,22 @@ end
 			}
 		}
 	}
-	lsp.sumneko_lua.setup {
+	nvim_lsp.sumneko_lua.setup {
 		cmd = { sumneko_root_path .. sumneko_binary_path, '-E', sumneko_root_path .. '/main.lua' };
-		on_attach = on_attach_cb,
-		capabilities = cap,
-		settings = settings
+		on_attach = on_attach,
+		capabilities = capabilities,
+		settings = settings,
+		flags = {
+			debounce_text_changes = 150,
+		}
 	}
-end)(nvim_lsp, capabilities, globals, on_attach)
+end
 -- }}}
 -- {{{ LSP diagnostics on CursorHold
-show_line_diagnostics = function()
-	local diag = vim.lsp.diagnostic.get_line_diagnostics()
-	if not next(diag) then
-		return
-	end
-	local severity = 9
-	local index = 0
-	for key, value in pairs(diag) do
-		if value.severity < severity then
-			severity = value.severity
-			index = key
-		end
-	end
-	if diag[index].message ~= nil then
-		print(diag[index].message)
-		vim.api.nvim_exec([[
-			augroup cleardiag
-				autocmd!
-				autocmd CursorMoved * : echo "" | autocmd!
-			augroup end
-		]], false)
-	end
-end
 vim.api.nvim_exec([[
 	augroup linediag
 		autocmd!
-		autocmd CursorHold * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
+		autocmd CursorHold,CursorHoldI * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
 	augroup end
 ]], false)
 -- }}}
@@ -507,7 +503,7 @@ treesitter_init = function()
 	}
 end
 -- Treesitter folding whitelist
-(function()
+do
 	local fold_whitelist = {
 		'markdown',
 	}
@@ -515,7 +511,7 @@ end
 		vim.api.nvim_exec('augroup fold | autocmd! fold FileType ' .. value ..
 			' setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()', false)
 	end
-end)()
+end
 nmap('<F5>', '<Cmd>setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()<CR>')
 -- }}}
 -- {{{ Linter
@@ -549,8 +545,8 @@ indent_init = function()
 		indent_tab_guides = true;
 		indent_soft_pattern = '\\s';
 		exclude_filetypes = {'help','dashboard','dashpreview','NvimTree','vista','sagahover'};
-		even_colors = { fg='#2a3834',bg='#332b36' };
-		odd_colors = { fg='#332b36',bg='#2a3834' };
+		odd_colors = { fg='#565f89',bg='#2a2e42' };
+		even_colors = { fg='#414868',bg='#2e3346' };
 	}
 end
 -- }}}
@@ -564,6 +560,7 @@ gitsigns_init = function()
 			topdelete = { hl = 'GitSignsTopDelete', text = '‾', numhl='GitSignsDeleteNr', linehl='GitSignsDeleteLn' },
 			changedelete = { hl = 'GitSignsChangeDelete', text = '~',  numhl='GitSignsChangeNr', linehl='GitSignsChangeLn' },
 		},
+		update_debounce = 500,
 		numhl = true,
 		linehl = false,
 		current_line_blame = false,
@@ -649,7 +646,7 @@ nmap('<F4>', '<Cmd>lua toggle_mouse()<CR>')
 lualine_init = function()
 	require'lualine'.setup {
 		options = {
-			theme = 'dracula';
+			theme = 'tokyonight';
 			icons_enabled = false,
 			padding = 1,
 			left_padding = 1,
@@ -801,20 +798,19 @@ SudoWrite = function(bang)
 		]], false)
 	end
 end
-(function()
+do
 	local askpass = {
 		'/usr/libexec/seahorse/ssh-askpass',
 		'/usr/libexec/openssh/gnome-ssh-askpass',
 	}
 	for _, v in ipairs(askpass) do
-		if vim.fn.executable(v) then
+		if vim.fn.executable(v) == 1 then
 			ex.abbrev('w!!', 'w !SUDO_ASKPASS=' .. v .. ' sudo -A tee > /dev/null %')
-			return
+			break
 		end
 	end
 	print('No gui capable askpass binary found.')
-end)();
-
+end
 -- }}}
 -- {{{ Insert modeline
 GenerateModeline = function()
@@ -847,6 +843,10 @@ end
 nmap('<leader>M', [[<Cmd>lua GenerateModeline()<CR>]])
 -- }}}
 -- {{{ Telescope
+local find_cmd
+if vim.fn.executable("fd") == 1 then
+	find_cmd = { 'fd', '--type', 'f', '--hidden', '--no-ignore', '--exclude', '.git', '--exclude', '.tags' }
+end
 require'telescope'.setup {
 	defaults = {
 		mappings = {
@@ -857,21 +857,67 @@ require'telescope'.setup {
 		},
 		generic_sorter =  require'telescope.sorters'.get_fzy_sorter,
 		file_sorter =  require'telescope.sorters'.get_fzy_sorter,
+	},
+	pickers = {
+		-- Your special builtin config goes in here
+		buffers = {
+			sort_lastused = true,
+			theme = "ivy",
+			previewer = false,
+			mappings = {
+				i = {
+					["<c-d>"] = require("telescope.actions").delete_buffer,
+				},
+				n = {
+					["<c-d>"] = require("telescope.actions").delete_buffer,
+				}
+			}
+		},
+		find_files = {
+			theme = "ivy",
+			previewer = false,
+			hidden = true,
+			find_command = find_cmd
+		},
+		git_files = {
+			theme = "ivy",
+			previewer = false,
+		},
+		old_files = {
+			theme = "ivy",
+			previewer = false,
+		},
+		builtin = {
+			theme = "dropdown",
+			previewer = false
+		},
+		marks = {
+			theme = "ivy"
+		},
+		registers = {
+			theme = "ivy"
+		},
+		tags = {
+			only_current_buffer = true
+		},
+	},
+	extensions = {
+		-- Your extension config goes in here
 	}
 }
 -- Add leader shortcuts
 opts = { noremap = true, silent = true }
+nmap('<leader>b', [[<Cmd>lua require'telescope.builtin'.buffers()<CR>]], opts)
+nmap('<leader>B', [[<Cmd>lua require'telescope.builtin'.builtin()<CR>]], opts)
 nmap('<leader>f', [[<Cmd>lua require'telescope.builtin'.find_files()<CR>]], opts)
 nmap('<leader><space>', [[<Cmd>lua require'telescope.builtin'.buffers()<CR>]], opts)
-nmap('<leader>b', [[<Cmd>lua require'telescope.builtin'.buffers()<CR>]], opts)
 nmap('<leader>r', [[<Cmd>lua require'telescope.builtin'.registers()<CR>]], opts)
 nmap('<leader>l', [[<Cmd>lua require'telescope.builtin'.current_buffer_fuzzy_find()<CR>]], opts)
 nmap('<leader>m', [[<Cmd>lua require'telescope.builtin'.marks()<CR>]], opts)
 nmap('<leader>t', [[<Cmd>lua require'telescope.builtin'.tags()<CR>]], opts)
 nmap('<leader>?', [[<Cmd>lua require'telescope.builtin'.oldfiles()<CR>]], opts)
 nmap('<leader>i', [[<Cmd>lua require'telescope.builtin'.live_grep()<CR>]], opts)
-nmap('<leader>F', [[<Cmd>lua require'telescope.builtin'.grep_string()<CR>]], opts)
-nmap('<leader>o', [[<Cmd>lua require('telescope.builtin').tags{ only_current_buffer = true }<CR>]], opts)
+nmap('<leader>s', [[<Cmd>lua require'telescope.builtin'.grep_string()<CR>]], opts)
 nmap('<leader>Gc', [[<Cmd>lua require'telescope.builtin'.git_commits()<CR>]], opts)
 nmap('<leader>Gb', [[<Cmd>lua require'telescope.builtin'.git_branches()<CR>]], opts)
 nmap('<leader>Gs', [[<Cmd>lua require'telescope.builtin'.git_status()<CR>]], opts)
@@ -879,8 +925,8 @@ nmap('<leader>Gp', [[<Cmd>lua require'telescope.builtin'.git_bcommits()<CR>]], o
 nmap('<leader>g', [[<Cmd>lua require'telescope.builtin'.git_files()<CR>]], opts)
 nmap('<leader>H', [[<Cmd>lua require'telescope.builtin'.help_tags()<CR>]], opts)
 -- Extensions
-nmap('<leader><Tab>', [[<Cmd>lua require'telescope'.extensions.frecency.frecency()<CR>]], opts)
-nmap('<leader>S', [[<Cmd>lua require'telescope'.extensions.session_manager.load()<CR>]], opts)
+nmap('<leader>F', [[<Cmd>lua require'telescope'.extensions.frecency.frecency(require'telescope.themes'.get_ivy({previewer = false}))<CR>]], opts)
+nmap('<leader>S', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
 -- Change preview window location
 vim.g.splitbelow = true
 -- }}}
@@ -923,7 +969,6 @@ compe_init = function()
 		},
 	}
 end
-
 -- Insert mode mappings
 opts = { silent = true, expr = true  }
 imap('<C-Space>', 'compe#complete()', opts)
@@ -996,7 +1041,7 @@ vim.api.nvim_exec([[
 vim.api.nvim_exec([[
 	augroup YankHighlight
 		autocmd!
-		autocmd TextYankPost * silent! lua vim.highlight.on_yank()
+		autocmd TextYankPost * silent! lua vim.highlight.on_yank { timeout = 500, higroup = "Visual" }
 	augroup end
 ]], false)
 -- Remap escape to leave terminal mode
@@ -1029,7 +1074,7 @@ vim.api.nvim_exec([[
 		autocmd ColorScheme dracula call ColorOverride()
 	augroup end
 ]], false);
-ex.colorscheme([[dracula]])
+-- ex.colorscheme([[tokyonight]])
 vim.opt.guicursor:append({ 'i:ver100-iCursor', 'i:blinkon2' })
 vim.o.guifont = 'Fira Code:h14'
 -- }}}

@@ -1,3 +1,5 @@
+# git
+core/git/.config/git/config.local
 # fish
 core/fish/.config/fish/fishd.*
 core/fish/.config/fish/functions/*

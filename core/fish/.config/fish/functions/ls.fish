@@ -12,7 +12,9 @@ if command ls --version >/dev/null 2>/dev/null
 	end
 
 	if not set -q LS_COLORS
-		if command -sq dircolors
+		if command -sq vivid and set -q VIVID_LS_THEME
+			set -gx LS_COLORS (vivid generate $VIVID_LS_THEME)
+		else if command -sq dircolors
 			set -l colorfile
 			for file in ~/.dir_colors ~/.dircolors /etc/DIR_COLORS
 				if test -f $file
@@ -29,14 +31,5 @@ if command ls --version >/dev/null 2>/dev/null
 			end
 		end
 	end
-else if command ls -G / >/dev/null 2>/dev/null
-	# It looks like BSD, OS X and a few more which support colors through the -G switch instead.
-	function ls --description "List contents of directory"
-		command ls -G $argv
-	end
-else if command ls --color / >/dev/null 2>/dev/null
-	# Solaris 11's ls command takes a --color flag
-	function ls --description "List contents of directory"
-		command ls --color $argv
-	end
 end
+

@@ -1,12 +1,6 @@
 # ~/.gitconfig: git-config(1) - Git configuration
-# # vim: ft=gitconfig
-
-[user]
-	name = Thorsten Schubert
-	email = tschubert@bafh.org
-	# sign with the ed25519 subkey
-	signingKey = "890563373AFD6DD0AA52970BF74F74BB63C458FD!"
-
+# vim: ft=gitconfig
+#
 [alias]
 	a = add --all
 	a-p = add --all --patch
@@ -278,22 +272,6 @@
 	diff-del-highlight = black red
 	title-blur = black blue
 	title-focus = white blue
-
-[pager]
-	diff = delta
-	log = delta
-	reflog = delta
-	show = delta
-
-[interactive]
-	diffFilter = delta --color-only
-
-[delta]
-	features = side-by-side line-numbers decorations
-	whitespace-error-style = 22 reverse
-
-[delta "decorations"]
-	syntax-theme = Dracula
 
 # local config
 [include]

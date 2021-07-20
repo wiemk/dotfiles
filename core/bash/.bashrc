@@ -5,11 +5,17 @@ if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
 	printf '%d%s\n' "${EPOCHSECONDS}" ': .bashrc' >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
 fi
 
-# Source global definitions
-if [[ -f /etc/bashrc ]]; then
-	source /etc/bashrc
+# dircolors
+if [[ -n $VIVID_LS_THEME ]] && hash vivid &>/dev/null; then
+	# fedora uses this variable to detect custom LS_COLORS
+	LS_COLORS="$(vivid generate "$VIVID_LS_THEME" 2>/dev/null)"
+	if [[ -n $LS_COLORS ]]; then
+		export LS_COLORS
+		export USER_LS_COLORS=$VIVID_LS_THEME
+	fi
 fi
 
+# prompt
 if hash starship &>/dev/null; then
     eval "$(starship init bash)"
 else
@@ -38,12 +44,22 @@ else
 	export PROMPT_COMMAND=displayPS1
 fi
 
+# alias
 alias tma='fish -c tma'
 
+# utility functions
+bashquote() { printf '%q\n' "$(</dev/stdin)"; }
+
+# Source global definitions
+if [[ -f /etc/bashrc ]]; then
+	source /etc/bashrc
+fi
+
+# shell options
 set +H
 shopt -s extglob
 shopt -s lastpipe
 
-bashquote() { printf '%q\n' "$(</dev/stdin)"; }
+[[ -f .bashrc.local ]] && source .bashrc.local || true
 
 # vim: ft=bash ts=4 sw=4 noet

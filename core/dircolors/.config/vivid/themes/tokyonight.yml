@@ -1,0 +1,144 @@
+colors:
+  # This keyword, HTML elements, Regex group symbol, CSS units, Terminal Red
+  term-red: 'f7768e'
+  # Number and Boolean constants, Language support constants
+  constants: 'ff9e64'
+  # Function parameters, Regex character sets, Terminal Yellow
+  functions: 'e0af68'
+  # Strings, CSS class names
+  strings: '9ece6a'
+  # Object literal keys, Markdown links, Terminal Green
+  term-green: '73daca'
+  # Regex literal strings
+  regex: 'b4f9f8'
+  # Language support functions, CSS HTML elements
+  support: '2ac3de'
+  # Object properties, Regex quantifiers and flags, Markdown headings, Terminal Cyan, Markdown code, Import/export keywords
+  term-cyan: '7dcfff'
+  # Function names, CSS property names, Terminal Blue
+  term-blue: '7aa2f7'
+  # Control Keywords, Storage Types, Regex symbols and operators, HTML Attributes, Terminal Magenta
+  term-magenta: 'bb9af7'
+  # Variables, Class names, Terminal White
+  term-white: 'c0caf5'
+  # Editor Foreground
+  term-fg: 'a9b1d6'
+  # Markdown Text, HTML Text
+  markdown: '9aa5ce'
+  # Parameters inside functions (semantic highlighting only)
+  parameters: 'cfc9c2'
+  # Comments
+  comments: '565f89'
+  # Terminal Black
+  term-black: '414868'
+  # Editor Background (Storm)
+  term-bg-storm: '24283b'
+  # Editor Background (Night)
+  term-bg-night: '1a1b26'
+
+core:
+  regular_file:
+    foreground: term-fg
+
+  directory:
+    foreground: comments
+    font-style: bold
+
+  executable_file:
+    foreground: term-red
+    font-style: bold
+
+  symlink:
+    foreground: term-magenta
+    font-style: bold
+
+  broken_symlink:
+    foreground: term-fg
+    background: term-red
+    font-style: bold
+
+  missing_symlink_target:
+    foreground: term-fg
+    background: term-red
+    font-style: bold
+
+  fifo:
+    foreground: regex
+    background: term-black
+    font-style: bold
+
+  socket:
+    foreground: functions
+    background: comments
+    font-style: bold
+
+  character_device:
+    foreground: regex
+    background: term-black
+    font-style: italic
+
+  block_device:
+    foreground: regex
+    background: term-black
+    font-style: bold
+
+  normal_text:
+    foreground: term-fg
+
+  other_writable:
+    {}
+
+  sticky:
+    {}
+
+  sticky_other_writable:
+    {}
+
+text:
+  special:
+    foreground: strings
+
+  todo:
+    foreground: term-fg
+    font-style: bold
+
+  licenses:
+    foreground: term-fg
+
+  configuration:
+    foreground: term-green
+
+  other:
+    foreground: term-fg
+
+markup:
+  foreground: term-magenta
+
+programming:
+  foreground: term-magenta
+
+media:
+  image:
+    foreground: term-fg
+
+  audio:
+    foreground: term-fg
+
+  video:
+    foreground: term-fg
+
+  fonts:
+    foreground: term-fg
+
+office:
+  foreground: term-fg
+
+archives:
+  foreground: markdown
+  font-style: bold
+
+executable:
+  foreground: term-red
+
+unimportant:
+  foreground: term-blue

@@ -86,7 +86,7 @@ external_menu_len=220
 #the player to use for playing the video, must be able to stream from youtube-dl
 #vlc also works
 #(YTFZF_PLAYER)
-video_player="mpv --quiet --msg-level=ffmpeg=fatal --profile=live"
+video_player="mpv" 
 
 #the player to use when choosing a video format with $YTFZF_PREF
 #(YTFZF_PLAYER_FORMAT)
@@ -94,7 +94,7 @@ video_player_format="${video_player} --ytdl-format="
 
 #the player to use for audio ( option -m )
 #(YTFZF_AUDIO_PLAYER)
-audio_player="chrt -r 10 mpv --quiet --msg-level=ffmpeg=fatal --profile=live --no-video"
+audio_player="mpv --profile=live-audio"
 
 #enable/disable ytfzf's use of your $FZF_DEFAULT_OPTS
 #depending on your fzf settings, this could mess up the formatting of the menu
