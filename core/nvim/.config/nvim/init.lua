@@ -699,9 +699,11 @@ vim.api.nvim_set_keymap('', '<Space>', '<Nop>', {noremap = true, silent = true})
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
-opts = { noremap = true, expr = true, silent = true }
+-- Workaround for tmux under kitty
+vim.api.nvim_set_keymap('', '<C-a>', '<Home>', {noremap = true, silent = true})
+vim.api.nvim_set_keymap('', '<C-e>', '<End>', {noremap = true, silent = true})
 
--- Lua test mapping
+opts = { noremap = true, expr = true, silent = true }
 
 nmap('k', "v:count == 0 ? 'gk' : 'k'", opts)
 nmap('j', "v:count == 0 ? 'gj' : 'j'", opts)
@@ -736,22 +738,22 @@ nmap('<C-h>', ':noh<CR>')
 nmap('<C-w>s', ':vsplit<CR>:wincmd l<CR>')
 
 -- Create, close, and move between tabs
-nmap('<M-N>', ':tabnew<CR>')
-nmap('<M-M>', ':tabclose<CR>')
-nmap('<M-b>', ':tabprevious<CR>')
-nmap('<M-n>', ':tabnext<CR>')
+nmap('~', ':tabnew<CR>')
+nmap('–', ':tabclose<CR>')
+nmap('·', ':tabprevious<CR>')
+nmap('…', ':tabnext<CR>')
 
 -- Cycle through open buffers
-nmap('<leader>.', ':bnext<CR>')
 nmap('<leader>,', ':bprevious<CR>')
-nmap('<M-.>', ':bnext<CR>')
+nmap('<leader>.', ':bnext<CR>')
 nmap('<M-,>', ':bprevious<CR>')
+nmap('<M-.>', ':bnext<CR>')
 
 -- Change to file directory in current window
 nmap('<leader>cd', ':lcd %:p:h<CR>:pwd<CR>')
 
 -- Save all.
-nmap('<C-M-s>', ':wa<CR>')
+nmap('<C-M-s>', ':wa<CR>:echo "All saved!"<CR>')
 
 -- Search and replace using marked text
 vmap('<C-r>', '"hy:%s/<C-r>h//gc<left><left><left>')
@@ -1041,7 +1043,7 @@ vim.api.nvim_exec([[
 vim.api.nvim_exec([[
 	augroup YankHighlight
 		autocmd!
-		autocmd TextYankPost * silent! lua vim.highlight.on_yank { timeout = 500, higroup = "Visual" }
+		autocmd TextYankPost * silent! lua vim.highlight.on_yank { timeout = 250, higroup = "Visual" }
 	augroup end
 ]], false)
 -- Remap escape to leave terminal mode
@@ -1058,6 +1060,14 @@ vim.api.nvim_exec([[
 		autocmd!
 		autocmd BufNewFile,BufRead *.txt setlocal ft=markdown
 	augroup end
+]], false);
+-- Open help as vsplit
+vim.api.nvim_exec([[
+	augroup vimrc_help
+		autocmd!
+"		autocmd BufEnter *.txt if &buftype == 'help' | wincmd L | endif
+		autocmd FileType help wincmd L
+	augroup END
 ]], false);
 -- }}}
 -- {{{ Theme/GUI

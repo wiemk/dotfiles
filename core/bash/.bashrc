@@ -23,29 +23,36 @@ else
 	if [[ $(/usr/bin/tput colors) = 256 ]]; then
 		displayPS1() {
 			local rval=$?
+			local -r rempath="\[\033]0;\u@\h: \w\007\]"
 			if (( rval == 0 )); then
 				unset rval
 			else
 				printf -v rval '\[\e[3;37m\](\[\e[1;31m\]%s\[\e[0m\]\[\e[3;37m\])\[\e[0m\] ' $rval
 			fi
-			PS1="\[\e[3;37m\]\A (\u)\[\e[0m\] \[\e[3;32m\]\w\[\e[0m\]\n${rval}\\[\e[1;34m\]\$\[\e[0m\] \[$(tput sgr0)\]"
+			PS1="${rempath}\[\e[3;37m\]\A (\u)\[\e[0m\] \[\e[3;32m\]\w\[\e[0m\]\n${rval}\\[\e[1;34m\]\$\[\e[0m\] \[$(tput sgr0)\]"
 		}
 	else
 		displayPS1() {
 			local rval=$?
+			local -r rempath="\[\033]0;\u@\h: \w\007\]"
 			if (( rval == 0 )); then
 				unset rval
 			else
 				printf -v rval '(%s) ' $rval
 			fi
-			PS1="\A (\u) \w\n${rval}\\$ \[$(tput sgr0)\]"
+			PS1="${rempath}\A (\u) \w\n${rval}\\$ \[$(tput sgr0)\]"
 		}
 	fi
 	export PROMPT_COMMAND=displayPS1
 fi
 
-# alias
-alias tma='fish -c tma'
+tma() {
+	local sess='main'
+	if (( $# > 0 )); then
+		sess=$1
+	fi
+	command tmux new-session -A -s "${sess}" -t 'primary'
+}
 
 # utility functions
 bashquote() { printf '%q\n' "$(</dev/stdin)"; }

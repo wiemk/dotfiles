@@ -1,0 +1,12 @@
+[Unit]
+Description=Fetch newsboat RSS articles
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+Persistent=true
+RandomizedDelaySec=60
+
+[Install]
+WantedBy=default.target
+

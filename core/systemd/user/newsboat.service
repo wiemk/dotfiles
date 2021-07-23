@@ -1,0 +1,7 @@
+[Unit]
+Description=Fetch newsboat RSS articles
+
+[Service]
+Type=oneshot
+ExecStart=-/usr/bin/newsboat -x reload
+

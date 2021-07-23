@@ -1,0 +1,12 @@
+launch fish -c 'vim'
+new_tab
+launch
+new_tab
+launch
+launch
+launch
+new_tab bash
+launch /usr/bin/bash -i
+new_tab tmux
+launch fish -c 'tma'
+

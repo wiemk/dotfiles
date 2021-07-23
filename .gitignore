@@ -29,6 +29,13 @@ staging/pulse/.config/pulse/*
 # tmux
 core/tmux/.config/tmux/hooks/_*.hook
 core/tmux/.config/tmux/hooks/_*.sh
+# kitty
+gui/kitty/.config/kitty/*
+!gui/kitty/.config/kitty/kitty.conf
+!gui/kitty/.config/kitty/*.session
 # alacritty
 gui/alacritty/.config/alacritty/*
 !gui/alacritty/.config/alacritty/alacritty.yml
+# newsboat
+gui/newsboat/.config/newsboat/urls
+
