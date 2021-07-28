@@ -1,5 +1,5 @@
 # git
-core/git/.config/git/config.local
+core/git/.config/git/*.local
 # fish
 core/fish/.config/fish/fishd.*
 core/fish/.config/fish/functions/*

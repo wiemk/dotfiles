@@ -3,8 +3,8 @@ Description=Fetch newsboat RSS articles
 
 [Timer]
 OnBootSec=5min
-OnUnitActiveSec=15min
-Persistent=true
+OnUnitActiveSec=20min
+Persistent=false
 RandomizedDelaySec=60
 
 [Install]

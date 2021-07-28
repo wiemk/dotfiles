@@ -774,8 +774,7 @@ nmap('Q', 'B')
 nmap('<F6>', '<Cmd>SaveSession<CR><Cmd>echo "Session saved!"<CR>')
 
 -- Update Plugins
-nmap('<leader>U', '<Cmd>PackerUpdate<CR>')
-nmap('<leader>C', '<Cmd>PackerCompile<CR><Cmd>echo "Compiled!"<CR>')
+nmap('<leader>U', '<Cmd>PackerSync<CR>')
 
 -- Transpose lines
 opts = { noremap = true, silent = true }

@@ -1,7 +1,9 @@
 [Unit]
 Description=Fetch newsboat RSS articles
+StartLimitIntervalSec=0
 
 [Service]
 Type=oneshot
-ExecStart=-/usr/bin/newsboat -x reload
-
+ExecStart=/usr/bin/newsboat -x reload
+Restart=on-failure
+RestartSec=2m

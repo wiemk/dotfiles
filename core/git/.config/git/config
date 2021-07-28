@@ -275,5 +275,6 @@
 
 # local config
 [include]
+	path = ~/.config/git/identity.local
 	path = ~/.config/git/config.local
 
