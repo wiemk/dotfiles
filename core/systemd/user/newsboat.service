@@ -6,4 +6,4 @@ StartLimitIntervalSec=0
 Type=oneshot
 ExecStart=/usr/bin/newsboat -x reload
 Restart=on-failure
-RestartSec=2m
+RestartSec=1m

@@ -56,6 +56,8 @@ tma() {
 
 # utility functions
 bashquote() { printf '%q\n' "$(</dev/stdin)"; }
+up() { cd $(printf '../%.0s' $(seq 1 $1)); }
+alias ..='up'
 
 # Source global definitions
 if [[ -f /etc/bashrc ]]; then

@@ -9,7 +9,7 @@ if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
 	printf '%d%s\n' "${EPOCHSECONDS}" ': .profile' >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
 fi
 
-export PROFILE_SOURCED=true
+export PROFILE_SOURCED=1
 
 is_cmd() {
 	hash "$1" &>/dev/null
@@ -18,27 +18,19 @@ is_cmd() {
 is_in_exp () { 
 	local haystack="$1[@]"
 	local needle=$2
-	local in=1
 	for e in "${!haystack}"; do
-		if [[ $e == "$needle" ]]; then
-			in=0
-			break
-		fi
+		[[ $e == "$needle" ]] && return 0
 	done
-	return $in
+	return 1
 }
 
 is_in_ref () { 
-	local -n haystack="$1"
+	local -n haystack=$1
 	local needle=$2
-	local in=1
 	for e in "${haystack[@]}"; do
-		if [[ $e == "$needle" ]]; then
-			in=0
-			break
-		fi
+		[[ $e == "$needle" ]] && return 0
 	done
-	return $in
+	return 1
 }
 
 #################################################
@@ -90,25 +82,20 @@ env_exports=("${pam_exports[@]}")
 #################################################
 # source host specific profile
 source_machine_profile() {
-	local machine=${HOST:-$HOSTNAME}
+	local machine=${HOSTNAME:-$(</proc/sys/kernel/hostname)}
 	machine=${machine,,}
-	if [[ -n ${machine+x} ]]; then
-		if [[ -r "${HOME}/.profile-${machine}" ]]; then
-			source "${HOME}/.profile-${machine}"
-		elif [[ -r "${XDG_CONFIG_HOME}/profile/profile-${machine}" ]]; then
+	if [[ -n $machine ]]; then
+		if [[ -r "${XDG_CONFIG_HOME}/profile/profile-${machine}" ]]; then
 			source "${XDG_CONFIG_HOME}/profile/profile-${machine}"
+		elif [[ -r "${HOME}/.profile-${machine}" ]]; then
+			source "${HOME}/.profile-${machine}"
 		fi
 	fi
 }
-source_machine_profile
 
-# export canonicalized 'path_exports' entries after sourcing host specific profile
-export_path() {
+export_user_paths() {
 	local -a rpath
 	if is_cmd realpath; then
-		# let's do not use IFS or eval shenanigans here
-		# if the user specified the path multiple times
-		# we honor that decision
 		readarray -t -d ':' apath <<< "$PATH"
 		for (( i=0; i < ${#path_exports[@]}; i++ )); do
 			local realp="$(realpath -qms "${path_exports[$i]}")"
@@ -123,10 +110,9 @@ export_path() {
 	PATH="${spath:0:-1}"
 	export PATH
 }
-export_path
 
 # export for pam_env and avoid unnecessary writes
-create_pam_export() {
+create_pamd_export() {
 	local -a buf
 	for var in "${pam_exports[@]}"; do
 		printf -v line '%-32s DEFAULT=%s' "$var" "${!var}"
@@ -137,49 +123,45 @@ create_pam_export() {
 }
 
 # same for environment.d
-create_env_export() {
+create_envd_export() {
 	local -a buf
 	for var in "${env_exports[@]}"; do
 		printf -v line '%s=%s' "$var" "${!var}"
 		buf+=("${line}")
 	done
-	IFS=$'\n'
+	local IFS=$'\n'
 	printf '%s' "${buf[*]}"
 }
 
-is_identical_hash() {
+is_equal() {
 	local file="$1" nbuf="$2"
-	if [[ -f "${file}" ]]; then
-		local obuf="$(<"${file}")"
-		local ohash=$(printf '%s' "${obuf}" | command b2sum | cut -d ' ' -f1)
-		local nhash=$(printf '%s' "${nbuf}" | command b2sum | cut -d ' ' -f1)
-		test "$ohash" == "$nhash"
-	fi
-}
-
-is_identical_cmp() {
-	local file="$1" nbuf="$2"
-	if [[ -f "${file}" ]]; then
+	if [[ -r "${file}" ]]; then
 		command cmp -s "$file" <(printf '%s\n' "${nbuf}")
 	fi
 }
 
-write_pam_export() {
-	render_exp="$(create_pam_export)"
-	if ! is_identical_cmp "${HOME}/.pam_environment" "$render_exp"; then
+write_pamd_exports() {
+	render_exp="$(create_pamd_export)"
+	if ! is_equal "${HOME}/.pam_environment" "$render_exp"; then
 		printf '%s\n' "${HOME}/.pam_environment updated" >&2
 		printf '%s\n' "$render_exp" > "${HOME}/.pam_environment"
 	fi
 }
-write_pam_export
 
-write_env_export() {
-	render_exp="$(create_env_export)"
-	if ! is_identical_cmp "${XDG_CONFIG_HOME}/environment.d/50-profile.conf" "$render_exp"; then
+write_envd_exports() {
+	render_exp="$(create_envd_export)"
+	if ! is_equal "${XDG_CONFIG_HOME}/environment.d/50-profile.conf" "$render_exp"; then
 		printf '%s\n' "${XDG_CONFIG_HOME}/environment.d/50-profile.conf updated" >&2
 		printf '%s\n' "$render_exp" > "${XDG_CONFIG_HOME}/environment.d/50-profile.conf"
 	fi
 }
-write_env_export
+
+# load host specific profile
+source_machine_profile
+# export canonicalized 'path_exports' entries after sourcing host specific profile
+export_user_paths
+# serialize
+write_pamd_exports
+write_envd_exports
 
 # vim: ft=bash ts=4 sw=4 noet

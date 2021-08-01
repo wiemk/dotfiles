@@ -25,8 +25,11 @@ MPC_HOST="${XDG_RUNTIME_DIR}/mpc/socket"
 LIBVIRT_DEFAULT_URI="qemu:///system"
 DO_NOT_TRACK=1
 VIVID_LS_THEME=tokyonight
+CARGO_HOME="${XDG_DATA_HOME}/cargo"
+RUSTUP_HOME="${XDG_DATA_HOME}/rustup"
 
-export SQLITE_HISTORY LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE MPC_HOST NQDIR LIBVIRT_DEFAULT_URI WINIT_UNIX_BACKEND WINIT_UNIX_BACKEND DO_NOT_TRACK VIVID_LS_THEME
+# available inside the terminal, not necessarily GUI applications
+export SQLITE_HISTORY LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE MPC_HOST NQDIR LIBVIRT_DEFAULT_URI WINIT_UNIX_BACKEND WINIT_UNIX_BACKEND DO_NOT_TRACK VIVID_LS_THEME CARGO_HOME RUSTUP_HOME
 
 if is_cmd nvim; then
 	EDITOR='nvim'
@@ -35,10 +38,17 @@ if is_cmd nvim; then
 	export EDITOR VISUAL SUDO_EDITOR
 fi
 
-# path_exports+=( "${CARGO_HOME}/bin" )
-# leads to regenerating environment.d/50-profile.conf for systemd-environment-d-generator
-# and session-wide availability
-pam_exports+=( LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE WINIT_UNIX_BACKEND DO_NOT_TRACK )
-env_exports+=( LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE WINIT_UNIX_BACKEND DO_NOT_TRACK )
+path_exports+=( "${CARGO_HOME}/bin" )
+
+# leads to regenerating environment.d/50-profile.conf for systemd-environment-d-generator and global availability (terminal, wayland, systemd-user services)
+global_exports=( LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE WINIT_UNIX_BACKEND DO_NOT_TRACK )
+env_exports+=( "${global_exports[@]}" )
+pam_exports+=( "${global_exports[@]}" )
+
+#/etc/X11/xinit/xinitrc.d/50-systemd-user.sh
+# systemctl --user import-environment DISPLAY XAUTHORITY
+# if command -v dbus-update-activation-environment >/dev/null 2>&1; then
+#     dbus-update-activation-environment DISPLAY XAUTHORITY
+# fi
 
 # vim: ft=bash ts=4 sw=4 noet

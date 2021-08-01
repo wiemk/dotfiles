@@ -1,35 +1,39 @@
 -- vi:set ft=lua ts=4 sw=4 noet ai fdm=marker:
+-- {{{ Disable unused built-in plugins
+vim.g.loaded_python_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_man = 0
+vim.g.loaded_gzip = 0
+vim.g.loaded_netrwPlugin = 0
+vim.g.loaded_tarPlugin = 0
+vim.g.loaded_zipPlugin = 0
+vim.g.loaded_2html_plugin = 0
+vim.g.loaded_remote_plugins = 0
+-- }}}
 -- {{{ Decrease start-up time
-vim.cmd([[
+vim.cmd[[
 	syntax off
 	filetype off
 	filetype plugin indent off
-]])
+]]
 -- Temporarily disable shada file to improve performance
 vim.opt.shadafile = 'NONE'
--- Disable some unused built-in Neovim plugins
-vim.g.loaded_python_provider = false
-vim.g.loaded_man = false
-vim.g.loaded_gzip = false
-vim.g.loaded_netrwPlugin = false
-vim.g.loaded_tarPlugin = false
-vim.g.loaded_zipPlugin = false
-vim.g.loaded_2html_plugin = false
-vim.g.loaded_remote_plugins = false
 local async
 async = vim.loop.new_async(vim.schedule_wrap(function()
 	vim.defer_fn(function()
 		vim.opt.shadafile = ''
 		vim.defer_fn(function()
-			vim.cmd([[
+			vim.cmd[[
 				rshada!
 				doautocmd BufRead
 				syntax on
 				filetype on
 				filetype plugin indent on
 				silent! bufdo e
-				colorscheme tokyonight
-			]])
+			]]
 		end, 15)
 	end, 0)
 	async:close()
@@ -42,24 +46,33 @@ if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
 	vim.fn.system({'git', 'clone', 'https://github.com/wbthomason/packer.nvim', install_path})
 	vim.api.nvim_command 'packadd packer.nvim'
 end
-vim.api.nvim_exec([[
+vim.cmd[[
 	augroup Packer
 		autocmd!
 		autocmd BufWritePost init.lua PackerCompile
 	augroup end
-]], false)
+]]
 
 local use = require'packer'.use
 require'packer'.startup(function()
 	use 'wbthomason/packer.nvim'          -- Package manager
 	use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
-	use 'folke/tokyonight.nvim'           -- Gloomy colorful theme
 	use 'machakann/vim-sandwich'          -- Surround text objects
 	use 'tpope/vim-commentary'            -- 'gc' to comment visual regions/lines
 	use 'tpope/vim-fugitive'              -- Git commands in nvim
 	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
 	use 'tjdevries/astronauta.nvim'       -- Keymap wrapper functions
 	use 'antoinemadec/FixCursorHold.nvim' -- Temporary fix for neovim #12587
+	-- Tokyonight theme
+	use { 'folke/tokyonight.nvim',
+		setup = function()
+			vim.g.tokyonight_lualine_bold = false
+			vim.g.tokyonight_sidebars = { 'qf', 'terminal', 'packer' }
+		end,
+		config = function()
+			vim.cmd[[colorscheme tokyonight]]
+		end
+	}
 	-- Autocompletion plugin
 	use { 'hrsh7th/nvim-compe',
 		config = function()
@@ -70,11 +83,13 @@ require'packer'.startup(function()
 	}
 	-- Language parser
 	use { 'nvim-treesitter/nvim-treesitter',
+		run = ':TSUpdate',
 		config = function() treesitter_init(); end
 	}
+	-- Indent guides for spaces
 	use { 'glepnir/indent-guides.nvim',
 		config = function() indent_init(); end
-	}      -- Indent guides for spaces
+	}
 	-- Lua scratchpad
 	use { 'rafcamlet/nvim-luapad',
 		cmd = 'Luapad',
@@ -87,36 +102,45 @@ require'packer'.startup(function()
 	-- Interactive keybind overview
 	use { 'folke/which-key.nvim',
 		config = function()
-			require'which-key'.setup {
+			local wk = require'which-key'
+			wk.setup {
 				triggers = {'<leader>'}
 			}
+			wk.register({
+				c = { "Yank to CLIPBOARD" },
+				C = { "Yank to PRIMARY"}
+			}, { prefix = '<leader>', mode = 'x'})
 		end
 	}
 	use { 'hoob3rt/lualine.nvim',
 		config = function() lualine_init(); end
 	}
 	-- Add git related info in the signs columns and popups
-	use {'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'},
+	use { 'lewis6991/gitsigns.nvim', requires = {'nvim-lua/plenary.nvim'},
 		config = function() gitsigns_init(); end
 	}
 	-- UI to select things (files, grep results, open buffers...)
-	use {'nvim-telescope/telescope.nvim',
+	use { 'nvim-telescope/telescope.nvim',
 		requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
 	}
 	-- Frecency algorithm support for telescope
-	use {'nvim-telescope/telescope-frecency.nvim',
-		requires = {{'nvim-telescope/telescope.nvim'},
-			{'tami5/sql.nvim', config = 'vim.g.sql_clib_path = [[/usr/lib64/libsqlite3.so.0]]'}},
+	use { 'nvim-telescope/telescope-frecency.nvim',
+		requires = {{'tami5/sql.nvim',
+			setup = function()
+				vim.g.sql_clib_path = [[/usr/lib64/libsqlite3.so.0]]
+			end
+		}},
 		config = function() require'telescope'.load_extension('frecency'); end
 	}
 	-- Session management
 	use { 'Shatur/neovim-session-manager',
-		requires = {'nvim-telescope/telescope.nvim'},
-		config = function()
+		setup =  function()
 			vim.g.autosave_last_session = false
 			vim.g.sessions_dir = vim.fn.stdpath('cache') .. '/sessions/'
-			require'telescope'.load_extension('session_manager')
 		end,
+		config = function()
+			require'telescope'.load_extension('session_manager')
+		end
 	}
 	-- Native telescope fuzzy sorter
 	use { 'nvim-telescope/telescope-fzy-native.nvim',
@@ -152,10 +176,6 @@ function _G.dump(...)
 end
 
 local util = {}
-function util.win_float(s)
-	vim.lsp.util.open_floating_preview({s}, 'plaintext', {})
-end
-
 function util.keep_state(callback, ...)
 	local view = vim.fn.winsaveview()
 	callback(...)
@@ -178,7 +198,7 @@ function util.tok(s, sep)
 	return t
 end
 
--- create mapping functions
+-- create mapping functions and add them to globals table for LSP
 local globals = (function(modes)
 	local map = {}
 	modes:gsub('.', function(c)
@@ -271,8 +291,14 @@ vim.o.swapfile = true
 -- Show whitespace characters
 vim.wo.list = true
 vim.o.listchars = 'tab:→ ,eol:↲,nbsp:␣,trail:•,lead:_,extends:⟩,precedes:⟨'
-
 vim.o.showbreak = '↪ '
+
+-- Diff mode options
+vim.opt.diffopt = { 'filler', 'vertical', 'internal', 'algorithm:patience', 'indent-heuristic', 'context:3' }
+
+-- Improve performance
+vim.o.lz = true
+vim.o.synmaxcol = 256
 
 -- Fold method, may be changed by treesitter
 vim.o.foldmethod = 'marker'
@@ -293,6 +319,9 @@ vim.o.updatetime = 150
 -- Always show diagnostics column
 vim.wo.signcolumn = 'yes:1'
 
+-- Change preview window location
+vim.o.splitright = true
+
 -- Set colorscheme (order is important here)
 vim.o.termguicolors = true
 vim.wo.cursorline = true
@@ -300,7 +329,7 @@ vim.wo.cursorcolumn = true
 -- vim.g.onedark_terminal_italics = 2
 vim.g.tokyonight_style='storm'
 -- Add map to enter paste mode
-vim.o.pastetoggle='<F3>'
+vim.o.pastetoggle='<F5>'
 -- }}}
 -- {{{ LSP attach
 local nvim_lsp = require'lspconfig'
@@ -380,7 +409,7 @@ vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
 		update_in_insert = false,
 	})
 -- Map :Format to vim.lsp.buf.formatting()
-vim.cmd([[command! Format execute 'lua vim.lsp.buf.formatting()']])
+vim.cmd[[command! Format execute 'lua vim.lsp.buf.formatting()']]
 -- Allow for virtual text to be toggled
 vim.b.lsp_virtual_text_enabled = true
 
@@ -393,19 +422,12 @@ end
 -- }}}
 -- {{{ LSP Lua server
 do
-	local sumneko_root_path = vim.fn.getenv('XDG_DATA_HOME') .. '/lua-language-server'
-	local sumneko_binary_path = '/bin/Linux/lua-language-server'
-	table.insert(globals, 'vim')
-	table.insert(globals, 'use_rocks')
-	-- Make runtime files discoverable to the server
-	local runtime_path = vim.split(package.path, ';')
-	table.insert(runtime_path, 'lua/?.lua')
-	table.insert(runtime_path, 'lua/?/init.lua')
 	local settings = {
 		Lua = {
 			runtime = {
 				version = 'LuaJIT',
-				path = runtime_path,
+				-- Make runtime files discoverable to the server
+				path = { 'lua/?.lua', 'lua/?/init.lua', table.unpack(vim.split(package.path, ';')) }
 			},
 			completion = {
 				enable = true,
@@ -413,7 +435,7 @@ do
 			},
 			diagnostics = {
 				enable = true,
-				globals = globals,
+				globals = { 'vim', 'use_rocks', table.unpack(globals) },
 				disable = {'lowercase-global'}
 			},
 			workspace = {
@@ -426,6 +448,8 @@ do
 			}
 		}
 	}
+	local sumneko_root_path = vim.fn.getenv('XDG_DATA_HOME') .. '/lua-language-server'
+	local sumneko_binary_path = '/bin/Linux/lua-language-server'
 	nvim_lsp.sumneko_lua.setup {
 		cmd = { sumneko_root_path .. sumneko_binary_path, '-E', sumneko_root_path .. '/main.lua' };
 		on_attach = on_attach,
@@ -438,12 +462,12 @@ do
 end
 -- }}}
 -- {{{ LSP diagnostics on CursorHold
-vim.api.nvim_exec([[
+vim.cmd[[
 	augroup linediag
 		autocmd!
 		autocmd CursorHold,CursorHoldI * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
 	augroup end
-]], false)
+]]
 -- }}}
 -- {{{ Treesitter
 treesitter_init = function()
@@ -512,7 +536,7 @@ do
 			' setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()', false)
 	end
 end
-nmap('<F5>', '<Cmd>setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()<CR>')
+nmap('<F8>', '<Cmd>setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()<CR>')
 -- }}}
 -- {{{ Linter
 lint_init = function()
@@ -526,12 +550,12 @@ lint_init = function()
 		sh = {'shellcheck',},
 		bash = {'shellcheck',},
 	}
-	vim.api.nvim_exec([[
+	vim.cmd[[
 		augroup Linter
 			autocmd! * <buffer>
 			autocmd BufWritePost * lua require'lint'.try_lint()
 		augroup end
-	]], false)
+	]]
 end
 -- }}}
 -- {{{ Indent guides
@@ -640,7 +664,7 @@ toggle_mouse = function()
 	nomouse.status = not nomouse.status
 end
 
-nmap('<F4>', '<Cmd>lua toggle_mouse()<CR>')
+nmap('<F7>', '<Cmd>lua toggle_mouse()<CR>')
 -- }}}
 -- {{{ lualine statusbar
 lualine_init = function()
@@ -686,9 +710,9 @@ delete_empty = function()
 	util.keep_state(vim.api.nvim_command, [[keeppatterns :v/\_s*\S/d]])
 end
 
-vim.cmd([[command! TrimTrailingWhite :lua trim_lines()]])
-vim.cmd([[command! TrimTrailingLines :lua delete_empty()]])
-vim.cmd([[command! TrimAll :lua trim_lines(); delete_empty()]])
+vim.cmd[[command! TrimTrailingWhite :lua trim_lines()]]
+vim.cmd[[command! TrimTrailingLines :lua delete_empty()]]
+vim.cmd[[command! TrimAll :lua trim_lines(); delete_empty()]]
 -- }}}
 -- {{{ Custom key bindings
 -- Test mapping with lua callback
@@ -724,7 +748,6 @@ vmap('H', '_')
 vmap('L', '$')
 
 nmap('<C-f>', '/')
-nmap('<C-g>', ':Rg<CR>')
 -- nmap('<C-q>', ':q<CR>')
 nmap('<C-s>', ':w<CR>')
 nmap('<C-t>', ':Telescope fd<CR>')
@@ -776,6 +799,10 @@ nmap('<F6>', '<Cmd>SaveSession<CR><Cmd>echo "Session saved!"<CR>')
 -- Update Plugins
 nmap('<leader>U', '<Cmd>PackerSync<CR>')
 
+-- Next search result
+nmap('<F3>', 'n')
+nmap('<F4>', 'N')
+
 -- Transpose lines
 opts = { noremap = true, silent = true }
 nmap('<S-Up>', '<Cmd>move .-2<CR>', opts)
@@ -783,6 +810,11 @@ nmap('<S-Down>', '<Cmd>move .+1<CR>', opts)
 -- need to leave visual mode (:) for the mark to be set
 vmap('<S-Up>', ':move \'<-2<CR>gv=gv', opts)
 vmap('<S-Down>', ':move \'>+1<CR>gv=gv', opts);
+
+-- Yank to CLIPBOARD register
+xmap('<leader>c', '"+y')
+-- Yank to PRIMARY register
+xmap('<leader>C', '"*y')
 -- }}}
 -- {{{ Abbreviations
 -- Force write with sudo, two different approaches
@@ -791,12 +823,12 @@ SudoWrite = function(bang)
 	if not bang then
 		print('Add ! to use sudo.')
 	else
-		vim.api.nvim_exec([[
+		vim.cmd[[
 			w! /tmp/sudonvim
 			bel 2new
 			startinsert
 			te sudo tee #:S </tmp/sudonvim >/dev/null; rm /tmp/sudonvim
-		]], false)
+		]]
 	end
 end
 do
@@ -810,7 +842,6 @@ do
 			break
 		end
 	end
-	print('No gui capable askpass binary found.')
 end
 -- }}}
 -- {{{ Insert modeline
@@ -880,6 +911,14 @@ require'telescope'.setup {
 			hidden = true,
 			find_command = find_cmd
 		},
+		live_grep = {
+			-- extending the default values
+			vimgrep_arguments = (function()
+				local args = vim.tbl_values(require("telescope.config").values.vimgrep_arguments)
+				table.insert(args, "--hidden")
+				return args
+			end)()
+		},
 		git_files = {
 			theme = "ivy",
 			previewer = false,
@@ -928,12 +967,12 @@ nmap('<leader>H', [[<Cmd>lua require'telescope.builtin'.help_tags()<CR>]], opts)
 -- Extensions
 nmap('<leader>F', [[<Cmd>lua require'telescope'.extensions.frecency.frecency(require'telescope.themes'.get_ivy({previewer = false}))<CR>]], opts)
 nmap('<leader>S', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
--- Change preview window location
-vim.g.splitbelow = true
+nmap('<F9>', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
 -- }}}
--- {{{ gutentags
+-- {{{ Gutentags
 -- vim.g.gutentags_cache_dir = vim.fn.stdpath('cache') .. '/tags'
 vim.g.gutentags_ctags_tagfile = '.tags'
+vim.g.gutentags_file_list_command = 'fd'
 -- }}}
 -- {{{ Compe
 compe_init = function()
@@ -1030,48 +1069,55 @@ luapad_init = function()
 	nmap('<F2>', '<Cmd>Luapad<CR>')
 end
 -- }}}
+-- {{{ FileType
+-- Open help as vsplit
+vim.cmd[[
+	augroup vimrc_help
+		autocmd!
+"		autocmd BufEnter *.txt if &buftype == 'help' | wincmd L | endif
+		autocmd FileType help wincmd L
+	augroup end
+]]
+vim.cmd[[
+	augroup fish_cs
+		autocmd FileType fish setlocal commentstring=#%s
+	augroup end
+]]
+-- }}}
 -- {{{ Loose autocmds
 -- Hide cmdline after entering a command
-vim.api.nvim_exec([[
+vim.cmd[[
 	augroup cmdline
 		autocmd!
 		autocmd CmdlineLeave : echo ""
 	augroup end
-]], false)
+]]
 -- Highlight on yank
-vim.api.nvim_exec([[
+vim.cmd[[
 	augroup YankHighlight
 		autocmd!
 		autocmd TextYankPost * silent! lua vim.highlight.on_yank { timeout = 250, higroup = "Visual" }
 	augroup end
-]], false)
+]]
 -- Remap escape to leave terminal mode
-vim.api.nvim_exec([[
+vim.cmd[[
 	augroup Terminal
 		autocmd!
 		autocmd TermOpen * tnoremap <buffer> <Esc> <c-\><c-n>
 		autocmd TermOpen * set nonu
 	augroup end
-]], false);
+]]
 -- Markdown filetype for bare textfiles
-vim.api.nvim_exec([[
+vim.cmd[[
 	augroup MarkdownText
 		autocmd!
 		autocmd BufNewFile,BufRead *.txt setlocal ft=markdown
 	augroup end
-]], false);
--- Open help as vsplit
-vim.api.nvim_exec([[
-	augroup vimrc_help
-		autocmd!
-"		autocmd BufEnter *.txt if &buftype == 'help' | wincmd L | endif
-		autocmd FileType help wincmd L
-	augroup END
-]], false);
+]]
 -- }}}
 -- {{{ Theme/GUI
 -- Override highlighting
-vim.api.nvim_exec([[
+vim.cmd[[
 	function! ColorOverride() abort
 		highlight clear MatchParen
 		highlight MatchParen cterm=underline ctermfg=84 gui=underline guifg=#50FA7B guibg=#ff79c6
@@ -1082,14 +1128,10 @@ vim.api.nvim_exec([[
 		autocmd!
 		autocmd ColorScheme dracula call ColorOverride()
 	augroup end
-]], false);
--- ex.colorscheme([[tokyonight]])
+]]
 vim.opt.guicursor:append({ 'i:ver100-iCursor', 'i:blinkon2' })
 vim.o.guifont = 'Fira Code:h14'
 -- }}}
 -- {{{ Staging area
--- Neovide
-vim.g.neovide_refresh_rate = 60
-vim.g.neovide_cursor_antialiasing = false
-vim.g.neovide_cursor_vfx_mode = 'pixiedust'
 -- }}}
+

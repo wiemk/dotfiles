@@ -270,7 +270,7 @@ current_item_prefix = $(default)$r
 ## Note: Custom command that will be executed each time song changes. Useful for
 ## notifications etc.
 ##
-execute_on_song_change = notify-send --urgency=low --expire-time=2000 --app-name=mpd --icon=/usr/share/icons/hicolor/scalable/apps/org.gnome.Rhythmbox-symbolic.svg "Now Playing" "$(mpc --format '%title% \n%artist% - %album%' current)"
+#execute_on_song_change = notify-send --urgency=low --expire-time=2000 --app-name=mpd --icon=/usr/share/icons/hicolor/scalable/apps/org.gnome.Rhythmbox-symbolic.svg "Now Playing" "$(mpc --format '%title% \n%artist% - %album%' current)"
 #
 ##
 ## Note: Custom command that will be executed each time player state
@@ -309,7 +309,7 @@ execute_on_song_change = notify-send --urgency=low --expire-time=2000 --app-name
 #
 #volume_change_step = 2
 #
-#autocenter_mode = no
+autocenter_mode = yes
 #
 #centered_cursor = no
 #
