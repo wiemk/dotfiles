@@ -1,5 +1,5 @@
 -- vi:set ft=lua ts=4 sw=4 noet ai fdm=marker:
--- {{{ Disable unused built-in plugins
+-- {{{1 Disable unused built-in plugins
 vim.g.loaded_python_provider = 0
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
@@ -13,8 +13,8 @@ vim.g.loaded_zipPlugin = 0
 vim.g.loaded_2html_plugin = 0
 vim.g.loaded_remote_plugins = 0
 -- }}}
--- {{{ Decrease start-up time
-vim.cmd[[
+-- {{{1 Decrease start-up time
+vim.cmd [[
 	syntax off
 	filetype off
 	filetype plugin indent off
@@ -26,7 +26,7 @@ async = vim.loop.new_async(vim.schedule_wrap(function()
 	vim.defer_fn(function()
 		vim.opt.shadafile = ''
 		vim.defer_fn(function()
-			vim.cmd[[
+			vim.cmd [[
 				rshada!
 				doautocmd BufRead
 				syntax on
@@ -40,13 +40,13 @@ async = vim.loop.new_async(vim.schedule_wrap(function()
 end))
 async:send()
 -- }}}
--- {{{ Packer plugin manager
+-- {{{1 Packer plugin manager
 local install_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 if vim.fn.empty(vim.fn.glob(install_path)) > 0 then
 	vim.fn.system({'git', 'clone', 'https://github.com/wbthomason/packer.nvim', install_path})
 	vim.api.nvim_command 'packadd packer.nvim'
 end
-vim.cmd[[
+vim.cmd [[
 	augroup Packer
 		autocmd!
 		autocmd BufWritePost init.lua PackerCompile
@@ -63,6 +63,7 @@ require'packer'.startup(function()
 	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
 	use 'tjdevries/astronauta.nvim'       -- Keymap wrapper functions
 	use 'antoinemadec/FixCursorHold.nvim' -- Temporary fix for neovim #12587
+	use 'ggandor/lightspeed.nvim'         -- Motion plugin
 	-- Tokyonight theme
 	use { 'folke/tokyonight.nvim',
 		setup = function()
@@ -70,7 +71,7 @@ require'packer'.startup(function()
 			vim.g.tokyonight_sidebars = { 'qf', 'terminal', 'packer' }
 		end,
 		config = function()
-			vim.cmd[[colorscheme tokyonight]]
+			vim.cmd [[colorscheme tokyonight]]
 		end
 	}
 	-- Autocompletion plugin
@@ -158,7 +159,7 @@ require'packer'.startup(function()
 	}
 end)
 -- }}}
--- {{{ Utility functions
+-- {{{1 Utility functions
 ex = setmetatable({}, {
 	__index = function(t, k)
 		local command = k:gsub('_$', '!')
@@ -225,7 +226,7 @@ do
 	end
 end
 -- }}}
--- {{{ Generic options
+-- {{{1 Generic options
 -- Disable welcome text
 vim.opt.shortmess:append({ c = true })
 
@@ -331,7 +332,8 @@ vim.g.tokyonight_style='storm'
 -- Add map to enter paste mode
 vim.o.pastetoggle='<F5>'
 -- }}}
--- {{{ LSP attach
+-- {{{1 LSP
+-- {{{2 Attach
 local nvim_lsp = require'lspconfig'
 local on_attach = function(client, bufnr)
 	vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
@@ -374,8 +376,8 @@ local on_attach = function(client, bufnr)
 		map.n('<space>f', '<Cmd>lua vim.lsp.buf.range_formatting()<CR>', opts)
 	end
 end
--- }}}
--- {{{ LSP servers
+-- 2}}}
+-- {{{2 Servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 do
 	capabilities.textDocument.completion.completionItem.snippetSupport = false
@@ -400,8 +402,8 @@ do
 	end
 end
 -- }}}
--- {{{ LSP features
-vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
+-- {{{2 Features
+vim.lsp.handlers['extDocument/publishDiagnostics'] = vim.lsp.with(
 	vim.lsp.diagnostic.on_publish_diagnostics, {
 		underline = true,
 		virtual_text = true,
@@ -409,7 +411,7 @@ vim.lsp.handlers['textDocument/publishDiagnostics'] = vim.lsp.with(
 		update_in_insert = false,
 	})
 -- Map :Format to vim.lsp.buf.formatting()
-vim.cmd[[command! Format execute 'lua vim.lsp.buf.formatting()']]
+vim.cmd [[command! Format execute 'lua vim.lsp.buf.formatting()']]
 -- Allow for virtual text to be toggled
 vim.b.lsp_virtual_text_enabled = true
 
@@ -420,7 +422,7 @@ local diagnostic_toggle_virtual_text = function()
 	vim.lsp.diagnostic.display(vim.lsp.diagnostic.get(0, 1), 0, 1, { virtual_text = virtual_text })
 end
 -- }}}
--- {{{ LSP Lua server
+-- {{{2 Sumneko LUA
 do
 	local settings = {
 		Lua = {
@@ -461,15 +463,16 @@ do
 	}
 end
 -- }}}
--- {{{ LSP diagnostics on CursorHold
-vim.cmd[[
+-- {{{2 Diagnostics
+vim.cmd [[
 	augroup linediag
 		autocmd!
 		autocmd CursorHold,CursorHoldI * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
 	augroup end
 ]]
--- }}}
--- {{{ Treesitter
+-- 2}}}
+-- 1}}}
+-- {{{1 Treesitter
 treesitter_init = function()
 	require'nvim-treesitter.configs'.setup {
 		-- debatable whether this should be commented or not
@@ -538,7 +541,7 @@ do
 end
 nmap('<F8>', '<Cmd>setlocal foldmethod=expr | setlocal foldexpr=nvim_treesitter#foldexpr()<CR>')
 -- }}}
--- {{{ Linter
+-- {{{1 Linter
 lint_init = function()
 	require'lint'.linters.shellcheck.args = {
 		'--format', 'json',
@@ -550,7 +553,7 @@ lint_init = function()
 		sh = {'shellcheck',},
 		bash = {'shellcheck',},
 	}
-	vim.cmd[[
+	vim.cmd [[
 		augroup Linter
 			autocmd! * <buffer>
 			autocmd BufWritePost * lua require'lint'.try_lint()
@@ -558,7 +561,7 @@ lint_init = function()
 	]]
 end
 -- }}}
--- {{{ Indent guides
+-- {{{1 Indent guides
 indent_init = function()
 	require'indent_guides'.setup {
 		indent_guide_size = 1;
@@ -574,7 +577,7 @@ indent_init = function()
 	}
 end
 -- }}}
--- {{{ Gitsigns init
+-- {{{1 Gitsigns init
 gitsigns_init = function()
 	require'gitsigns'.setup{
 		signs = {
@@ -593,7 +596,7 @@ gitsigns_init = function()
 	}
 end
 -- }}}
--- {{{ Autopairs
+-- {{{1 Autopairs
 autopairs_init = function()
 	local npairs = require'nvim-autopairs'
 	npairs.setup({
@@ -625,7 +628,7 @@ autopairs_init = function()
 	})
 end
 -- }}}
--- {{{ Mouse toggle
+-- {{{1 Mouse toggle
 local nomouse = {
 	status = false,
 	window = 0,
@@ -666,7 +669,7 @@ end
 
 nmap('<F7>', '<Cmd>lua toggle_mouse()<CR>')
 -- }}}
--- {{{ lualine statusbar
+-- {{{1 lualine statusbar
 lualine_init = function()
 	require'lualine'.setup {
 		options = {
@@ -702,7 +705,7 @@ lualine_init = function()
 	}
 end
 -- }}}
--- {{{ Whitespace handling
+-- {{{1 Whitespace handling
 trim_lines = function()
 	util.keep_state(vim.api.nvim_command, [[keeppatterns %s/\s\+$//e]])
 end
@@ -710,11 +713,11 @@ delete_empty = function()
 	util.keep_state(vim.api.nvim_command, [[keeppatterns :v/\_s*\S/d]])
 end
 
-vim.cmd[[command! TrimTrailingWhite :lua trim_lines()]]
-vim.cmd[[command! TrimTrailingLines :lua delete_empty()]]
-vim.cmd[[command! TrimAll :lua trim_lines(); delete_empty()]]
+vim.cmd [[command! TrimTrailingWhite :lua trim_lines()]]
+vim.cmd [[command! TrimTrailingLines :lua delete_empty()]]
+vim.cmd [[command! TrimAll :lua trim_lines(); delete_empty()]]
 -- }}}
--- {{{ Custom key bindings
+-- {{{1 Custom key bindings
 -- Test mapping with lua callback
 -- nnoremap { '<leader>hello', function() print('"hello world!" from lua!') end }
 
@@ -816,14 +819,14 @@ xmap('<leader>c', '"+y')
 -- Yank to PRIMARY register
 xmap('<leader>C', '"*y')
 -- }}}
--- {{{ Abbreviations
+-- {{{1 Abbreviations
 -- Force write with sudo, two different approaches
-vim.cmd[[com! -bang W lua SudoWrite('<bang>' == '!')]]
+vim.cmd [[com! -bang W lua SudoWrite('<bang>' == '!')]]
 SudoWrite = function(bang)
 	if not bang then
 		print('Add ! to use sudo.')
 	else
-		vim.cmd[[
+		vim.cmd [[
 			w! /tmp/sudonvim
 			bel 2new
 			startinsert
@@ -844,7 +847,7 @@ do
 	end
 end
 -- }}}
--- {{{ Insert modeline
+-- {{{1 Insert modeline
 GenerateModeline = function()
 	local expand
 	if vim.bo.expandtab ~= 'noexpandtab' then
@@ -874,7 +877,7 @@ GenerateModeline = function()
 end
 nmap('<leader>M', [[<Cmd>lua GenerateModeline()<CR>]])
 -- }}}
--- {{{ Telescope
+-- {{{1 Telescope
 local find_cmd
 if vim.fn.executable("fd") == 1 then
 	find_cmd = { 'fd', '--type', 'f', '--hidden', '--no-ignore', '--exclude', '.git', '--exclude', '.tags' }
@@ -969,12 +972,12 @@ nmap('<leader>F', [[<Cmd>lua require'telescope'.extensions.frecency.frecency(req
 nmap('<leader>S', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
 nmap('<F9>', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
 -- }}}
--- {{{ Gutentags
+-- {{{1 Gutentags
 -- vim.g.gutentags_cache_dir = vim.fn.stdpath('cache') .. '/tags'
 vim.g.gutentags_ctags_tagfile = '.tags'
 vim.g.gutentags_file_list_command = 'fd'
 -- }}}
--- {{{ Compe
+-- {{{1 Compe
 compe_init = function()
 	require'compe'.setup {
 		enabled = true,
@@ -1017,7 +1020,7 @@ imap('<C-e>', "compe#close('<C-e>')", opts)
 imap('<C-f>', "compe#scroll({ 'delta': +4 }", opts)
 imap('<C-d>', "compe#scroll({ 'delta': -4 }", opts)
 -- }}}
--- {{{ Tab completion
+-- {{{1 Tab completion
 local t = function(str)
 	return vim.api.nvim_replace_termcodes(str, true, true, true)
 end
@@ -1052,7 +1055,7 @@ smap('<Tab>', 'v:lua.tab_complete()', {expr = true})
 imap('<S-Tab>', 'v:lua.s_tab_complete()', {expr = true})
 smap('<S-Tab>', 'v:lua.s_tab_complete()', {expr = true})
 -- }}}
--- {{{ Luapad
+-- {{{1 Luapad
 luapad_init = function()
 	require'luapad'.config {
 		count_limit = 150000,
@@ -1069,38 +1072,38 @@ luapad_init = function()
 	nmap('<F2>', '<Cmd>Luapad<CR>')
 end
 -- }}}
--- {{{ FileType
+-- {{{1 FileType
 -- Open help as vsplit
-vim.cmd[[
-	augroup vimrc_help
+vim.cmd [[
+	augroup VerticalHelp
 		autocmd!
-"		autocmd BufEnter *.txt if &buftype == 'help' | wincmd L | endif
-		autocmd FileType help wincmd L
+		autocmd BufEnter *.txt if &buftype == 'help' | wincmd L | endif
+"		autocmd FileType help wincmd L
 	augroup end
 ]]
-vim.cmd[[
-	augroup fish_cs
+vim.cmd [[
+	augroup FishComment
 		autocmd FileType fish setlocal commentstring=#%s
 	augroup end
 ]]
 -- }}}
--- {{{ Loose autocmds
+-- {{{1 Loose autocmds
 -- Hide cmdline after entering a command
-vim.cmd[[
-	augroup cmdline
+vim.cmd [[
+	augroup CmdLine
 		autocmd!
 		autocmd CmdlineLeave : echo ""
 	augroup end
 ]]
 -- Highlight on yank
-vim.cmd[[
+vim.cmd [[
 	augroup YankHighlight
 		autocmd!
 		autocmd TextYankPost * silent! lua vim.highlight.on_yank { timeout = 250, higroup = "Visual" }
 	augroup end
 ]]
 -- Remap escape to leave terminal mode
-vim.cmd[[
+vim.cmd [[
 	augroup Terminal
 		autocmd!
 		autocmd TermOpen * tnoremap <buffer> <Esc> <c-\><c-n>
@@ -1108,23 +1111,23 @@ vim.cmd[[
 	augroup end
 ]]
 -- Markdown filetype for bare textfiles
-vim.cmd[[
+vim.cmd [[
 	augroup MarkdownText
 		autocmd!
 		autocmd BufNewFile,BufRead *.txt setlocal ft=markdown
 	augroup end
 ]]
 -- }}}
--- {{{ Theme/GUI
+-- {{{1 Theme/GUI
 -- Override highlighting
-vim.cmd[[
+vim.cmd [[
 	function! ColorOverride() abort
 		highlight clear MatchParen
 		highlight MatchParen cterm=underline ctermfg=84 gui=underline guifg=#50FA7B guibg=#ff79c6
 		highlight link String DraculaPurple
 		highlight iCursor guifg=white guibg=#50FA7B
 	endfunction
-	augroup hloverride
+	augroup HlOverride
 		autocmd!
 		autocmd ColorScheme dracula call ColorOverride()
 	augroup end
@@ -1132,6 +1135,8 @@ vim.cmd[[
 vim.opt.guicursor:append({ 'i:ver100-iCursor', 'i:blinkon2' })
 vim.o.guifont = 'Fira Code:h14'
 -- }}}
--- {{{ Staging area
+-- {{{1 Legacy VimScript
+-- }}}
+-- {{{1 Staging area
 -- }}}
 
