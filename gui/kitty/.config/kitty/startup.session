@@ -1,4 +1,3 @@
-launch fish -c 'vim'
 new_tab
 launch
 new_tab

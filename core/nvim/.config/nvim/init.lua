@@ -75,11 +75,16 @@ require'packer'.startup(function()
 		end
 	}
 	-- Autocompletion plugin
-	use { 'hrsh7th/nvim-compe',
+	use { 'hrsh7th/nvim-cmp',
+		requires = {
+			{'hrsh7th/cmp-nvim-lsp'},
+			{'hrsh7th/cmp-buffer'},
+			{'saadparwaiz1/cmp_luasnip', requires = {'L3MON4D3/LuaSnip'}}
+		},
 		config = function()
 			vim.opt.completeopt = {'menuone', 'noselect'}
 			vim.opt.shortmess:append({ I = true })
-			compe_init()
+			cmp_init()
 		end
 	}
 	-- Language parser
@@ -124,16 +129,6 @@ require'packer'.startup(function()
 	use { 'nvim-telescope/telescope.nvim',
 		requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
 	}
-	-- Frecency algorithm support for telescope
-	use { 'nvim-telescope/telescope-frecency.nvim',
-		requires = {{'tami5/sql.nvim',
-			setup = function()
-				vim.g.sql_clib_path = [[/usr/lib64/libsqlite3.so.0]]
-			end
-		}},
-		config = function() require'telescope'.load_extension('frecency'); end
-	}
-	-- Session management
 	use { 'Shatur/neovim-session-manager',
 		setup =  function()
 			vim.g.autosave_last_session = false
@@ -177,6 +172,10 @@ function _G.dump(...)
 end
 
 local util = {}
+function t(s)
+	return vim.api.nvim_replace_termcodes(s, true, true, true)
+end
+
 function util.keep_state(callback, ...)
 	local view = vim.fn.winsaveview()
 	callback(...)
@@ -281,8 +280,8 @@ vim.o.sidescroll = 10
 vim.wo.colorcolumn = '120'
 
 -- Save undo history
-vim.o.undodir = vim.fn.stdpath('cache') .. '/undo'
-vim.bo.undofile = true
+vim.opt.undodir = vim.fn.stdpath('cache') .. '/undo'
+vim.opt.undofile = true
 
 vim.o.directory = vim.fn.stdpath('cache') .. '/swap'
 vim.o.backup = false
@@ -380,7 +379,20 @@ end
 -- {{{2 Servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 do
-	capabilities.textDocument.completion.completionItem.snippetSupport = false
+	capabilities.textDocument.completion.completionItem.snippetSupport = true
+	capabilities.textDocument.completion.completionItem.preselectSupport = true
+	capabilities.textDocument.completion.completionItem.insertReplaceSupport = true
+	capabilities.textDocument.completion.completionItem.labelDetailsSupport = true
+	capabilities.textDocument.completion.completionItem.deprecatedSupport = true
+	capabilities.textDocument.completion.completionItem.commitCharactersSupport = true
+	capabilities.textDocument.completion.completionItem.tagSupport = { valueSet = { 1 } }
+	capabilities.textDocument.completion.completionItem.resolveSupport = {
+		properties = {
+			'documentation',
+			'detail',
+			'additionalTextEdits',
+		},
+	}
 	local servers = {
 		-- 'clangd',
 		-- 'dockerls',
@@ -590,9 +602,6 @@ gitsigns_init = function()
 		update_debounce = 500,
 		numhl = true,
 		linehl = false,
-		current_line_blame = false,
-		current_line_blame_delay = 1000,
-		current_line_blame_position = 'eol',
 	}
 end
 -- }}}
@@ -613,10 +622,6 @@ autopairs_init = function()
 	require('nvim-treesitter.configs').setup {
 		autopairs = {enable = true}
 	}
-	require("nvim-autopairs.completion.compe").setup({
-		map_cr = true,
-		map_complete = true
-	})
 	local ts_conds = require('nvim-autopairs.ts-conds')
 	local Rule = require('nvim-autopairs.rule')
 	-- press % => %% is only inside comment or string
@@ -968,7 +973,6 @@ nmap('<leader>Gp', [[<Cmd>lua require'telescope.builtin'.git_bcommits()<CR>]], o
 nmap('<leader>g', [[<Cmd>lua require'telescope.builtin'.git_files()<CR>]], opts)
 nmap('<leader>H', [[<Cmd>lua require'telescope.builtin'.help_tags()<CR>]], opts)
 -- Extensions
-nmap('<leader>F', [[<Cmd>lua require'telescope'.extensions.frecency.frecency(require'telescope.themes'.get_ivy({previewer = false}))<CR>]], opts)
 nmap('<leader>S', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
 nmap('<F9>', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
 -- }}}
@@ -977,83 +981,53 @@ nmap('<F9>', [[<Cmd>lua require'telescope'.extensions.session_manager.load(requi
 vim.g.gutentags_ctags_tagfile = '.tags'
 vim.g.gutentags_file_list_command = 'fd'
 -- }}}
--- {{{1 Compe
-compe_init = function()
-	require'compe'.setup {
-		enabled = true,
-		autocomplete = true,
-		debug = false,
-		min_length = 2,
-		preselect = 'enable',
-		throttle_time = 80,
-		source_timeout = 200,
-		incomplete_delay = 400,
-		max_abbr_width = 100,
-		max_kind_width = 100,
-		max_menu_width = 100,
-		documentation = {
-			border = { '', '' ,'', ' ', '', '', '', ' ' },
-			winhighlight = 'NormalFloat:CompeDocumentation,FloatBorder:CompeDocumentationBorder',
-			max_width = 120,
-			min_width = 60,
-			max_height = math.floor(vim.o.lines * 0.3),
-			min_height = 1,
+-- {{{1 cmp
+cmp_init = function()
+	local cmp = require'cmp'
+	local luasnip = require'luasnip'
+	cmp.setup {
+		snippet = {
+			expand = function(args)
+				require'luasnip'.lsp_expand(args.body)
+			end,
 		},
-		source = {
-			buffer = true,
-			calc = false,
-			nvim_lua = true,
-			nvim_lsp = true,
-			path = false,
-			tags = true,
-			luasnip = false,
-			vsnip = false,
-			ultisnip = false,
+		mapping = {
+			['<C-p>'] = cmp.mapping.prev_item(),
+			['<C-n>'] = cmp.mapping.next_item(),
+			['<C-d>'] = cmp.mapping.scroll(-4),
+			['<C-f>'] = cmp.mapping.scroll(4),
+			['<C-Space>'] = cmp.mapping.complete(),
+			['<C-e>'] = cmp.mapping.close(),
+			['<CR>'] = cmp.mapping.confirm {
+				behavior = cmp.ConfirmBehavior.Replace,
+				select = true,
+			},
+			['<Tab>'] = cmp.mapping.mode({ 'i', 's' }, function(_, fallback)
+				if vim.fn.pumvisible() == 1 then
+					vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<C-n>', true, true, true), 'n')
+				elseif luasnip.expand_or_jumpable() then
+					vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>luasnip-expand-or-jump', true, true, true), '')
+				else
+					fallback()
+				end
+			end),
+			['<S-Tab>'] = cmp.mapping.mode({ 'i', 's' }, function(_, fallback)
+				if vim.fn.pumvisible() == 1 then
+					vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<C-p>', true, true, true), 'n')
+				elseif luasnip.jumpable(-1) then
+					vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>luasnip-jump-prev', true, true, true), '')
+				else
+					fallback()
+				end
+			end),
+		},
+		sources = {
+			{ name = 'nvim_lsp' },
+			{ name = 'luasnip' },
+			{ name = 'buffer' },
 		},
 	}
 end
--- Insert mode mappings
-opts = { silent = true, expr = true  }
-imap('<C-Space>', 'compe#complete()', opts)
--- imap('<CR>', "compe#confirm('<CR>')", opts)
-imap('<C-e>', "compe#close('<C-e>')", opts)
-imap('<C-f>', "compe#scroll({ 'delta': +4 }", opts)
-imap('<C-d>', "compe#scroll({ 'delta': -4 }", opts)
--- }}}
--- {{{1 Tab completion
-local t = function(str)
-	return vim.api.nvim_replace_termcodes(str, true, true, true)
-end
-
-local check_back_space = function()
-	local col = vim.fn.col('.') - 1
-	return col == 0 or vim.fn.getline('.'):sub(col, col):match('%s')
-end
--- Use (s-)tab to:
---- move to prev/next item in completion menuone
---- jump to prev/next snippet's placeholder
-_G.tab_complete = function()
-	if vim.fn.pumvisible() == 1 then
-		return t '<C-n>'
-	elseif check_back_space() then
-		return t '<Tab>'
-	else
-		return vim.fn['compe#complete']()
-	end
-end
-
-_G.s_tab_complete = function()
-	if vim.fn.pumvisible() == 1 then
-		return t '<C-p>'
-	else
-		return t '<S-Tab>'
-	end
-end
-
-imap('<Tab>', 'v:lua.tab_complete()', {expr = true})
-smap('<Tab>', 'v:lua.tab_complete()', {expr = true})
-imap('<S-Tab>', 'v:lua.s_tab_complete()', {expr = true})
-smap('<S-Tab>', 'v:lua.s_tab_complete()', {expr = true})
 -- }}}
 -- {{{1 Luapad
 luapad_init = function()
@@ -1133,7 +1107,10 @@ vim.cmd [[
 	augroup end
 ]]
 vim.opt.guicursor:append({ 'i:ver100-iCursor', 'i:blinkon2' })
-vim.o.guifont = 'Fira Code:h14'
+vim.o.guifont = 'Fira Code:h11'
+vim.g.neovide_refresh_rate = 120
+vim.g.neovide_cursor_antialiasing = false
+vim.g.neovide_cursor_vfx_mode = 'pixiedust'
 -- }}}
 -- {{{1 Legacy VimScript
 -- }}}

@@ -5,21 +5,9 @@ if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
 	printf '%d%s\n' "${EPOCHSECONDS}" ': profile-polaris' >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
 fi
 
+declare -a global_exports
+
 SQLITE_HISTORY="${XDG_DATA_HOME}/sqlite_history"
-# nvidia proprietary
-#MOZ_X11_EGL=1
-#LIBVA_DRIVER_NAME=nvidia
-#VDPAU_DRIVER=nvidia
-# nouveau
-LIBVA_DRIVER_NAME=nouveau
-VDPAU_DRIVER=nouveau
-# wayland shortcomings
-XCURSOR_THEME=Breeze_Snow
-XCURSOR_SIZE=16
-#QT_QPA_PLATFORM='xcb;wayland'
-# for theme consistency with dracula
-#QT_QPA_PLATFORMTHEME=qt5ct
-WINIT_UNIX_BACKEND=x11
 NQDIR="${HOME}/tmpfs/nq"
 MPC_HOST="${XDG_RUNTIME_DIR}/mpc/socket"
 LIBVIRT_DEFAULT_URI="qemu:///system"
@@ -29,8 +17,9 @@ CARGO_HOME="${XDG_DATA_HOME}/cargo"
 RUSTUP_HOME="${XDG_DATA_HOME}/rustup"
 
 # available inside the terminal, not necessarily GUI applications
-export SQLITE_HISTORY LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE MPC_HOST NQDIR LIBVIRT_DEFAULT_URI WINIT_UNIX_BACKEND WINIT_UNIX_BACKEND DO_NOT_TRACK VIVID_LS_THEME CARGO_HOME RUSTUP_HOME
+export SQLITE_HISTORY MPC_HOST NQDIR LIBVIRT_DEFAULT_URI DO_NOT_TRACK VIVID_LS_THEME CARGO_HOME RUSTUP_HOME
 
+# override .profile exports
 if is_cmd nvim; then
 	EDITOR='nvim'
 	VISUAL=${EDITOR}
@@ -38,10 +27,19 @@ if is_cmd nvim; then
 	export EDITOR VISUAL SUDO_EDITOR
 fi
 
-path_exports+=( "${CARGO_HOME}/bin" )
+if is_cmd firefox; then
+	export BROWSER=firefox
+	global_exports+=( BROWSER )
+fi
 
-# leads to regenerating environment.d/50-profile.conf for systemd-environment-d-generator and global availability (terminal, wayland, systemd-user services)
-global_exports=( LIBVA_DRIVER_NAME VDPAU_DRIVER XCURSOR_THEME XCURSOR_SIZE WINIT_UNIX_BACKEND DO_NOT_TRACK )
+if is_cmd kitty; then
+	export TERMINAL=kitty
+	global_exports+=( TERMINAL )
+fi
+
+global_exports+=( LIBVIRT_DEFAULT_URI DO_NOT_TRACK EDITOR VISUAL SUDO_EDITOR )
+path_exports+=( "${CARGO_HOME}/bin" )
+# leads to regenerating environment.d/50-profile.conf for systemd-environment-d-generator and global availability (terminal, gdm/gnome, systemd-user services)
 env_exports+=( "${global_exports[@]}" )
 pam_exports+=( "${global_exports[@]}" )
 

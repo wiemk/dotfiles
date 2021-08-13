@@ -76,7 +76,7 @@ external_menu="dmenu -i -l 30 -p Search:"
     #chafa-4
     #chafa-8
 #(YTFZF_THUMB_DISP_METHOD)
-thumb_disp_method="catimg"
+thumb_disp_method="ueberzug"
 
 #the amount of characters that can fit on a line in the external menu
 #tweek this for better formatting if the external menu looks weird

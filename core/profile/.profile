@@ -156,6 +156,20 @@ write_envd_exports() {
 	fi
 }
 
+export_envd() {
+	# unused for now, synchronizes env.d + profile variables in a 1:1 fashion
+	shopt -s nullglob
+	local -r envd="${XDG_CONFIG_HOME}/environment.d"
+	set -a
+	if [[ -d $fragment ]]; then
+		for fragment in "${envd}"/*.conf
+		do
+			source "$fragment"
+		done
+	fi
+	set +a
+}
+
 # load host specific profile
 source_machine_profile
 # export canonicalized 'path_exports' entries after sourcing host specific profile
