@@ -8,6 +8,8 @@ new_tab bash
 launch /usr/bin/bash -i
 new_tab tmux
 launch fish -c 'tma'
+new_tab irc
+launch /usr/bin/weechat
 new_tab mpd
 launch /usr/bin/ncmpcpp -q
 
