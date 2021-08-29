@@ -15,9 +15,10 @@ DO_NOT_TRACK=1
 VIVID_LS_THEME=tokyonight
 CARGO_HOME="${XDG_DATA_HOME}/cargo"
 RUSTUP_HOME="${XDG_DATA_HOME}/rustup"
+GOPATH="${XDG_DATA_HOME}/go"
 
 # available inside the terminal, not necessarily GUI applications
-export SQLITE_HISTORY MPC_HOST NQDIR LIBVIRT_DEFAULT_URI DO_NOT_TRACK VIVID_LS_THEME CARGO_HOME RUSTUP_HOME
+export SQLITE_HISTORY MPC_HOST NQDIR LIBVIRT_DEFAULT_URI DO_NOT_TRACK VIVID_LS_THEME CARGO_HOME RUSTUP_HOME GOPATH
 
 # override .profile exports
 if is_cmd nvim; then
@@ -38,7 +39,7 @@ if is_cmd kitty; then
 fi
 
 global_exports+=( LIBVIRT_DEFAULT_URI DO_NOT_TRACK EDITOR VISUAL SUDO_EDITOR )
-path_exports+=( "${CARGO_HOME}/bin" )
+path_exports+=( "${CARGO_HOME}/bin" "${GOPATH}/bin")
 # leads to regenerating environment.d/50-profile.conf for systemd-environment-d-generator and global availability (terminal, gdm/gnome, systemd-user services)
 env_exports+=( "${global_exports[@]}" )
 pam_exports+=( "${global_exports[@]}" )

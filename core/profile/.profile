@@ -143,7 +143,7 @@ is_equal() {
 write_pamd_exports() {
 	render_exp="$(create_pamd_export)"
 	if ! is_equal "${HOME}/.pam_environment" "$render_exp"; then
-		printf '%s\n' "${HOME}/.pam_environment updated" >&2
+		printf '%s\n' "${HOME}/.pam_environment updated!" >&2
 		printf '%s\n' "$render_exp" > "${HOME}/.pam_environment"
 	fi
 }
@@ -151,7 +151,7 @@ write_pamd_exports() {
 write_envd_exports() {
 	render_exp="$(create_envd_export)"
 	if ! is_equal "${XDG_CONFIG_HOME}/environment.d/50-profile.conf" "$render_exp"; then
-		printf '%s\n' "${XDG_CONFIG_HOME}/environment.d/50-profile.conf updated" >&2
+		printf '%s\n' "${XDG_CONFIG_HOME}/environment.d/50-profile.conf updated!" >&2
 		printf '%s\n' "$render_exp" > "${XDG_CONFIG_HOME}/environment.d/50-profile.conf"
 	fi
 }
@@ -174,8 +174,11 @@ export_envd() {
 source_machine_profile
 # export canonicalized 'path_exports' entries after sourcing host specific profile
 export_user_paths
-# serialize
-write_pamd_exports
-write_envd_exports
+
+# has to be manually called by the user
+generate-env() {
+	write_pamd_exports
+	write_envd_exports
+}
 
 # vim: ft=bash ts=4 sw=4 noet

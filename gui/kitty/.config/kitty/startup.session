@@ -1,15 +1,23 @@
 new_tab
 launch
-new_tab
-launch
-launch
-launch
 new_tab bash
 launch /usr/bin/bash -i
+new_tab split
+launch
+launch
+launch
+new_tab toolbox
+launch /usr/bin/toolbox enter
 new_tab tmux
 launch fish -c 'tma'
-new_tab irc
-launch /usr/bin/weechat
-new_tab mpd
-launch /usr/bin/ncmpcpp -q
+new_tab electra
+launch ssh electra
+new_tab altair
+launch ssh altair
+new_tab navi
+launch ssh navi
+new_tab sirius
+launch ssh sirius
+new_tab
+launch fish -c 'irc'
 

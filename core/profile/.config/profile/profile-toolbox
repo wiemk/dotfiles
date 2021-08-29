@@ -1,0 +1,26 @@
+# shellcheck shell=bash
+# profile-polaris sourced by ~/.profile
+# DEBUG
+if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
+	printf '%d%s\n' "${EPOCHSECONDS}" ': profile-toolbox' >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
+fi
+
+VIVID_LS_THEME=tokyonight
+CARGO_HOME="${XDG_DATA_HOME}/cargo"
+RUSTUP_HOME="${XDG_DATA_HOME}/rustup"
+GOPATH="${XDG_DATA_HOME}/go"
+
+# available inside the terminal, not necessarily GUI applications
+export VIVID_LS_THEME CARGO_HOME RUSTUP_HOME GOPATH
+
+# override .profile exports
+if is_cmd nvim; then
+	EDITOR='nvim'
+	VISUAL=${EDITOR}
+	SUDO_EDITOR=${EDITOR}
+	export EDITOR VISUAL SUDO_EDITOR
+fi
+
+path_exports+=( "${CARGO_HOME}/bin" "${GOPATH}/bin")
+
+# vim: ft=bash ts=4 sw=4 noet

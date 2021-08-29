@@ -6,7 +6,8 @@ if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
 fi
 
 # load .profile since .bash_profile takes priority
-if [[ -f ~/.profile && -z $PROFILE_SOURCED ]]; then
+# if [[ -f ~/.profile && -z $PROFILE_SOURCED ]]; then
+if [[ -f ~/.profile ]]; then
 	source ~/.profile
 fi
 
