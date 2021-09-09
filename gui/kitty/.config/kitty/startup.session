@@ -1,11 +1,11 @@
 new_tab
 launch
-new_tab bash
-launch /usr/bin/bash -i
 new_tab split
 launch
 launch
 launch
+new_tab bash
+launch /usr/bin/bash -i
 new_tab toolbox
 launch /usr/bin/toolbox enter
 new_tab tmux

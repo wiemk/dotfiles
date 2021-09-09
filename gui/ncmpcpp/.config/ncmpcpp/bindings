@@ -3,11 +3,6 @@ def_key "/"
 def_key "/"
     find_item_forward
 
-def_key "+"
-    show_clock
-def_key "="
-    volume_up
-
 def_key "j"
     scroll_down
 def_key "k"
@@ -36,3 +31,9 @@ def_key "J"
     move_sort_order_down
 def_key "K"
     move_sort_order_up
+
+def_key "right"
+  seek_forward
+
+def_key "left"
+  seek_backward

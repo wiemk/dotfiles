@@ -129,15 +129,15 @@ require'packer'.startup(function()
 	use { 'nvim-telescope/telescope.nvim',
 		requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
 	}
-	use { 'Shatur/neovim-session-manager',
-		setup =  function()
-			vim.g.autosave_last_session = false
-			vim.g.sessions_dir = vim.fn.stdpath('cache') .. '/sessions/'
-		end,
-		config = function()
-			require'telescope'.load_extension('session_manager')
-		end
-	}
+	-- use { 'Shatur/neovim-session-manager',
+	-- 	setup =  function()
+	-- 		vim.g.autosave_last_session = false
+	-- 		vim.g.sessions_dir = vim.fn.stdpath('cache') .. '/sessions/'
+	-- 	end,
+	-- 	config = function()
+	-- 		-- require'telescope'.load_extension('session_manager')
+	-- 	end
+	-- }
 	-- Native telescope fuzzy sorter
 	use { 'nvim-telescope/telescope-fzy-native.nvim',
 		requires = {'nvim-telescope/telescope.nvim'},
@@ -960,8 +960,8 @@ nmap('<leader>Gp', [[<Cmd>lua require'telescope.builtin'.git_bcommits()<CR>]], o
 nmap('<leader>g', [[<Cmd>lua require'telescope.builtin'.git_files()<CR>]], opts)
 nmap('<leader>H', [[<Cmd>lua require'telescope.builtin'.help_tags()<CR>]], opts)
 -- Extensions
-nmap('<leader>S', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
-nmap('<F9>', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
+-- nmap('<leader>S', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
+-- nmap('<F9>', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
 -- }}}
 -- {{{1 Gutentags
 -- vim.g.gutentags_cache_dir = vim.fn.stdpath('cache') .. '/tags'

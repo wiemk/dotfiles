@@ -6,7 +6,6 @@ if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
 fi
 
 # shell options
-set +H
 shopt -s extglob
 shopt -s lastpipe
 shopt -s direxpand
@@ -70,6 +69,12 @@ else
 	export PROMPT_COMMAND=displayPS1
 fi
 
+# Source global definitions
+if [[ -f /etc/bashrc ]]; then
+	source /etc/bashrc
+fi
+
+# utility functions
 tma() {
 	local sess='main'
 	if (( $# > 0 )); then
@@ -78,25 +83,58 @@ tma() {
 	command tmux new-session -A -s "${sess}" -t 'primary'
 }
 
-# utility functions
 bashquote() { printf '%q\n' "$(</dev/stdin)"; }
 up() { cd $(printf '../%.0s' $(seq 1 $1)); }
 alias ..='up'
 
-# Source global definitions
-if [[ -f /etc/bashrc ]]; then
-	source /etc/bashrc
-fi
+__ehc()
+{
+	if [[ -n $1 ]]; then
+		bind '"\er": redraw-current-line'
+		bind '"\e^": magic-space'
+		READLINE_LINE=${READLINE_LINE:+${READLINE_LINE:0:READLINE_POINT}}${1}${READLINE_LINE:+${READLINE_LINE:READLINE_POINT}}
+		READLINE_POINT=$(( READLINE_POINT + ${#1} ))
+	else
+		bind '"\er":'
+		bind '"\e^":'
+	fi
+}
 
 if is_cmd zoxide; then
 	eval "$(zoxide init bash)"
 	if is_cmd fzf; then
-		bind '"\er": redraw-current-line'
-		bind '"\C-x": "zi\e\C-e\r"'
-		bind '"\C-xx": "zi\r\e\C-e\er"'
+		bind '"\C-x": "\C-x2\e^\er"'
+		bind '"\C-xx": "\C-x2\e^\er"'
+		bind -x '"\C-x2": zi';
 	fi
 fi
 
-[[ -f .bashrc.local ]] && source .bashrc.local || true
+if is_cmd fzf; then
+	# https://github.com/junegunn/fzf/wiki/examples#command-history
+	bind '"\C-r": "\C-x1\e^\er"'
+	bind -x '"\C-x1": __fzf_history';
+
+	__fzf_history ()
+	{
+		__ehc "$(history | fzf --tac --tiebreak=index | perl -ne 'm/^\s*([0-9]+)/ and print "!$1"')"
+	}
+
+	fkill() {
+		local pid 
+		if [[ "$UID" != "0" ]]; then
+			pid=$(ps -f -u $UID --no-headers | fzf -m | awk '{print $2}')
+		else
+			pid=$(ps -ef --no-headers | fzf -m | awk '{print $2}')
+		fi
+
+		if [[ -n $pid ]]; then
+			echo $pid | xargs kill -${1:-15}
+		fi
+	}
+fi
+
+if [[ -f ~/.bashrc.local ]]; then
+	source ~/.bashrc.local
+fi
 
 # vim: ft=bash ts=4 sw=4 noet
