@@ -62,7 +62,7 @@ require'packer'.startup(function()
 	use 'tpope/vim-fugitive'              -- Git commands in nvim
 	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
 	use 'tjdevries/astronauta.nvim'       -- Keymap wrapper functions
-	use 'antoinemadec/FixCursorHold.nvim' -- Temporary fix for neovim #12587
+	-- use 'antoinemadec/FixCursorHold.nvim' -- Temporary fix for neovim #12587
 	use 'ggandor/lightspeed.nvim'         -- Motion plugin
 	-- Tokyonight theme
 	use { 'folke/tokyonight.nvim',
@@ -466,7 +466,7 @@ end
 vim.cmd [[
 	augroup linediag
 		autocmd!
-		autocmd CursorHold,CursorHoldI * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
+		" autocmd CursorHold,CursorHoldI * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
 	augroup end
 ]]
 -- 2}}}

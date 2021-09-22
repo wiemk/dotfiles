@@ -9,15 +9,8 @@ launch /usr/bin/bash -i
 new_tab toolbox
 launch /usr/bin/toolbox enter
 new_tab tmux
-launch fish -c 'tma'
-new_tab electra
-launch ssh electra
-new_tab altair
-launch ssh altair
-new_tab navi
-launch ssh navi
-new_tab sirius
-launch ssh sirius
-new_tab
-launch fish -c 'irc'
+launch /usr/bin/tmux new-session -A -s main
+new_tab ssh
+# work around a data race issue
+launch sh -c 'sleep 0.1s; /usr/bin/tmux new-session -A -s ssh'
 
