@@ -466,7 +466,7 @@ end
 vim.cmd [[
 	augroup linediag
 		autocmd!
-		" autocmd CursorHold,CursorHoldI * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
+		autocmd CursorHold,CursorHoldI * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
 	augroup end
 ]]
 -- 2}}}
