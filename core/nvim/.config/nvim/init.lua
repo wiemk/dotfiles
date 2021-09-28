@@ -62,7 +62,6 @@ require'packer'.startup(function()
 	use 'tpope/vim-fugitive'              -- Git commands in nvim
 	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
 	use 'tjdevries/astronauta.nvim'       -- Keymap wrapper functions
-	-- use 'antoinemadec/FixCursorHold.nvim' -- Temporary fix for neovim #12587
 	use 'ggandor/lightspeed.nvim'         -- Motion plugin
 	-- Tokyonight theme
 	use { 'folke/tokyonight.nvim',
@@ -126,18 +125,7 @@ require'packer'.startup(function()
 		config = function() gitsigns_init(); end
 	}
 	-- UI to select things (files, grep results, open buffers...)
-	use { 'nvim-telescope/telescope.nvim',
-		requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}
-	}
-	-- use { 'Shatur/neovim-session-manager',
-	-- 	setup =  function()
-	-- 		vim.g.autosave_last_session = false
-	-- 		vim.g.sessions_dir = vim.fn.stdpath('cache') .. '/sessions/'
-	-- 	end,
-	-- 	config = function()
-	-- 		-- require'telescope'.load_extension('session_manager')
-	-- 	end
-	-- }
+	use { 'nvim-telescope/telescope.nvim', requires = {'nvim-lua/plenary.nvim'}}
 	-- Native telescope fuzzy sorter
 	use { 'nvim-telescope/telescope-fzy-native.nvim',
 		requires = {'nvim-telescope/telescope.nvim'},
@@ -474,11 +462,9 @@ vim.cmd [[
 -- {{{1 Treesitter
 treesitter_init = function()
 	require'nvim-treesitter.configs'.setup {
-		-- debatable whether this should be commented or not
-		-- ensure_installed = 'maintained', -- one of 'all', 'maintained' (parsers with maintainers), or a list of languages
 		ensure_installed = 'maintained',
 		highlight = {
-			enable = true,              -- false will disable the whole extension
+			enable = true,
 			-- disable = { 'lua' }
 		},
 		incremental_selection = {
@@ -496,7 +482,8 @@ treesitter_init = function()
 		textobjects = {
 			select = {
 				enable = true,
-				lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
+				-- Automatically jump forward to textobj, similar to targets.vim
+				lookahead = true,
 				keymaps = {
 					-- You can use the capture groups defined in textobjects.scm
 					['af'] = '@function.outer',
@@ -507,7 +494,8 @@ treesitter_init = function()
 			},
 			move = {
 				enable = true,
-				set_jumps = true, -- whether to set jumps in the jumplist
+				-- whether to set jumps in the jumplist
+				set_jumps = true,
 				goto_next_start = {
 					[']m'] = '@function.outer',
 					[']]'] = '@class.outer',
@@ -907,11 +895,11 @@ require'telescope'.setup {
 			find_command = find_cmd
 		},
 		live_grep = {
-			-- extending the default values
+			-- extending default values instead of overwriting
 			vimgrep_arguments = (function()
 				local args = vim.tbl_values(require("telescope.config").values.vimgrep_arguments)
-				table.insert(args, "--hidden")
-				return args
+				local ext = { "--hidden", "--glob", "!.git/**" }
+				return vim.tbl_flatten({ args, ext })
 			end)()
 		},
 		git_files = {

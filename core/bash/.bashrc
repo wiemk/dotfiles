@@ -5,7 +5,11 @@ if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
 	printf '%d%s\n' "${EPOCHSECONDS}" ': .bashrc' >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
 fi
 
-# shell options
+HISTCONTROL=ignoreboth
+HISTSIZE=1000
+HISTFILESIZE=5000
+
+shopt -s histappend
 shopt -s extglob
 shopt -s lastpipe
 shopt -s direxpand
