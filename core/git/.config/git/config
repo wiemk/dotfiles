@@ -4,13 +4,20 @@
 [alias]
 	a = add --all
 	a-p = add --all --patch
+	ap = add --patch
 	ainit = "!git init && git add --all && git commit -m 'initial commit'"
 	amend = commit --amend
+	b = branch -vv --sort=-committerdate
 	br = branch
 	bra = branch -vv
+	ca = commit --amend --no-edit
+	cm = commit --amend -o
 	ci = commit
 	ci-m = commit -m
 	co = checkout
+	cr = reset HEAD~1
+	d = diff --summary --stat --patch
+	dc = diff --cached
 	di = diff
 	emerge = merge --edit --no-ff
 	export = "!touch \"$(git rev-parse --git-dir)/git-daemon-export-ok\""
@@ -21,6 +28,12 @@
 	fetch-notes = "!git config --add remote.origin.fetch \"+refs/notes/*:refs/notes/*\" && git fetch origin"
 	fetch-pr = "!git config --add remote.origin.fetch \"+refs/pull/*/head:refs/remotes/pr/*\" && git fetch origin"
 	in = log --oneline --decorate ..@{upstream}
+	inc = log --name-status origin/master..
+	l = log --format=format:'%C(auto)%h%d%C(reset) %s %C(bold blue)(%an, %ar)%C(reset)'
+	ll = log --stat --decorate --abbrev-commit --date=relative
+	lll = log -p --stat --decorate --color-moved --pretty=fuller
+	lt = log --topo-order --format=format:'%C(auto)%h%d%C(reset) %s %C(bold blue)(%an, %ar)%C(reset)'
+	lm = log --oneline --decorate --topo-order --merges --ancestry-path
 	lg = log --oneline --decorate
 	lgs = log --format=\"%C(yellow)%h%C(reset)%C(cyan)% GK%C(reset) %s\"
 	logs = log --show-signature
@@ -29,18 +42,33 @@
 	lsf = ls-files
 	lsr = "!_() { [ \"$1\" ] || set -- HEAD; git ls-tree -r \"$@\"; }; _"
 	lsb = "!git ls-tree -r -t -l --full-name HEAD | sort -n -k 4 | tail -n 10"
+	m = merge --no-ff
 	mend = commit --amend --reuse-message HEAD
+	mt = mergetool
 	mkobject = hash-object --stdin -w
 	out = log --oneline --decorate @{upstream}..
+	p = push
+	pg = pagediffs
+	pushnoci = push -o ci.skip
 	rbc = rebase --continue
 	rbs = rebase -i
 	re = rebase
 	rec = rebase --continue
+	ref = rev-parse --symbolic-full-name
 	refs = for-each-ref
 	repack-to-alternate = repack -dal
 	repack-to-local = repack -da
+	rl = reflog --date=relative
+	rll = reflog --date=relative --stat
+	rlll = reflog --date=relative -p --stat --color-moved
+	sd = "!_() { git stash drop stash@{${1:-0}}; };_"
 	sg = diff --cached
-	st = status
+	sh = show --summary --stat --pretty=fuller --patch
+	short = rev-parse --short
+	sl = stash list --name-status --pretty='format:%gd [%ar]: %s'
+	ss = "!_() { git stash show -p stash@{${1:-0}}; };_"
+	st = status -s -b
+	sti = status -s -b --ignored
 	staged = diff --cached
 	stat = diff --stat
 	statg = diff --cached --stat
@@ -50,43 +78,18 @@
 	tip = !git --no-pager log -1 --decorate --abbrev-commit --date=relative
 	uncommit = reset HEAD^
 	undo = reset --soft HEAD^
-	unexport = "!rm -v \"$(git rev-parse --git-dir)/git-daemon-export-ok\""
+	unexport = "!set -x && rm -v \"$(git rev-parse --git-dir)/git-daemon-export-ok\""
 	wdiff = diff --word-diff
+	which = "!_() { git config --global --get alias.$1; };_"
 	wshow = show --word-diff
 	ic = commit
 	tig = !tig
-
-	# new aliases, may overwrite old ones
-	b = branch -vv --sort=-committerdate
-	ap = add --patch
-	ca = commit --amend --no-edit
-	cm = commit --amend -o
-	ci = commit
-	cr = reset HEAD~1
-	co = checkout
-	inc = log --name-status origin/master..
-	d = diff --summary --stat --patch
-	dc = diff --cached
 	ff = merge --ff-only
-	m = merge --no-ff
-	mt = mergetool
-	p = push
-	pushnoci = push -o ci.skip
-	pg = pagediffs
-	short = rev-parse --short
-	ref = rev-parse --symbolic-full-name
-	sh = show --summary --stat --pretty=fuller --patch
-	st = status -s -b
-	sti = status -s -b --ignored
-	stat = diff --stat
-	sl = stash list --name-status --pretty='format:%gd [%ar]: %s'
-	ss = "!_() { git stash show -p stash@{${1:-0}}; };_"
-	sd = "!_() { git stash drop stash@{${1:-0}}; };_"
-	which = "!_() { git config --global --get alias.$1; };_"
-	churn = "!sh -c '!git log --all -M -C --name-only --format='format:' "$@" \
-		| grep . | sort | uniq -c | sort -n -r'"
+	ch = cherry-pick
 	whoami = !git var GIT_COMMITTER_IDENT | sed 's/>.*/>/'
 
+	churn = "!sh -c '!git log --all -M -C --name-only --format='format:' "$@" \
+		| grep . | sort | uniq -c | sort -n -r'"
 	# Fetch all or one remote:
 	#   git f
 	#   git f upstream
@@ -125,15 +128,6 @@
 		${1:?Missing branch} HEAD \
 		| awk '\\''/<<<<<<</ { print \"Conflicts found\"; exit 1 }'\\''' -"
 
-	l = log --format=format:'%C(auto)%h%d%C(reset) %s %C(bold blue)(%an, %ar)%C(reset)'
-	ll = log --stat --decorate --abbrev-commit --date=relative
-	lll = log -p --stat --decorate --color-moved --pretty=fuller
-	lt = log --topo-order --format=format:'%C(auto)%h%d%C(reset) %s %C(bold blue)(%an, %ar)%C(reset)'
-	lm = log --oneline --decorate --topo-order --merges --ancestry-path
-
-	rl = reflog --date=relative
-	rll = reflog --date=relative --stat
-	rlll = reflog --date=relative -p --stat --color-moved
 
 	# Show the Git log and automatically shorten & search for a SHA:
 	#   git lf deb8dff8d8c1ed8acb7d7a2ec1158e7db136aab3
@@ -142,9 +136,6 @@
 
 	# Use sk to quickly filter available files.
 	sk = "!git ls-files | sk"
-
-	# http://tbaggery.com/2011/08/08/effortless-ctags-with-git.html
-	ctags = !.git/hooks/ctags
 
 	# Merge a GitHub pull request into the current branch.
 	# Usage: git preq <preq>
@@ -242,6 +233,13 @@
 [merge]
 	conflictStyle = diff3
 	defaultToUpstream = true
+	tool = vimdiff
+
+[mergetool]
+	prompt = false
+
+[mergetool "vimdiff"]
+	cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
 
 [push]
 	#default = upstream
