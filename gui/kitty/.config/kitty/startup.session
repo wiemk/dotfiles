@@ -4,10 +4,10 @@ new_tab split
 launch
 launch
 launch
-new_tab tmux
-launch /usr/bin/tmux new-session -A -s main
 new_tab bash
 launch /usr/bin/bash -i
+new_tab tmux
+launch /usr/bin/tmux new-session -A -s main
 new_tab toolbox
 launch /usr/bin/toolbox enter
 

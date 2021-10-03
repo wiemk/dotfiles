@@ -44,6 +44,7 @@
 	lsb = "!git ls-tree -r -t -l --full-name HEAD | sort -n -k 4 | tail -n 10"
 	m = merge --no-ff
 	mend = commit --amend --reuse-message HEAD
+	amp = "!git commit --all --amend --reuse-message HEAD && git push --force-with-lease"
 	mt = mergetool
 	mkobject = hash-object --stdin -w
 	out = log --oneline --decorate @{upstream}..

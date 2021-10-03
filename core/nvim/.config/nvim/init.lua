@@ -60,9 +60,16 @@ require'packer'.startup(function()
 	use 'machakann/vim-sandwich'          -- Surround text objects
 	use 'tpope/vim-commentary'            -- 'gc' to comment visual regions/lines
 	use 'tpope/vim-fugitive'              -- Git commands in nvim
-	use 'ludovicchabant/vim-gutentags'    -- Automatic tags management
 	use 'tjdevries/astronauta.nvim'       -- Keymap wrapper functions
 	use 'ggandor/lightspeed.nvim'         -- Motion plugin
+	-- Automatic tags management
+	use { 'ludovicchabant/vim-gutentags',
+		setup = function()
+			vim.g.gutentags_enabled = false
+			vim.g.gutentags_ctags_tagfile = '.tags'
+			vim.g.gutentags_file_list_command = 'fd'
+		end
+	}
 	-- Tokyonight theme
 	use { 'folke/tokyonight.nvim',
 		setup = function()
@@ -950,11 +957,6 @@ nmap('<leader>H', [[<Cmd>lua require'telescope.builtin'.help_tags()<CR>]], opts)
 -- Extensions
 -- nmap('<leader>S', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
 -- nmap('<F9>', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
--- }}}
--- {{{1 Gutentags
--- vim.g.gutentags_cache_dir = vim.fn.stdpath('cache') .. '/tags'
-vim.g.gutentags_ctags_tagfile = '.tags'
-vim.g.gutentags_file_list_command = 'fd'
 -- }}}
 -- {{{1 cmp
 cmp_init = function()
