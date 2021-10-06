@@ -65,7 +65,7 @@ require'packer'.startup(function()
 	-- Automatic tags management
 	use { 'ludovicchabant/vim-gutentags',
 		setup = function()
-			vim.g.gutentags_enabled = false
+			vim.g.gutentags_enabled = true
 			vim.g.gutentags_ctags_tagfile = '.tags'
 			vim.g.gutentags_file_list_command = 'fd'
 		end
@@ -120,7 +120,7 @@ require'packer'.startup(function()
 			}
 			wk.register({
 				c = { "Yank to CLIPBOARD" },
-				C = { "Yank to PRIMARY"}
+				y = { "Yank to PRIMARY"}
 			}, { prefix = '<leader>', mode = 'x'})
 		end
 	}
@@ -146,6 +146,22 @@ require'packer'.startup(function()
 	-- Automatically create parenthesis pairs
 	use { 'windwp/nvim-autopairs',
 		config = function() autopairs_init(); end
+	}
+	-- Bookmarks in QuickFix
+	use { 'MattesGroeger/vim-bookmarks',
+	setup = function()
+		vim.g.bookmark_auto_save_file = vim.fn.stdpath('cache') .. '/bookmarks'
+		vim.g.bookmark_save_per_working_dir = false
+		vim.g.bookmark_auto_save = false
+		vim.g.bookmark_disable_ctrlp = true
+		vim.g.bookmark_highlight_lines = true
+		vim.g.bookmark_manage_per_buffer = false
+	end
+	}
+	-- Bookmark support for Telescope
+	use { 'tom-anders/telescope-vim-bookmarks.nvim',
+		requires = {'nvim-telescope/telescope.nvim'},
+		config = function() require'telescope'.load_extension('vim_bookmarks'); end
 	}
 end)
 -- }}}
@@ -230,6 +246,9 @@ vim.o.inccommand = 'nosplit'
 -- Set highlight on search
 vim.o.hlsearch = true
 vim.o.incsearch = true
+
+-- No magic by default
+vim.opt.magic = false
 
 -- Keep cursor away from screen edge
 vim.o.scrolloff = 5
@@ -346,28 +365,28 @@ local on_attach = function(client, bufnr)
 	end)('nvic')
 
 	local opts = { noremap=true, silent=true }
-	map.n('<leader>pgD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-	map.n('<leader>pgd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-	map.n('<leader>pk', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-	map.n('<leader>pK', '<Cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-	map.n('<leader>pgi', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-	map.n('<leader>pwa', '<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-	map.n('<leader>pwr', '<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-	map.n('<leader>pwl', '<Cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-	map.n('<leader>pD', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-	map.n('<leader>prn', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
-	map.n('<leader>pgr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
-	map.n('<leader>pca', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-	map.n('<leader>pe', '<Cmd>lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})<CR>', opts)
-	map.n('<leader>pö', '<Cmd>lua vim.lsp.diagnostic.goto_prev({popup_opts = {focusable = false}})<CR>', opts)
-	map.n('<leader>pä', '<Cmd>lua vim.lsp.diagnostic.goto_next({popup_opts = {focusable = false}})<CR>', opts)
-	map.n('<leader>pq', '<Cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+	map.n('<leader>lgD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+	map.n('<leader>lgd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+	map.n('<leader>lk', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+	map.n('<leader>lK', '<Cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+	map.n('<leader>li', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+	map.n('<leader>ld', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+	map.n('<leader>lR', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
+	map.n('<leader>lr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
+	map.n('<leader>la', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+	map.n('<leader>le', '<Cmd>lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})<CR>', opts)
+	map.n('<leader>lö', '<Cmd>lua vim.lsp.diagnostic.goto_prev({popup_opts = {focusable = false}})<CR>', opts)
+	map.n('<leader>lä', '<Cmd>lua vim.lsp.diagnostic.goto_next({popup_opts = {focusable = false}})<CR>', opts)
+	map.n('<leader>lq', '<Cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+	map.n('<leader>lwa', '<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+	map.n('<leader>lwr', '<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+	map.n('<leader>lwl', '<Cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
 
 	-- Set some keybinds conditional on server capabilities
 	if client.resolved_capabilities.document_formatting then
-		map.n('<space>f', '<Cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+		map.n('<leader>F', '<Cmd>lua vim.lsp.buf.formatting()<CR>', opts)
 	elseif client.resolved_capabilities.document_range_formatting then
-		map.n('<space>f', '<Cmd>lua vim.lsp.buf.range_formatting()<CR>', opts)
+		map.n('<leader>F', '<Cmd>lua vim.lsp.buf.range_formatting()<CR>', opts)
 	end
 end
 -- 2}}}
@@ -376,7 +395,7 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 do
 	capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 	local servers = {
-		-- 'clangd',
+		'clangd',
 		-- 'dockerls',
 		-- 'bashls',
 		-- 'cmake',
@@ -566,8 +585,8 @@ indent_init = function()
 		indent_tab_guides = true;
 		indent_soft_pattern = '\\s';
 		exclude_filetypes = {'help','dashboard','dashpreview','NvimTree','vista','sagahover'};
-		odd_colors = { fg='#565f89',bg='#2a2e42' };
-		even_colors = { fg='#414868',bg='#2e3346' };
+		odd_colors = { fg='#565f89',bg='bg' };
+		even_colors = { fg='#414868',bg='bg' };
 	}
 end
 -- }}}
@@ -738,7 +757,7 @@ vmap('H', '_')
 vmap('L', '$')
 
 nmap('<C-f>', '/')
--- nmap('<C-q>', ':q<CR>')
+nmap('<C-q>', '<Cmd>close<CR>')
 nmap('<C-s>', ':w<CR>')
 nmap('<C-t>', ':Telescope fd<CR>')
 nmap('u', ':undo<CR>')
@@ -769,7 +788,7 @@ nmap('<leader>cd', ':lcd %:p:h<CR>:pwd<CR>')
 nmap('<C-M-s>', ':wa<CR>:echo "All saved!"<CR>')
 
 -- Search and replace using marked text
-vmap('<C-r>', '"hy:%s/<C-r>h//gc<left><left><left>')
+vmap('<C-r>', '"vy:%s/<C-r>v//gc<left><left><left>')
 
 -- Don't yank when using delete
 nmap('<del>', '"_x')
@@ -783,8 +802,7 @@ nmap('q', 'b')
 nmap('Q', 'B')
 
 -- Save session
--- nmap('<F6>', '<Cmd>wa<Bar>exe "mksession! " . v:this_session<CR><Cmd>echo "Session saved!"<CR>')
-nmap('<F6>', '<Cmd>SaveSession<CR><Cmd>echo "Session saved!"<CR>')
+nmap('<F6>', '<Cmd>wa<Bar>exe "mksession! " . v:this_session<CR><Cmd>echo "Session saved!"<CR>')
 
 -- Update Plugins
 nmap('<leader>U', '<Cmd>PackerSync<CR>')
@@ -797,14 +815,16 @@ nmap('<F4>', 'N')
 opts = { noremap = true, silent = true }
 nmap('<S-Up>', '<Cmd>move .-2<CR>', opts)
 nmap('<S-Down>', '<Cmd>move .+1<CR>', opts)
--- need to leave visual mode (:) for the mark to be set
+-- Need to trigger CmdlineEnter/CmdlineLeave events, so do not use <Cmd>
 vmap('<S-Up>', ':move \'<-2<CR>gv=gv', opts)
 vmap('<S-Down>', ':move \'>+1<CR>gv=gv', opts);
 
 -- Yank to CLIPBOARD register
 xmap('<leader>c', '"+y')
+xmap('<C-c>', '"+y')
 -- Yank to PRIMARY register
-xmap('<leader>C', '"*y')
+xmap('<leader>y', '"*y')
+xmap('<C-y>', '"*y')
 -- }}}
 -- {{{1 Abbreviations
 -- Force write with sudo, two different approaches
@@ -942,8 +962,8 @@ nmap('<leader>B', [[<Cmd>lua require'telescope.builtin'.builtin()<CR>]], opts)
 nmap('<leader>f', [[<Cmd>lua require'telescope.builtin'.find_files()<CR>]], opts)
 nmap('<leader><space>', [[<Cmd>lua require'telescope.builtin'.buffers()<CR>]], opts)
 nmap('<leader>r', [[<Cmd>lua require'telescope.builtin'.registers()<CR>]], opts)
-nmap('<leader>l', [[<Cmd>lua require'telescope.builtin'.current_buffer_fuzzy_find()<CR>]], opts)
-nmap('<leader>m', [[<Cmd>lua require'telescope.builtin'.marks()<CR>]], opts)
+nmap('<leader>p', [[<Cmd>lua require'telescope.builtin'.current_buffer_fuzzy_find()<CR>]], opts)
+-- nmap('<leader>m', [[<Cmd>lua require'telescope.builtin'.marks()<CR>]], opts)
 nmap('<leader>t', [[<Cmd>lua require'telescope.builtin'.tags()<CR>]], opts)
 nmap('<leader>?', [[<Cmd>lua require'telescope.builtin'.oldfiles()<CR>]], opts)
 nmap('<leader>i', [[<Cmd>lua require'telescope.builtin'.live_grep()<CR>]], opts)
@@ -954,10 +974,8 @@ nmap('<leader>Gs', [[<Cmd>lua require'telescope.builtin'.git_status()<CR>]], opt
 nmap('<leader>Gp', [[<Cmd>lua require'telescope.builtin'.git_bcommits()<CR>]], opts)
 nmap('<leader>g', [[<Cmd>lua require'telescope.builtin'.git_files()<CR>]], opts)
 nmap('<leader>H', [[<Cmd>lua require'telescope.builtin'.help_tags()<CR>]], opts)
--- Extensions
--- nmap('<leader>S', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
--- nmap('<F9>', [[<Cmd>lua require'telescope'.extensions.session_manager.load(require'telescope.themes'.get_dropdown({previewer = false}))<CR>]], opts)
--- }}}
+nmap('<leader>m', [[<Cmd>lua require'telescope'.extensions.vim_bookmarks.all()<CR>]], opts)
+nmap('<leader>M', [[<Cmd>lua require'telescope'.extensions.vim_bookmarks.current_file()<CR>]], opts)
 -- {{{1 cmp
 cmp_init = function()
 	local cmp = require'cmp'
@@ -980,19 +998,19 @@ cmp_init = function()
 				select = true,
 			},
 			['<Tab>'] = function(fallback)
-				if vim.fn.pumvisible() == 1 then
-					vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<C-n>', true, true, true), 'n')
+				if cmp.visible() then
+					cmp.select_next_item()
 				elseif luasnip.expand_or_jumpable() then
-					vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>luasnip-expand-or-jump', true, true, true), '')
+					luasnip.expand_or_jump()
 				else
 					fallback()
 				end
 			end,
 			['<S-Tab>'] = function(fallback)
-				if vim.fn.pumvisible() == 1 then
-					vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<C-p>', true, true, true), 'n')
+				if cmp.visible() then
+					cmp.select_prev_item()
 				elseif luasnip.jumpable(-1) then
-					vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>luasnip-jump-prev', true, true, true), '')
+					luasnip.jumpable(-1)
 				else
 					fallback()
 				end
@@ -1050,7 +1068,7 @@ vim.cmd [[
 vim.cmd [[
 	augroup YankHighlight
 		autocmd!
-		autocmd TextYankPost * silent! lua vim.highlight.on_yank { timeout = 250, higroup = "Visual" }
+		autocmd TextYankPost * silent! lua vim.highlight.on_yank { timeout = 100, higroup = "lCursor" }
 	augroup end
 ]]
 -- Remap escape to leave terminal mode

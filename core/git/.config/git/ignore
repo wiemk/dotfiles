@@ -64,3 +64,6 @@ Thumbs.db
 tags
 .tags
 
+# vim
+.vim-bookmarks
+

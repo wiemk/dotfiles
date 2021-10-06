@@ -43,8 +43,9 @@
 	lsr = "!_() { [ \"$1\" ] || set -- HEAD; git ls-tree -r \"$@\"; }; _"
 	lsb = "!git ls-tree -r -t -l --full-name HEAD | sort -n -k 4 | tail -n 10"
 	m = merge --no-ff
-	mend = commit --amend --reuse-message HEAD
-	amp = "!git commit --all --amend --reuse-message HEAD && git push --force-with-lease"
+	mend = commit --all --amend --reuse-message HEAD
+	amp = "!git add -u && git commit --amend --no-edit && git push --force-with-lease"
+	ampa = "!git commit --all --amend --no-edit && git push --force-with-lease"
 	mt = mergetool
 	mkobject = hash-object --stdin -w
 	out = log --oneline --decorate @{upstream}..
@@ -59,6 +60,8 @@
 	refs = for-each-ref
 	repack-to-alternate = repack -dal
 	repack-to-local = repack -da
+	rg = "!_() { git rev-list --topo-order --abbrev-commit --glob=\"refs/*/$(git name-rev --name-only HEAD)\" | xargs -- git grep -P \"$@\"; };_"
+	rga = "!_() { git rev-list --all --topo-order --abbrev-commit | xargs -- git grep -P \"$@\"; };_"
 	rl = reflog --date=relative
 	rll = reflog --date=relative --stat
 	rlll = reflog --date=relative -p --stat --color-moved
@@ -89,7 +92,7 @@
 	ch = cherry-pick
 	whoami = !git var GIT_COMMITTER_IDENT | sed 's/>.*/>/'
 
-	churn = "!sh -c '!git log --all -M -C --name-only --format='format:' "$@" \
+	churn = "!sh -c 'git log --all -M -C --name-only --format='format:' "$@" \
 		| grep . | sort | uniq -c | sort -n -r'"
 	# Fetch all or one remote:
 	#   git f
@@ -196,7 +199,7 @@
 	gpgsign = true
 
 [core]
-	excludefiles = ~/.config/git/ignore
+	excludesFile = ~/.config/git/ignore
 	askpass =
 	autocrlf = input
 	logAllRefUpdates = true
@@ -230,6 +233,7 @@
 
 [log]
 	decorate = auto
+	abbrevCommit = true
 
 [merge]
 	conflictStyle = diff3

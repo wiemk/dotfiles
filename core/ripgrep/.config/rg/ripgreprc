@@ -1,5 +1,5 @@
 --glob
-!.git/*
+!.git/**
 --colors
 match:style:bold
 --colors

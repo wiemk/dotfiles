@@ -66,7 +66,7 @@ else
 	export PROMPT_COMMAND=displayPS1
 fi
 
-# Source global definitions
+# Source global config *after* prompt definition
 if [[ -f /etc/bashrc ]]; then
 	source /etc/bashrc
 fi
