@@ -1,10 +1,11 @@
-# shellcheck shell=bash
+# vi:set ft=bash ts=4 sw=4 noet noai:
 
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
 	printf '%d%s\n' "${EPOCHSECONDS}" ': .bashrc' >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
 fi
 
+# Settings
 HISTCONTROL=ignoreboth
 HISTSIZE=1000
 HISTFILESIZE=5000
@@ -14,60 +15,52 @@ shopt -s extglob
 shopt -s lastpipe
 shopt -s direxpand
 
-is_cmd() {
+has() {
 	if hash "${1}" &>/dev/null; then
 		return 0
 	fi
 	return 1
 }
 
-# dircolors
-if [[ -n $VIVID_LS_THEME ]] && is_cmd vivid; then
-	# fedora uses this variable to detect custom LS_COLORS
-	LS_COLORS="$(vivid generate "$VIVID_LS_THEME" 2>/dev/null)"
-	if [[ -n $LS_COLORS ]]; then
-		export LS_COLORS
-		export USER_LS_COLORS=$VIVID_LS_THEME
-	fi
+if [[ -f /run/.containerenv ]] || systemd-detect-virt --quiet --container; then
+	export CONTAINER=1
 fi
 
-if [ -f /run/.containerenv ] \
-   && [ -f /run/.toolboxenv ]; then
-    export CONTAINER=1
-fi
-
-# prompt
-if is_cmd starship; then
+# Prompt
+if has starship; then
     eval "$(starship init bash)"
 else
+	if [[ -f /run/.toolboxenv ]]; then
+		export TOOLBOX=1
+	fi
 	PS4='+ ${BASH_SOURCE:-}:${FUNCNAME[0]:-}:L${LINENO:-}:   '
 	if [[ $(/usr/bin/tput colors) = 256 ]]; then
 		displayPS1() {
 			local rval=$?
-			local -r rempath="\[\033]0;\u@\h: \w\007\]"
+			local -r remp="\[\033]0;\u@\h: \w\007\]"
 			if (( rval == 0 )); then
 				unset rval
 			else
 				printf -v rval '\[\e[3;37m\](\[\e[1;31m\]%s\[\e[0m\]\[\e[3;37m\])\[\e[0m\] ' $rval
 			fi
-			if [[ $CONTAINER == 1 ]]; then
-				local -r container="\[\033[35m\]⬢\[\033[0m\] "
+			if [[ $TOOLBOX == 1 ]]; then
+				local -r tbox="\[\033[35m\]⬢\[\033[0m\] "
 			fi
-			PS1="${container}${rempath}\[\e[3;37m\]\A (\u)\[\e[0m\] \[\e[3;32m\]\w\[\e[0m\]\n${rval}\\[\e[1;34m\]\$\[\e[0m\] \[$(tput sgr0)\]"
+			PS1="${tbox}${remp}\[\e[3;37m\]\A (\u)\[\e[0m\] \[\e[3;32m\]\w\[\e[0m\]\n${rval}\\[\e[1;34m\]\$\[\e[0m\] \[$(tput sgr0)\]"
 		}
 	else
 		displayPS1() {
 			local rval=$?
-			local -r rempath="\[\033]0;\u@\h: \w\007\]"
+			local -r remp="\[\033]0;\u@\h: \w\007\]"
 			if (( rval == 0 )); then
 				unset rval
 			else
 				printf -v rval '(%s) ' $rval
 			fi
-			if [[ $CONTAINER == 1 ]]; then
-				local -r container="\[\033[35m\]⬢\[\033[0m\] "
+			if [[ $TOOLBOX == 1 ]]; then
+				local -r tbox="\[\033[35m\]⬢\[\033[0m\] "
 			fi
-			PS1="${container}${rempath}\A (\u) \w\n${rval}\\$ \[$(tput sgr0)\]"
+			PS1="${tbox}${remp}\A (\u) \w\n${rval}\\$ \[$(tput sgr0)\]"
 		}
 	fi
 	export PROMPT_COMMAND=displayPS1
@@ -78,7 +71,11 @@ if [[ -f /etc/bashrc ]]; then
 	source /etc/bashrc
 fi
 
-# utility functions
+# Functions
+up() { cd $(printf '../%.0s' $(seq 1 $1)); }
+bashquote() { printf '%q\n' "$(</dev/stdin)"; }
+
+## Attach tmux
 tma() {
 	local sess='main'
 	if (( $# > 0 )); then
@@ -87,10 +84,7 @@ tma() {
 	command tmux new-session -A -s "${sess}" -t 'primary'
 }
 
-bashquote() { printf '%q\n' "$(</dev/stdin)"; }
-up() { cd $(printf '../%.0s' $(seq 1 $1)); }
-alias ..='up'
-
+## Redraw prompt line
 __ehc()
 {
 	if [[ -n $1 ]]; then
@@ -104,16 +98,18 @@ __ehc()
 	fi
 }
 
-if is_cmd zoxide; then
+## zoxide fast jump
+if has zoxide; then
 	eval "$(zoxide init bash)"
-	if is_cmd fzf; then
+	if has fzf; then
 		bind '"\C-x": "\C-x2\e^\er"'
 		bind '"\C-xx": "\C-x2\e^\er"'
 		bind -x '"\C-x2": zi';
 	fi
 fi
 
-if is_cmd fzf; then
+## fzf utilities
+if has fzf; then
 	# https://github.com/junegunn/fzf/wiki/examples#command-history
 	bind '"\C-r": "\C-x1\e^\er"'
 	bind -x '"\C-x1": __fzf_history';
@@ -121,6 +117,7 @@ if is_cmd fzf; then
 	__fzf_history ()
 	{
 		__ehc "$(history | fzf --tac --tiebreak=index | perl -ne 'm/^\s*([0-9]+)/ and print "!$1"')"
+
 	}
 
 	fkill() {
@@ -137,8 +134,28 @@ if is_cmd fzf; then
 	}
 fi
 
+# Dircolors matching theme
+if [[ -n $VIVID_LS_THEME ]] && has vivid; then
+	# fedora uses this variable to detect custom LS_COLORS
+	LS_COLORS="$(vivid generate "$VIVID_LS_THEME" 2>/dev/null)"
+	if [[ -n $LS_COLORS ]]; then
+		export LS_COLORS
+		export USER_LS_COLORS=$VIVID_LS_THEME
+	fi
+fi
+
+# Aliase
+alias ..='up'
+# Create own scope for neovim and child processes
+if has nvim; then
+	if [[ -d /run/systemd/system && $CONTAINER != 1 ]]; then
+		alias vim='systemd-run --quiet --user --collect --scope nvim'
+	else
+		alias vim='nvim'
+	fi
+fi
+
 if [[ -f ~/.bashrc.local ]]; then
 	source ~/.bashrc.local
 fi
 
-# vim: ft=bash ts=4 sw=4 noet
