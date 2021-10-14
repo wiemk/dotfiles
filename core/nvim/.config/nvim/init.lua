@@ -145,7 +145,8 @@ require'packer'.startup(function()
 	}
 	-- Automatically create parenthesis pairs
 	use { 'windwp/nvim-autopairs',
-		config = function() autopairs_init(); end
+		config = function() autopairs_init(); end,
+		disable = true
 	}
 	-- Bookmarks in QuickFix
 	use { 'MattesGroeger/vim-bookmarks',
@@ -365,22 +366,26 @@ local on_attach = function(client, bufnr)
 	end)('nvic')
 
 	local opts = { noremap=true, silent=true }
-	map.n('<leader>lgD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-	map.n('<leader>lgd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-	map.n('<leader>lk', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+	map.n('<leader>lD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+	map.n('<leader>ld', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+	map.n('<leader>lh', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
 	map.n('<leader>lK', '<Cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
 	map.n('<leader>li', '<Cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-	map.n('<leader>ld', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+	map.n('<leader>lt', '<Cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
 	map.n('<leader>lR', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
 	map.n('<leader>lr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
 	map.n('<leader>la', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
 	map.n('<leader>le', '<Cmd>lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})<CR>', opts)
-	map.n('<leader>lö', '<Cmd>lua vim.lsp.diagnostic.goto_prev({popup_opts = {focusable = false}})<CR>', opts)
-	map.n('<leader>lä', '<Cmd>lua vim.lsp.diagnostic.goto_next({popup_opts = {focusable = false}})<CR>', opts)
 	map.n('<leader>lq', '<Cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 	map.n('<leader>lwa', '<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
 	map.n('<leader>lwr', '<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
 	map.n('<leader>lwl', '<Cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+	map.n('ö', '<Cmd>lua vim.lsp.diagnostic.goto_prev({popup_opts = {focusable = false}})<CR>', opts)
+	map.n('ä', '<Cmd>lua vim.lsp.diagnostic.goto_next({popup_opts = {focusable = false}})<CR>', opts)
+	map.n('<M-k>', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+	map.n('<M-d>', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+	map.i('<M-k>', '<Cmd>lua vim.lsp.buf.hover({focusable = false})<CR>', opts)
+	map.i('<M-d>', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
 
 	-- Set some keybinds conditional on server capabilities
 	if client.resolved_capabilities.document_formatting then
@@ -577,7 +582,7 @@ end
 -- {{{1 Indent guides
 indent_init = function()
 	require'indent_guides'.setup {
-		indent_guide_size = 1;
+		indent_guide_snnn = 1;
 		indent_start_level = 1;
 		indent_levels = 16;
 		indent_enable = true;
@@ -741,6 +746,10 @@ opts = { noremap = true, expr = true, silent = true }
 nmap('k', "v:count == 0 ? 'gk' : 'k'", opts)
 nmap('j', "v:count == 0 ? 'gj' : 'j'", opts)
 
+-- I'm clumsy
+nmap('Q', 'q')
+nmap('q', '')
+
 -- Do not copy when pasting
 xmap('p', 'pgvy')
 
@@ -780,6 +789,8 @@ nmap('<leader>,', ':bprevious<CR>')
 nmap('<leader>.', ':bnext<CR>')
 nmap('<M-,>', ':bprevious<CR>')
 nmap('<M-.>', ':bnext<CR>')
+nmap('<M-->', ':bdelete<CR>')
+nmap('<M-_>', ':bwipeout<CR>')
 
 -- Change to file directory in current window
 nmap('<leader>cd', ':lcd %:p:h<CR>:pwd<CR>')
@@ -797,9 +808,6 @@ nmap('x', '"_x')
 -- Y yank until the end of line
 nmap('Y', 'y$')
 
--- q as b
-nmap('q', 'b')
-nmap('Q', 'B')
 
 -- Save session
 nmap('<F6>', '<Cmd>wa<Bar>exe "mksession! " . v:this_session<CR><Cmd>echo "Session saved!"<CR>')
@@ -813,11 +821,11 @@ nmap('<F4>', 'N')
 
 -- Transpose lines
 opts = { noremap = true, silent = true }
-nmap('<S-Up>', '<Cmd>move .-2<CR>', opts)
-nmap('<S-Down>', '<Cmd>move .+1<CR>', opts)
+nmap('<M-Up>', '<Cmd>move .-2<CR>', opts)
+nmap('<M-Down>', '<Cmd>move .+1<CR>', opts)
 -- Need to trigger CmdlineEnter/CmdlineLeave events, so do not use <Cmd>
-vmap('<S-Up>', ':move \'<-2<CR>gv=gv', opts)
-vmap('<S-Down>', ':move \'>+1<CR>gv=gv', opts);
+vmap('<M-Up>', ':move \'<-2<CR>gv=gv', opts)
+vmap('<M-Down>', ':move \'>+1<CR>gv=gv', opts);
 
 -- Yank to CLIPBOARD register
 xmap('<leader>c', '"+y')
@@ -825,6 +833,20 @@ xmap('<C-c>', '"+y')
 -- Yank to PRIMARY register
 xmap('<leader>y', '"*y')
 xmap('<C-y>', '"*y')
+
+-- Keep cursor position when scrolling
+nmap('<PageUp>', '<C-U><C-U>')
+vmap('<PageUp>', '<C-U><C-U>')
+imap('<PageUp>', '<C-\\><C-O><C-U><C-\\><C-O><C-U>')
+nmap('<PageDown>', '<C-D><C-D>')
+vmap('<PageDown>', '<C-D><C-D>')
+imap('<PageDown>', '<C-\\><C-O><C-D><C-\\><C-O><C-D>')
+
+
+-- nnoremap <silent> <PageDown> <C-D><C-D>
+-- vnoremap <silent> <PageDown> <C-D><C-D>
+-- inoremap <silent> <PageDown> <C-\><C-O><C-D><C-\><C-O><C-D>
+
 -- }}}
 -- {{{1 Abbreviations
 -- Force write with sudo, two different approaches
@@ -882,7 +904,7 @@ GenerateModeline = function()
 		' sw=' .. vim.bo.shiftwidth .. ' ' .. expand .. ' ' .. autoindent .. ': ' .. cout
 	vim.api.nvim_put({ util.trim(ml) }, 'l', true, false)
 end
-nmap('<leader>M', [[<Cmd>lua GenerateModeline()<CR>]])
+nmap('<leader>Z', [[<Cmd>lua GenerateModeline()<CR>]])
 -- }}}
 -- {{{1 Telescope
 local find_cmd
@@ -933,7 +955,7 @@ require'telescope'.setup {
 			theme = "ivy",
 			previewer = false,
 		},
-		old_files = {
+		oldfiles = {
 			theme = "ivy",
 			previewer = false,
 		},
@@ -1042,6 +1064,13 @@ luapad_init = function()
 end
 -- }}}
 -- {{{1 FileType
+-- Change local working dir to current file directory
+vim.cmd [[
+	augroup AutoChdir
+		autocmd!
+		autocmd BufEnter * silent! lcd %:p:h
+	augroup end
+]]
 -- Open help as vsplit
 vim.cmd [[
 	augroup VerticalHelp
