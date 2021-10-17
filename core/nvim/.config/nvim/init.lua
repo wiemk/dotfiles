@@ -124,7 +124,7 @@ require'packer'.startup(function()
 			}, { prefix = '<leader>', mode = 'x'})
 		end
 	}
-	use { 'hoob3rt/lualine.nvim',
+	use { 'nvim-lualine/lualine.nvim',
 		config = function() lualine_init(); end
 	}
 	-- Add git related info in the signs columns and popups
@@ -382,7 +382,7 @@ local on_attach = function(client, bufnr)
 	map.n('<leader>lwl', '<Cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
 	map.n('ö', '<Cmd>lua vim.lsp.diagnostic.goto_prev({popup_opts = {focusable = false}})<CR>', opts)
 	map.n('ä', '<Cmd>lua vim.lsp.diagnostic.goto_next({popup_opts = {focusable = false}})<CR>', opts)
-	map.n('<M-k>', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+	map.n('<M-k>', '<Cmd>lua vim.lsp.buf.hover({focusable = false})<CR>', opts)
 	map.n('<M-d>', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
 	map.i('<M-k>', '<Cmd>lua vim.lsp.buf.hover({focusable = false})<CR>', opts)
 	map.i('<M-d>', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
@@ -689,27 +689,26 @@ lualine_init = function()
 			padding = 1,
 			left_padding = 1,
 			right_padding = 1,
-			upper = false,
-			lower = true
+			fmt = string.lower
 		},
 		sections = {
 			lualine_a = { 'mode' },
 			lualine_b = {
 				{
 					(function() return [[NOMOUSE]]; end),
-					condition = (function() return nomouse.status; end),
-					lower = false
+					cond = (function() return nomouse.status; end),
+					fmt = string.upper
 				},
 				{
 					(function() return [[PASTE]]; end),
-					condition = (function() return vim.o.paste; end),
-					lower = false
+					cond = (function() return vim.o.paste; end),
+					fmt = string.upper
 				}
 			},
 			lualine_c = {
 				{ 'filename', file_status = true },
 				{ 'fugitive#head'},
-				{ 'diff', color_added = 'green', color_modified = 'yellow', color_removed = 'red' }},
+				{ 'diff' }},
 			lualine_y = { 'progress', 'hostname' }
 		},
 		extension = { 'fzf', 'fugitive' }
@@ -746,10 +745,6 @@ opts = { noremap = true, expr = true, silent = true }
 nmap('k', "v:count == 0 ? 'gk' : 'k'", opts)
 nmap('j', "v:count == 0 ? 'gj' : 'j'", opts)
 
--- I'm clumsy
-nmap('Q', 'q')
-nmap('q', '')
-
 -- Do not copy when pasting
 xmap('p', 'pgvy')
 
@@ -766,7 +761,7 @@ vmap('H', '_')
 vmap('L', '$')
 
 nmap('<C-f>', '/')
-nmap('<C-q>', '<Cmd>close<CR>')
+-- nmap('<C-q>', '<Cmd>close<CR>')
 nmap('<C-s>', ':w<CR>')
 nmap('<C-t>', ':Telescope fd<CR>')
 nmap('u', ':undo<CR>')
@@ -1065,12 +1060,12 @@ end
 -- }}}
 -- {{{1 FileType
 -- Change local working dir to current file directory
-vim.cmd [[
-	augroup AutoChdir
-		autocmd!
-		autocmd BufEnter * silent! lcd %:p:h
-	augroup end
-]]
+-- vim.cmd [[
+-- 	augroup AutoChdir
+-- 		autocmd!
+-- 		autocmd BufEnter * silent! lcd %:p:h
+-- 	augroup end
+-- ]]
 -- Open help as vsplit
 vim.cmd [[
 	augroup VerticalHelp
@@ -1139,5 +1134,6 @@ vim.g.neovide_cursor_vfx_mode = 'pixiedust'
 -- {{{1 Legacy VimScript
 -- }}}
 -- {{{1 Staging area
+vim.cmd [[command! Vsplit vsplit | wincmd w | vertical resize 125]]
 -- }}}
 

@@ -3,8 +3,6 @@ cd ~/Documents/dev
 launch /usr/bin/fish -i
 new_tab tmux
 launch /usr/bin/tmux new-session -A -s main
-new_tab toolbox
-launch /usr/bin/toolbox enter
 new_tab ssh
 launch /usr/bin/fish -i
 
