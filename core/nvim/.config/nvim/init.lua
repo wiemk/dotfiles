@@ -62,6 +62,9 @@ require'packer'.startup(function()
 	use 'tpope/vim-fugitive'              -- Git commands in nvim
 	use 'tjdevries/astronauta.nvim'       -- Keymap wrapper functions
 	use 'ggandor/lightspeed.nvim'         -- Motion plugin
+	use { 'williamboman/nvim-lsp-installer',
+		config = function() lsp_install_init() end
+	}
 	-- Automatic tags management
 	use { 'ludovicchabant/vim-gutentags',
 		setup = function()
@@ -401,13 +404,9 @@ do
 	capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 	local servers = {
 		'clangd',
-		-- 'dockerls',
-		-- 'bashls',
-		-- 'cmake',
 		-- 'gopls',
 		-- 'rust_analyzer',
 		-- 'pyright',
-		-- 'tsserver'
 	}
 	for _, lsp in ipairs(servers) do
 		nvim_lsp[lsp].setup {
@@ -418,6 +417,26 @@ do
 			}
 		}
 	end
+end
+-- }}}
+-- {{{2 LSP Installer
+lsp_install_init = function()
+	local lsp_installer = require("nvim-lsp-installer")
+	lsp_installer.on_server_ready(function(server)
+		local opts = {}
+		if server.name == "sumneko_lua" then
+			globals = { 'vim', 'use_rocks', table.unpack(globals) }
+			opts = { settings = { Lua = {
+				diagnostics = {
+					globals = globals,
+					disable = { 'lowercase-global' }
+				},
+				telemetry = { enable = false }
+			}}}
+		end
+		server:setup(opts)
+		vim.cmd [[ do User LspAttachBuffers ]]
+	end)
 end
 -- }}}
 -- {{{2 Features
@@ -438,47 +457,6 @@ local diagnostic_toggle_virtual_text = function()
 	virtual_text = not virtual_text
 	vim.b.lsp_virtual_text_enabled = virtual_text
 	vim.lsp.diagnostic.display(vim.lsp.diagnostic.get(0, 1), 0, 1, { virtual_text = virtual_text })
-end
--- }}}
--- {{{2 Sumneko LUA
-do
-	local settings = {
-		Lua = {
-			runtime = {
-				version = 'LuaJIT',
-				-- Make runtime files discoverable to the server
-				path = { 'lua/?.lua', 'lua/?/init.lua', table.unpack(vim.split(package.path, ';')) }
-			},
-			completion = {
-				enable = true,
-				callSnippet = 'Both'
-			},
-			diagnostics = {
-				enable = true,
-				globals = { 'vim', 'use_rocks', table.unpack(globals) },
-				disable = {'lowercase-global'}
-			},
-			workspace = {
-				library = vim.api.nvim_get_runtime_file('', true),
-				maxPreload = 2000,
-				preloadFileSize = 1000
-			},
-			telemetry = {
-				enable = false,
-			}
-		}
-	}
-	local sumneko_root_path = vim.fn.getenv('XDG_DATA_HOME') .. '/lua-language-server'
-	local sumneko_binary_path = '/bin/Linux/lua-language-server'
-	nvim_lsp.sumneko_lua.setup {
-		cmd = { sumneko_root_path .. sumneko_binary_path, '-E', sumneko_root_path .. '/main.lua' };
-		on_attach = on_attach,
-		capabilities = capabilities,
-		settings = settings,
-		flags = {
-			debounce_text_changes = 150,
-		}
-	}
 end
 -- }}}
 -- {{{2 Diagnostics
@@ -1000,7 +978,7 @@ cmp_init = function()
 	cmp.setup {
 		snippet = {
 			expand = function(args)
-				require'luasnip'.lsp_expand(args.body)
+				luasnip.lsp_expand(args.body)
 			end,
 		},
 		mapping = {
@@ -1111,6 +1089,10 @@ vim.cmd [[
 	augroup end
 ]]
 -- }}}
+-- {{{1 Assorted command
+-- Vertical split with bigger left window
+vim.cmd [[command! Vsplit vsplit | wincmd w | vertical resize 125]]
+-- }}}
 -- {{{1 Theme/GUI
 -- Override highlighting
 vim.cmd [[
@@ -1134,6 +1116,5 @@ vim.g.neovide_cursor_vfx_mode = 'pixiedust'
 -- {{{1 Legacy VimScript
 -- }}}
 -- {{{1 Staging area
-vim.cmd [[command! Vsplit vsplit | wincmd w | vertical resize 125]]
 -- }}}
 

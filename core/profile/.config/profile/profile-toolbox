@@ -9,6 +9,7 @@ VIVID_LS_THEME=tokyonight
 CARGO_HOME="${XDG_DATA_HOME}/cargo"
 RUSTUP_HOME="${XDG_DATA_HOME}/rustup"
 GOPATH="${XDG_DATA_HOME}/go"
+NPM_HOME="${XDG_DATA_HOME}/npm"
 
 # available inside the terminal, not necessarily GUI applications
 export VIVID_LS_THEME CARGO_HOME RUSTUP_HOME GOPATH
@@ -21,6 +22,6 @@ if is_cmd nvim; then
 	export EDITOR VISUAL SUDO_EDITOR
 fi
 
-path_exports+=( "${CARGO_HOME}/bin" "${GOPATH}/bin")
+path_exports+=( "${CARGO_HOME}/bin" "${GOPATH}/bin" "${NPM_HOME}/bin" )
 
 # vim: ft=bash ts=4 sw=4 noet

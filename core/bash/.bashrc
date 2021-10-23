@@ -74,14 +74,27 @@ fi
 # Functions
 up() { cd $(printf '../%.0s' $(seq 1 $1)); }
 bashquote() { printf '%q\n' "$(</dev/stdin)"; }
-
+mem() { ps -eo rss,vsz,pid,euser,args --cols=100 --sort %mem \
+	| grep -v grep \
+	| grep -i "$@" \
+	| awk '{
+		rss=$1;vsz=$2;pid=$3;uid=$4;$1=$2=$3=$4="";sub(/^[ \t\r\n]+/, "", $0);
+		printf("%d: (%s) # %s\n\tRSS: %8.2f M\n\tVSZ: %8.2f M\n", pid, uid, $0, rss/1024, vsz/1024);}'
+}
 ## Attach tmux
 tma() {
 	local sess='main'
 	if (( $# > 0 )); then
 		sess=$1
 	fi
-	command tmux new-session -A -s "${sess}" -t 'primary'
+	command tmux new-session -A -s "${sess}"
+}
+
+trim() {
+	local var="$*"
+	var="${var#"${var%%[![:space:]]*}"}"
+	var="${var%"${var##*[![:space:]]}"}"
+	printf '%s' "$var"
 }
 
 ## Redraw prompt line
@@ -91,7 +104,8 @@ __ehc()
 		bind '"\er": redraw-current-line'
 		bind '"\e^": magic-space'
 		READLINE_LINE=${READLINE_LINE:+${READLINE_LINE:0:READLINE_POINT}}${1}${READLINE_LINE:+${READLINE_LINE:READLINE_POINT}}
-		READLINE_POINT=$(( READLINE_POINT + ${#1} ))
+		READLINE_LINE=$(trim "$READLINE_LINE")
+		READLINE_POINT=$(( READLINE_POINT + ${#1}))
 	else
 		bind '"\er":'
 		bind '"\e^":'
@@ -114,10 +128,8 @@ if has fzf; then
 	bind '"\C-r": "\C-x1\e^\er"'
 	bind -x '"\C-x1": __fzf_history';
 
-	__fzf_history ()
-	{
-		__ehc "$(history | fzf --tac --tiebreak=index | perl -ne 'm/^\s*([0-9]+)/ and print "!$1"')"
-
+	__fzf_history () {
+		__ehc "$(history | fzf --tac --tiebreak=index | grep -oP '^\s*([0-9]+)\s+\K.*$')"
 	}
 
 	fkill() {
