@@ -404,9 +404,7 @@ do
 	capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 	local servers = {
 		'clangd',
-		-- 'gopls',
-		-- 'rust_analyzer',
-		-- 'pyright',
+		'gopls',
 	}
 	for _, lsp in ipairs(servers) do
 		nvim_lsp[lsp].setup {
@@ -1116,5 +1114,6 @@ vim.g.neovide_cursor_vfx_mode = 'pixiedust'
 -- {{{1 Legacy VimScript
 -- }}}
 -- {{{1 Staging area
+nmap('<leader>d', [[<Cmd>packadd termdebug | Termdebug<CR>]], opts)
 -- }}}
 
