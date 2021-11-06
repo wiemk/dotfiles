@@ -11,11 +11,14 @@ fi
 
 export PROFILE_SOURCED=1
 
-is_cmd() {
-	hash "$1" &>/dev/null
+has() {
+	if hash "${1}" &>/dev/null; then
+		return 0
+	fi
+	return 1
 }
 
-is_in_exp () { 
+contains_assoc() { 
 	local haystack="$1[@]"
 	local needle=$2
 	for e in "${!haystack}"; do
@@ -24,7 +27,7 @@ is_in_exp () {
 	return 1
 }
 
-is_in_ref () { 
+contains() { 
 	local -n haystack=$1
 	local needle=$2
 	for e in "${haystack[@]}"; do
@@ -35,14 +38,9 @@ is_in_ref () {
 
 #################################################
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
-if [[ -d "${HOME}/.tmp" ]]; then
-	XDG_CACHE_HOME="${HOME}/.tmp/cache"
-	export TMPDIR="${HOME}/.tmp"
-else
-	XDG_CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}
-fi
-export XDG_CACHE_HOME
+export XDG_CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}
 export XDG_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
+export XDG_STATE_HOME=${XDG_STATE_HOME:-${HOME}/.local/state}
 
 #################################################
 # you can override this in host specific profiles in
@@ -50,11 +48,11 @@ export XDG_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
 # default: emacs > nvim > vim > vi
 EDITOR='vi'
 
-if is_cmd emacsclient; then
+if has emacsclient; then
 	EDITOR='emacsclient -qc -a emacs'
-elif is_cmd nvim; then
+elif has nvim; then
 	EDITOR='nvim'
-elif is_cmd vim; then
+elif has vim; then
 	EDITOR='vim'
 fi
 export EDITOR
@@ -73,7 +71,7 @@ path_exports=("${XDG_DATA_HOME}/../bin")
 # read by PAM through the pam_env module (man 8 pam_env) - be aware that fedora
 # is using a patched pam_env module which does not enable user_readenv by default
 # touch ${HOME}/.pam_environment for enabling
-pam_exports=(XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME PATH)
+pam_exports=(XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME PATH)
 # environment.d (man 8 environment.d) read by systemd-environment-d-generator
 # (man 8 systemd-environment-d-generator), initialized with default pam_exports
 # touch ${XDG_CONFIG_HOME}/environment.d/50-profile.conf for enabling
@@ -82,25 +80,35 @@ env_exports=("${pam_exports[@]}")
 #################################################
 # source host specific profile
 source_machine_profile() {
-	local machine=${HOSTNAME:-$(</proc/sys/kernel/hostname)}
-	machine=${machine,,}
+	local machine=$(</etc/machine-id)
 	if [[ -n $machine ]]; then
-		if [[ -r "${XDG_CONFIG_HOME}/profile/profile-${machine}" ]]; then
-			source "${XDG_CONFIG_HOME}/profile/profile-${machine}"
-		elif [[ -r "${HOME}/.profile-${machine}" ]]; then
-			source "${HOME}/.profile-${machine}"
+		if [[ -r "${XDG_CONFIG_HOME}/profile/${machine}.conf" ]]; then
+			source "${XDG_CONFIG_HOME}/profile/${machine}.conf"
+		elif [[ -r "${HOME}/.profile-${machine}.conf" ]]; then
+			source "${HOME}/.profile-${machine}.conf"
+		fi
+	fi
+}
+source_host_profile() {
+	local host=${HOSTNAME:-$(</proc/sys/kernel/hostname)}
+	host=${host,,}
+	if [[ -n $host ]]; then
+		if [[ -r "${XDG_CONFIG_HOME}/profile/${host}.conf" ]]; then
+			source "${XDG_CONFIG_HOME}/profile/${host}.conf"
+		elif [[ -r "${HOME}/.profile-${host}.conf" ]]; then
+			source "${HOME}/.profile-${host}.conf"
 		fi
 	fi
 }
 
 export_user_paths() {
 	local -a rpath
-	if is_cmd realpath; then
+	if has realpath; then
 		readarray -t -d ':' apath <<< "$PATH"
 		for (( i=0; i < ${#path_exports[@]}; i++ )); do
 			local realp="$(realpath -qms "${path_exports[$i]}")"
 			# check if already added,
-			if ! is_in_ref apath "$realp"; then
+			if ! contains apath "$realp"; then
 				rpath+=("$realp")
 			fi
 		done
@@ -170,8 +178,11 @@ export_envd() {
 	set +a
 }
 
-# load host specific profile
+# load machine specific profile
 source_machine_profile
+# load host specific profile
+source_host_profile
+
 # export canonicalized 'path_exports' entries after sourcing host specific profile
 export_user_paths
 

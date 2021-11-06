@@ -1,9 +1,9 @@
 ### Installation
 
-The **core**, **gui**, or **staging** subdirectory must be part of the stow directory (`-d`):
+The **core**, **extra**, or **staging** subdirectory must be part of the stow directory (`-d`):
 
 ```sh
-stow -d "$REPO/{core,gui,staging}" -t "$HOME" -S <config>
+stow -d "$REPO/{core,extra,staging}" -t "$HOME" -S <config>
 ```
 
 #### Example
