@@ -1,4 +1,5 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
+on_debug
 
 # Dircolors matching theme
 if [[ -n $VIVID_LS_THEME ]] && has vivid; then

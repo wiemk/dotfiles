@@ -1,3 +1,6 @@
+# bash
+core/bash/.config/bash/rc.pre
+core/bash/.config/bash/rc.post
 # git
 core/git/.config/git/*.local
 # fish

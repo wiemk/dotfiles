@@ -1,34 +1,41 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
 
 # DEBUG
-if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
-	printf '%d%s\n' "${EPOCHSECONDS}" ': .bashrc' >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
+if [[ -e "${XDG_CONFIG_HOME}/bash/_debug" ]]; then
+	on_debug() {
+		local -r script=$(readlink -e -- "${BASH_SOURCE[1]}") || return
+		printf '%d%s\n' "${EPOCHSECONDS}" ": ${script}" >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
+	}
+else
+	on_debug() { :; }
 fi
+
+on_debug
 
 export BDOTDIR=${XDG_CONFIG_HOME:-~/.config/}/bash 
-
-if [[ -f $BDOTDIR/bashrc.pre ]]; then
-	source "${BDOTDIR}/bashrc.pre"
-fi
 
 if [[ -f /etc/bashrc ]]; then
 	source /etc/bashrc
 fi
 
-shopt -s histappend
-shopt -s extglob
-shopt -s lastpipe
-shopt -s direxpand
-shopt -s checkwinsize
+shopt -s histappend \
+	extglob \
+	lastpipe \
+	direxpand \
+	checkwinsize
 
 # some useful settings
-shopt -s dotglob
-shopt -s autocd
-shopt -s cdspell
-shopt -s assoc_expand_once
-shopt -s checkhash
-shopt -s globstar
-shopt -s lithist
+shopt -s dotglob \
+	autocd \
+	cdspell \
+	assoc_expand_once \
+	checkhash \
+	globstar \
+	lithist
+
+if [[ -f $BDOTDIR/rc.pre ]]; then
+	source "${BDOTDIR}/rc.pre"
+fi
 
 BSTATE=${XDG_STATE_HOME:-~/.local/state}/bash
 
@@ -82,44 +89,33 @@ contains() {
 	return 1
 }
 
-# Redraw prompt line
-__ehc()
-{
-	if [[ -n $1 ]]; then
-		bind '"\er": redraw-current-line'
-		bind '"\e^": magic-space'
-		READLINE_LINE=${READLINE_LINE:+${READLINE_LINE:0:READLINE_POINT}}${1}${READLINE_LINE:+${READLINE_LINE:READLINE_POINT}}
-		READLINE_LINE=$(trim "$READLINE_LINE")
-		READLINE_POINT=$((READLINE_POINT + ${#1}))
-	else
-		bind '"\er":'
-		bind '"\e^":'
-	fi
+trim() {
+	local var="$*"
+	var="${var#"${var%%[![:space:]]*}"}"
+	var="${var%"${var##*[![:space:]]}"}"
+	printf '%s' "$var"
 }
 
 if [[ -f /run/.containerenv ]] || systemd-detect-virt --quiet --container; then
 	export CONTAINER=1
 fi
+
 shopt -s nullglob
 # plugins are allowed to modify the environment via export
-pd="${BDOTDIR}/plugins"
-if [[ -d $pd ]]; then
-	for p in "$pd"/*; do
-		source "$p"
+if [[ -d $BDOTDIR/plugins ]]; then
+	for plug in "$BDOTDIR"/plugins/*; do
+		source "$plug"
 	done
 fi
-unset pd
 
 # functions should be pure
-fd="${BDOTDIR}/functions"
-if [[ -d $fd ]]; then
-	for f in "$fd"/*; do
-		source "$f"
+if [[ -d $BDOTDIR/functions ]]; then
+	for func in "$BDOTDIR"/functions/*; do
+		source "$func"
 	done
 fi
-unset fd
 shopt -u nullglob
 
-if [[ -f $BDOTDIR/bashrc.post ]]; then
-	source "${BDOTDIR}/bashrc.post"
+if [[ -f $BDOTDIR/rc.post ]]; then
+	source "${BDOTDIR}/rc.post"
 fi

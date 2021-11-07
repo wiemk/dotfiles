@@ -1,4 +1,5 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
+on_debug
 
 # Create own scope for neovim and child processes
 if has nvim; then
@@ -9,9 +10,9 @@ if has nvim; then
 
 		function vim() {
 			if ! type -t is_tmux &>/dev/null || ! is_tmux; then
-				systemd-run --quiet --user --collect --scope nvim
+				systemd-run --quiet --user --collect --scope nvim "$@"
 			else
-				tmux_rename_window vim nvim
+				tmux_rename_window vim nvim "$@"
 			fi
 		}
 	else

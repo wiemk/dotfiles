@@ -1,13 +1,21 @@
+# vim: ft=bash ts=4 sw=4 noet
 # shellcheck shell=bash
-# ~/.profile
-# you can override exported variables in host specific profiles
-# in ${XDG_CONFIG_HOME}/profile/profile-${HOSTNAME}
-# shellcheck disable=2155
+# shellcheck disable=2155,1090
+#
+# Override exported variables in host specific profiles
+# in ${XDG_CONFIG_HOME}/profile/${HOSTNAME}.conf
 
 # DEBUG
-if [[ -e "${XDG_CONFIG_HOME}/profile/_debug" ]]; then
-	printf '%d%s\n' "${EPOCHSECONDS}" ': .profile' >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
+if [[ -e "${XDG_CONFIG_HOME}/bash/_debug" ]]; then
+	on_debug() {
+		local -r script=$(readlink -e -- "${BASH_SOURCE[1]}") || return
+		printf '%d%s\n' "${EPOCHSECONDS}" ": ${script}" >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
+	}
+else
+	on_debug() { :; }
 fi
+
+on_debug
 
 export PROFILE_SOURCED=1
 
@@ -18,29 +26,23 @@ has() {
 	return 1
 }
 
-contains_assoc() { 
-	local haystack="$1[@]"
-	local needle=$2
-	for e in "${!haystack}"; do
-		[[ $e == "$needle" ]] && return 0
-	done
-	return 1
-}
-
 contains() { 
-	local -n haystack=$1
-	local needle=$2
-	for e in "${haystack[@]}"; do
-		[[ $e == "$needle" ]] && return 0
+	local -n arr=$1
+	local n=$2
+	for e in "${arr[@]}"; do
+		[[ $e == "$n" ]] && return 0
 	done
 	return 1
 }
 
 #################################################
-export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
-export XDG_CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}
-export XDG_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
-export XDG_STATE_HOME=${XDG_STATE_HOME:-${HOME}/.local/state}
+
+XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
+XDG_CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}
+XDG_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
+XDG_STATE_HOME=${XDG_STATE_HOME:-${HOME}/.local/state}
+
+export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME
 
 #################################################
 # you can override this in host specific profiles in
@@ -180,6 +182,7 @@ export_envd() {
 
 # load machine specific profile
 source_machine_profile
+
 # load host specific profile
 source_host_profile
 
@@ -191,5 +194,3 @@ generate-env() {
 	write_pamd_exports
 	write_envd_exports
 }
-
-# vim: ft=bash ts=4 sw=4 noet
