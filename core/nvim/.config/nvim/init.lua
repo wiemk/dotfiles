@@ -776,10 +776,6 @@ vmap('<C-r>', '"vy:%s/<C-r>v//gc<left><left><left>')
 nmap('<del>', '"_x')
 nmap('x', '"_x')
 
--- Y yank until the end of line
-nmap('Y', 'y$')
-
-
 -- Save session
 nmap('<F6>', '<Cmd>wa<Bar>exe "mksession! " . v:this_session<CR><Cmd>echo "Session saved!"<CR>')
 

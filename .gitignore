@@ -1,6 +1,8 @@
 # bash
 core/bash/.config/bash/rc.pre
 core/bash/.config/bash/rc.post
+core/bash/.config/bash/plugins/local.sh
+core/bash/.config/bash/functions/99-local.sh
 # git
 core/git/.config/git/*.local
 # fish
