@@ -5,6 +5,8 @@ if ! has fzf; then
 	return
 fi
 
+# export FZF_DEFAULT_OPTS="--height=50% --info=inline"
+
 # https://github.com/junegunn/fzf/wiki/examples#command-history
 bind '"\C-r": "\C-x1\e^\er"'
 bind -x '"\C-x1": __fzf_history';
@@ -13,14 +15,14 @@ bind -x '"\C-x1": __fzf_history';
 __ehc()
 {
 	if [[ -n $1 ]]; then
-		bind '"\er": redraw-current-line'
-		bind '"\e^": magic-space'
+		bind -m emacs '"\er": redraw-current-line'
+		bind -m emacs '"\e^": magic-space'
 		READLINE_LINE=${READLINE_LINE:+${READLINE_LINE:0:READLINE_POINT}}${1}${READLINE_LINE:+${READLINE_LINE:READLINE_POINT}}
 		READLINE_LINE=$(trim "$READLINE_LINE")
 		READLINE_POINT=$((READLINE_POINT + ${#1}))
 	else
-		bind '"\er":'
-		bind '"\e^":'
+		bind -m emacs '"\er":'
+		bind -m emacs '"\e^":'
 	fi
 }
 
@@ -40,3 +42,33 @@ fkill() {
 		echo $pid | xargs kill -${1:-15}
 	fi
 }
+
+_fzfyank() {
+	local cmd="$1 | xargs -d '\n' ls -dh --color=always"
+	local pre=${READLINE_LINE:0:READLINE_POINT}
+	local suf=${READLINE_LINE:READLINE_POINT}
+	local qry=${pre##*[ /=]}
+	local str=$(FZF_DEFAULT_COMMAND=$cmd fzf -q "$qry" --reverse --ansi \
+		--preview='ls -ldh --color=always {}' \
+		--preview-window=down,1,border-none)
+	if [[ $str ]]; then
+		pre=${pre%"$qry"}
+		str=${str@Q}" "
+		READLINE_LINE=${pre}${str}${suf}
+		READLINE_POINT=$((READLINE_POINT - ${#qry} + ${#str}))
+	fi
+}
+
+# Alt+[df] - local dir/all selection
+bind -m emacs -x '"\ed": _fzfyank "compgen -d | sort"'
+bind -m emacs -x '"\ef": _fzfyank "compgen -f | sort"'
+# Alt+Shift+[DF] - recursive dir/all selection
+if has fd; then
+	bind -m emacs -x '"\ed": _fzfyank "fd --hidden --max-depth=1 --type=d"'
+	bind -m emacs -x '"\ef": _fzfyank "fd --hidden --max-depth=1"'
+	bind -m emacs -x '"\eD": _fzfyank "fd --hidden --type=d"'
+	bind -m emacs -x '"\eF": _fzfyank "fd --hidden"'
+else
+	bind -m emacs -x '"\eD": _fzfyank "find . -xdev -mindepth 1 -name .\?\* -prune -o -type d -printf %P\\\n"'
+	bind -m emacs -x '"\eF": _fzfyank "find . -xdev -mindepth 1 -name .\?\* -prune -o -printf %P\\\n"'
+fi

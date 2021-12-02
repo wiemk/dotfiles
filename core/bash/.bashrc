@@ -40,7 +40,7 @@ fi
 BSTATE=${XDG_STATE_HOME:-~/.local/state}/bash
 
 HISTCONTROL=ignoreboth
-HISTIGNORE="history*:vim*:nvim*:cd *:ls *:"
+HISTIGNORE="history*:"
 HISTFILE=${BSTATE}/history
 HISTSIZE=10000
 HISTFILESIZE=50000

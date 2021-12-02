@@ -378,13 +378,13 @@ local on_attach = function(client, bufnr)
 	map.n('<leader>lR', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
 	map.n('<leader>lr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
 	map.n('<leader>la', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-	map.n('<leader>le', '<Cmd>lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})<CR>', opts)
-	map.n('<leader>lq', '<Cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+	map.n('<leader>le', '<Cmd>lua vim.diagnostic.open_float({focusable = false})<CR>', opts)
+	map.n('<leader>lq', '<Cmd>lua vim.diagnostic.setloclist()<CR>', opts)
 	map.n('<leader>lwa', '<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
 	map.n('<leader>lwr', '<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
 	map.n('<leader>lwl', '<Cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-	map.n('ö', '<Cmd>lua vim.lsp.diagnostic.goto_prev({popup_opts = {focusable = false}})<CR>', opts)
-	map.n('ä', '<Cmd>lua vim.lsp.diagnostic.goto_next({popup_opts = {focusable = false}})<CR>', opts)
+	map.n('ö', '<Cmd>lua vim.diagnostic.goto_prev({popup_opts = {focusable = false}})<CR>', opts)
+	map.n('ä', '<Cmd>lua vim.diagnostic.goto_next({popup_opts = {focusable = false}})<CR>', opts)
 	map.n('<M-k>', '<Cmd>lua vim.lsp.buf.hover({focusable = false})<CR>', opts)
 	map.n('<M-d>', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
 	map.i('<M-k>', '<Cmd>lua vim.lsp.buf.hover({focusable = false})<CR>', opts)
@@ -461,7 +461,7 @@ end
 vim.cmd [[
 	augroup linediag
 		autocmd!
-		autocmd CursorHold,CursorHoldI * lua vim.lsp.diagnostic.show_line_diagnostics({focusable = false})
+		autocmd CursorHold,CursorHoldI * lua vim.diagnostic.open_float({focusable = false})
 	augroup end
 ]]
 -- 2}}}
