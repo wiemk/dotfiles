@@ -7,7 +7,7 @@ fi
 
 eval "$(zoxide init bash)"
 if has fzf; then
-	bind '"\C-xx": "\C-x2\e^\er"'
-	bind '"\C-g": "\C-x2\e^\er"'
-	bind -x '"\C-x2": zi';
+	bind -m emacs '"\C-xx": "\C-x2\e^\er"'
+	bind -m emacs '"\C-g": "\C-x2\e^\er"'
+	bind -m emacs -x '"\C-x2": zi';
 fi

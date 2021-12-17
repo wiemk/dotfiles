@@ -1,4 +1,4 @@
-# vim: ft=sh:nowrap
+# vi:set ft=bash ts=4 sw=4 noet noai:
 
 # http://stackoverflow.com/a/1088763/49849
 
@@ -33,5 +33,4 @@ if has xclip; then
 	bind -m emacs -x '"\eu": _xdiscard'
 	bind -m emacs -x '"\ek": _xkill'
 	bind -m emacs -x '"\ey": _xyank'
-	bind -m emacs -x '"\C-g": _xyankq'
 fi
