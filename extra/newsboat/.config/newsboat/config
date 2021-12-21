@@ -2,6 +2,8 @@
 refresh-on-startup no
 reload-threads 32
 prepopulate-query-feeds yes
+confirm-mark-all-feeds-read no
+confirm-mark-feed-read no
 notify-program "notify-send"
 notify-screen yes
 notify-xterm yes

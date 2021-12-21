@@ -6,6 +6,15 @@ up() {
 }
 alias ..='up'
 
+prompt() {
+	read -rp "${1} (y/n) " choice
+	case "$choice" in 
+		y|Y ) return 0;;
+		n|N ) return 1;;
+		* ) return 1;;
+	esac
+}
+
 bashquote() {
 	printf '%q\n' "$(</dev/stdin)";
 }

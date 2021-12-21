@@ -58,12 +58,14 @@ require'packer'.startup(function()
 	use 'wbthomason/packer.nvim'          -- Package manager
 	use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
 	use 'machakann/vim-sandwich'          -- Surround text objects
-	use 'tpope/vim-commentary'            -- 'gc' to comment visual regions/lines
 	use 'tpope/vim-fugitive'              -- Git commands in nvim
-	use 'tjdevries/astronauta.nvim'       -- Keymap wrapper functions
 	use 'ggandor/lightspeed.nvim'         -- Motion plugin
 	use { 'williamboman/nvim-lsp-installer',
 		config = function() lsp_install_init() end
+	}
+	-- "gc" to comment visual regions/lines
+	use { 'numToStr/Comment.nvim',
+		config = function() comment_init() end
 	}
 	-- Automatic tags management
 	use { 'ludovicchabant/vim-gutentags',
@@ -125,7 +127,9 @@ require'packer'.startup(function()
 				c = { "Yank to CLIPBOARD" },
 				y = { "Yank to PRIMARY"}
 			}, { prefix = '<leader>', mode = 'x'})
-		end
+		end,
+		-- until it is fixed
+		disable = true
 	}
 	use { 'nvim-lualine/lualine.nvim',
 		config = function() lualine_init(); end
@@ -229,17 +233,6 @@ local globals = (function(modes)
 	end)
 	return map
 end)('cinostvx')
--- create astronauta mapping functions
-do
-	local km = require'astronauta.keymap'
-	for k,v in pairs(km) do
-		if string.match(k, '%Dnoremap') then
-			table.insert(globals, k)
-			rawset(_G, k, v)
-		end
-	end
-end
--- }}}
 -- {{{1 Generic options
 -- Disable welcome text
 vim.opt.shortmess:append({ c = true })
@@ -351,9 +344,8 @@ vim.o.pastetoggle='<F5>'
 -- }}}
 -- {{{1 LSP
 -- {{{2 Attach
-local nvim_lsp = require'lspconfig'
+local lspconfig = require'lspconfig'
 local on_attach = function(client, bufnr)
-	vim.api.nvim_buf_set_option(bufnr, 'omnifunc', 'v:lua.vim.lsp.omnifunc')
 	local map = (function(modes)
 		local map = {}
 		modes:gsub('.', function(c)
@@ -369,6 +361,12 @@ local on_attach = function(client, bufnr)
 	end)('nvic')
 
 	local opts = { noremap=true, silent=true }
+	-- technically these are not lsp specific
+	map.n('<leader>le', '<Cmd>lua vim.diagnostic.open_float({focusable = false})<CR>', opts)
+	map.n('<leader>lq', '<Cmd>lua vim.diagnostic.setloclist()<CR>', opts)
+	map.n('ö', '<Cmd>lua vim.diagnostic.goto_prev({popup_opts = {focusable = false}})<CR>', opts)
+	map.n('ä', '<Cmd>lua vim.diagnostic.goto_next({popup_opts = {focusable = false}})<CR>', opts)
+
 	map.n('<leader>lD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
 	map.n('<leader>ld', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
 	map.n('<leader>lh', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
@@ -378,13 +376,10 @@ local on_attach = function(client, bufnr)
 	map.n('<leader>lR', '<Cmd>lua vim.lsp.buf.rename()<CR>', opts)
 	map.n('<leader>lr', '<Cmd>lua vim.lsp.buf.references()<CR>', opts)
 	map.n('<leader>la', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-	map.n('<leader>le', '<Cmd>lua vim.diagnostic.open_float({focusable = false})<CR>', opts)
-	map.n('<leader>lq', '<Cmd>lua vim.diagnostic.setloclist()<CR>', opts)
 	map.n('<leader>lwa', '<Cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
 	map.n('<leader>lwr', '<Cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
 	map.n('<leader>lwl', '<Cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-	map.n('ö', '<Cmd>lua vim.diagnostic.goto_prev({popup_opts = {focusable = false}})<CR>', opts)
-	map.n('ä', '<Cmd>lua vim.diagnostic.goto_next({popup_opts = {focusable = false}})<CR>', opts)
+
 	map.n('<M-k>', '<Cmd>lua vim.lsp.buf.hover({focusable = false})<CR>', opts)
 	map.n('<M-d>', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
 	map.i('<M-k>', '<Cmd>lua vim.lsp.buf.hover({focusable = false})<CR>', opts)
@@ -407,7 +402,7 @@ do
 		'gopls',
 	}
 	for _, lsp in ipairs(servers) do
-		nvim_lsp[lsp].setup {
+		lspconfig[lsp].setup {
 			on_attach = on_attach,
 			capabilities = capabilities,
 			flags = {
@@ -569,6 +564,11 @@ indent_init = function()
 		odd_colors = { fg='#565f89',bg='bg' };
 		even_colors = { fg='#414868',bg='bg' };
 	}
+end
+-- }}}
+-- {{{1 Comment init
+comment_init = function()
+	require'Comment'.setup()
 end
 -- }}}
 -- {{{1 Gitsigns init
@@ -1006,7 +1006,7 @@ cmp_init = function()
 			end,
 		},
 		sources = {
-			{ name = 'nvim_lsp' },
+			{ name = 'lspconfig' },
 			{ name = 'luasnip' },
 			{ name = 'buffer' },
 		},

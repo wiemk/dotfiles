@@ -1,4 +1,4 @@
-new_tab vim
+new_tab main
 cd ~/Documents/dev
 launch /usr/bin/bash -i
 new_tab tmux
