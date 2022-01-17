@@ -5,7 +5,7 @@ on_debug
 if has nvim; then
 	if [[ -d /run/systemd/system && $CONTAINER != 1 ]]; then
 		# Fedora sets vim alias
-		unalias vim &>/dev/null
+		unalias vim 2>&1 &>/dev/null
 		unset -f vim
 
 		function vim() {

@@ -197,6 +197,7 @@
 
 [commit]
 	gpgsign = true
+	template = ~/.config/git/template/.gitmessage
 
 [core]
 	excludesFile = ~/.config/git/ignore

@@ -1,10 +1,9 @@
-new_tab main
-cd ~/Documents/dev
-launch /usr/bin/bash -i
-new_tab tmux
-launch /usr/bin/tmux new-session -A -s main
-new_tab toolbox
-launch /usr/bin/toolbox enter
-new_tab ssh
-launch /usr/bin/bash -i
+new_tab puppet
+launch /usr/bin/tmux new-session -A -s puppet
+new_tab dev
+launch /usr/bin/tmux new-session -A -s dev
+new_tab notes
+#launch /usr/bin/tmux new-session -A -s notes
+launch /usr/bin/tmux new-session -A -s notes "cd ~/Documents/dev; vim notes.txt; clear; fish -i"
+
 
