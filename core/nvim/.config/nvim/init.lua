@@ -128,8 +128,6 @@ require'packer'.startup(function()
 				y = { "Yank to PRIMARY"}
 			}, { prefix = '<leader>', mode = 'x'})
 		end,
-		-- until it is fixed
-		disable = true
 	}
 	use { 'nvim-lualine/lualine.nvim',
 		config = function() lualine_init(); end

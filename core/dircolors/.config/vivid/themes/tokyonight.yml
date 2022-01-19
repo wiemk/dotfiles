@@ -62,6 +62,19 @@ core:
     background: term-red
     font-style: bold
 
+  multi_hard_link:
+    foreground: term-fg
+
+  setuid:
+    foreground: term-white
+    background: term-red
+    font-style: bold
+
+  setgid:
+    foreground: term-white
+    background: term-red
+    font-style: bold
+
   fifo:
     foreground: regex
     background: term-black
@@ -84,6 +97,9 @@ core:
 
   normal_text:
     foreground: term-fg
+
+  reset_to_normal:
+    {}
 
   other_writable:
     {}
