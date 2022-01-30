@@ -37,3 +37,11 @@ netns() {
 		sudo -E ip netns exec "$ns" setpriv --reuid "$UID" --regid "${GROUPS[0]}" --clear-groups --reset-env "$@"
 	fi
 }
+
+ansi_colors() {
+	for c in {0..255}; do
+		tput setaf $c
+	   	tput setaf $c | cat -v
+		echo " =${c}"
+	done
+}

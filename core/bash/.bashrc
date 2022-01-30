@@ -18,20 +18,24 @@ if [[ -f /etc/bashrc ]]; then
 	source /etc/bashrc
 fi
 
-shopt -s histappend \
-	extglob \
-	lastpipe \
-	direxpand \
-	checkwinsize
+set -o physical
+set +o histexpand
 
-# some useful settings
-shopt -s dotglob \
+shopt -s histappend \
+	histreedit \
+	cmdhist \
+	extglob \
+	globstar \
+	dotglob \
+	lastpipe \
 	autocd \
+	direxpand \
+	checkwinsize \
 	cdspell \
 	assoc_expand_once \
 	checkhash \
-	globstar \
-	lithist
+	lithist \
+	no_empty_cmd_completion
 
 if [[ -f $BDOTDIR/rc.pre ]]; then
 	source "${BDOTDIR}/rc.pre"
