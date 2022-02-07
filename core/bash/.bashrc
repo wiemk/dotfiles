@@ -1,5 +1,5 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
-
+# shellcheck disable=SC1090,SC1091
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/bash/_debug" ]]; then
 	on_debug() {
@@ -18,7 +18,7 @@ if [[ -f /etc/bashrc ]]; then
 	source /etc/bashrc
 fi
 
-set -o physical
+#set -o physical
 set +o histexpand
 
 shopt -s histappend \
@@ -100,21 +100,20 @@ trim() {
 	printf '%s' "$var"
 }
 
-if [[ -f /run/.containerenv ]] || systemd-detect-virt --quiet --container; then
+if [[ -f /run/.containerenv ]] || systemd-detect-virt --quiet --container &>/dev/null; then
 	export CONTAINER=1
 fi
 
+# note: files beginning with `99-' are not version controlled
+if [[ -d $BDOTDIR/source.d ]]; then
 shopt -s nullglob
-# plugins are allowed to modify the environment via export
-if [[ -d $BDOTDIR/plugins ]]; then
-	for plug in "$BDOTDIR"/plugins/*; do
+	# plugins are allowed to modify the environment via export
+	# but are self-contained and loading order shall not matter
+	for plug in "$BDOTDIR"/source.d/*.in; do
 		source "$plug"
 	done
-fi
-
-# functions should be pure
-if [[ -d $BDOTDIR/functions ]]; then
-	for func in "$BDOTDIR"/functions/*; do
+	# functions should be pure/side-effect free but may depend on each other
+	for func in "$BDOTDIR"/source.d/*.sh; do
 		source "$func"
 	done
 fi

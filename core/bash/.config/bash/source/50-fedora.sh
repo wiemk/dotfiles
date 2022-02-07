@@ -1,4 +1,5 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
+
 on_debug
 
 (
@@ -19,11 +20,15 @@ if has koji; then
 fi
 
 dnf-reason() {
-	sudo dnf -qC repoquery --installed --qf='%{name}-%{evr}.%{arch} (%{reason})' "${1}" | grep --color=never -oP '\(.*\)'
+	sudo dnf -qC repoquery --installed --qf='%{name}-%{evr}.%{arch} (%{reason})' "${1}" | grep --color=never -oP '(?<=\()[\w-]+(?=\))'
 }
 
 dnf-group() {
 	sudo dnf -qC repoquery --groupmember "${1}"
+}
+
+dnf-needed() {
+	sudo dnf -qC repoquery --unneeded "${1}"
 }
 
 dnf-history() {
@@ -36,6 +41,10 @@ rpm-weakdeps() {
 
 pkginfo() {
 	local -r pkg=$1
+	if ! rpm -q "$pkg" &>/dev/null; then
+		echo "package not installed"
+		return 1
+	fi
 	sudo -v
 	echo "=== Install reason ==="
 	dnf-reason "$pkg"
@@ -43,7 +52,11 @@ pkginfo() {
 	dnf-group "$pkg"
 	echo "=== Weak dependencies ==="
 	rpm-weakdeps "$pkg"
-	printf "\n=== History ===\n"
+	echo "=== Marked for autoremove ==="
+	if [[ $(dnf-needed "$pkg" | wc -l) -gt 0 ]]; then
+		echo "YES"
+	fi
+	printf "=== History ===\n"
 	dnf-history "$pkg"
 	printf "\n=== Description ===\n"
 	rpm -qi "$pkg"
