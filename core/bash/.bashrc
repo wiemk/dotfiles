@@ -3,8 +3,10 @@
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/bash/_debug" ]]; then
 	on_debug() {
-		local -r script=$(readlink -e -- "${BASH_SOURCE[1]}") || return
-		printf '%d%s\n' "${EPOCHSECONDS}" ": ${script}" >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
+		local -r script=$(readlink -e -- "${BASH_SOURCE[1]}") || \
+			return
+		printf '%d%s\n' "${EPOCHSECONDS}" ": ${script}" \
+			>> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
 	}
 else
 	on_debug() { :; }
@@ -100,21 +102,20 @@ trim() {
 	printf '%s' "$var"
 }
 
-if [[ -f /run/.containerenv ]] || systemd-detect-virt --quiet --container &>/dev/null; then
+if [[ -f /run/.containerenv ]] || \
+	systemd-detect-virt --quiet --container &>/dev/null; then
 	export CONTAINER=1
 fi
 
 # note: files beginning with `99-' are not version controlled
 if [[ -d $BDOTDIR/source.d ]]; then
 shopt -s nullglob
-	# plugins are allowed to modify the environment via export
-	# but are self-contained and loading order shall not matter
-	for plug in "$BDOTDIR"/source.d/*.in; do
-		source "$plug"
-	done
-	# functions should be pure/side-effect free but may depend on each other
-	for func in "$BDOTDIR"/source.d/*.sh; do
-		source "$func"
+	# Plugins are allowed to modify the environment via export
+	# but are self-contained and loading order shall not matter.
+	# Functions should be pure/side-effect free but may depend
+	# on each other.
+	for src in "$BDOTDIR"/source.d/*.sh; do
+		source "$src"
 	done
 fi
 shopt -u nullglob

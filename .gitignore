@@ -1,8 +1,9 @@
 # bash
 core/bash/.config/bash/rc.pre
 core/bash/.config/bash/rc.post
-core/bash/.config/bash/source/99-*
+core/bash/.config/bash/source/9[0-9]-*.sh
 core/bash/.config/bash/source.d/*[.in,.sh]
+core/bash/.config/bash/source/local/*.sh
 # git
 core/git/.config/git/*.local
 # fish
