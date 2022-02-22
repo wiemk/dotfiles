@@ -13,14 +13,14 @@ else
 		declare -a seq=(bold dim blink smul rmul rev smso rmso sgr0 tsl fsl)
 		declare -A osc
 		for i in "${seq[@]}"; do
-			osc[$i]=$(tput $i)
+			osc[$i]="\[$(tput "$i")\]"
 		done
 
 		declare -A col
-		col[red]=$(tput setaf 1)
-		col[green]=$(tput setaf 2)
-		col[blue]=$(tput setaf 4)
-		col[purple]=$(tput setaf 105)
+		col[red]="\[$(tput setaf 1)\]"
+		col[green]="\[$(tput setaf 2)\]"
+		col[blue]="\[$(tput setaf 4)\]"
+		col[purple]="\[$(tput setaf 105)\]"
 
 	displayPS1() {
 		local rval=$?
@@ -31,10 +31,10 @@ else
 		if (( rval == 0 )); then
 			unset rval
 		else
-			printf -v rval "(%s%s%d%s) " $bold ${col[red]} $rval $norm
+			printf -v rval "(%s%s%d%s) " "$bold" "${col[red]}" "$rval" "$norm"
 		fi
 		if (( TOOLBOX == 1 )); then
-			printf -v tbox "%s%s⬢%s " $bold ${col[purple]} $norm
+			printf -v tbox "%s%s⬢%s " "$bold" "${col[purple]}" "$norm"
 		fi
 		PS1="${tbox}${remp}${dim}\A${norm} ${col[purple]}\u ${col[green]}\w${norm}\n${rval}${col[blue]}\$${norm} "
 	}

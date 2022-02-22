@@ -53,8 +53,7 @@ vim.cmd [[
 	augroup end
 ]]
 
-local use = require'packer'.use
-require'packer'.startup(function()
+require'packer'.startup(function(use)
 	use 'wbthomason/packer.nvim'          -- Package manager
 	use 'neovim/nvim-lspconfig'           -- Collection of configurations for built-in LSP client
 	use 'machakann/vim-sandwich'          -- Surround text objects
