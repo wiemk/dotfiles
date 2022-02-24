@@ -33,7 +33,7 @@ color listfocus_unread color236 color12
 ignore-mode "display"
 ignore-article "https://www.heise.de/rss/heise.rdf" "title =~ \"^heise\\+ \\| |^TechStage \\| \""
 # we get undramatized covid information from actual papers
-ignore-article "*" "title =~ \"Corona|Covid|Vacc|Sport\""
+ignore-article "*" "title =~ \"Corona|Covid|Vacc|Sport|Werbung\""
 
 bind-key a mark-all-above-as-read
 

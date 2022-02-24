@@ -1,31 +1,60 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
+# shellcheck shell=bash
+# shellcheck disable=2155,1090
 
 on_debug
 
-up() {
-	cd $(printf '../%.0s' $(seq 1 $1));
-}
-alias ..='up'
-
-prompt() {
-	read -rp "${1} (y/n) " choice
-	case "$choice" in 
-		y|Y ) return 0;;
-		n|N ) return 1;;
-		* ) return 1;;
-	esac
+ansi-colors() {
+	for c in {0..255}; do
+		tput setaf $c
+		tput setaf $c | cat -v
+		echo " =${c}"
+	done
 }
 
 bashquote() {
-	printf '%q\n' "$(</dev/stdin)";
+	printf '%q\n' "$(</dev/stdin)"
 }
 
-mem() { ps -eo rss,vsz,pid,euser,args --cols=100 --sort %mem \
-	| grep -v grep \
-	| grep -i "$@" \
-	| awk '{
-		rss=$1;vsz=$2;pid=$3;uid=$4;$1=$2=$3=$4="";sub(/^[ \t\r\n]+/, "", $0);
-		printf("%d: (%s) # %s\n\tRSS: %8.2f M\n\tVSZ: %8.2f M\n", pid, uid, $0, rss/1024, vsz/1024);}'
+if has secret-tool; then
+	get-secret() {
+		local -r kv=$1
+		readarray -td \: arr < <(printf "%s\0" "$kv")
+		secret-tool lookup "${arr[0]}" "${arr[1]}"
+	}
+else
+	# shim to avoid further checks
+	get-secret() {
+		printf "%s" "$*"
+	}
+fi
+
+srun() {
+	systemd-run --quiet --user --collect "$@"
+}
+
+up() {
+	builtin cd "$(printf '../%.0s' $(seq 1 "$1"))" || return
+	alias ..='up'
+}
+
+mem() {
+	ps -eo rss,vsz,pid,euser,args --cols=100 --sort %mem |
+		grep -v grep |
+		grep -i "$@" |
+		awk '{
+			rss=$1;vsz=$2;pid=$3;uid=$4;$1=$2=$3=$4="";sub(/^[ \t\r\n]+/, "", $0);
+			printf("%d: (%s) # %s\n\tRSS: %8.2f M\n\tVSZ: %8.2f M\n", pid, uid, $0, rss/1024, vsz/1024);
+		}'
+}
+
+prompt() {
+	read -rp "${1} (y/n) " choice
+	case "$choice" in
+	y | Y) return 0 ;;
+	n | N) return 1 ;;
+	*) return 1 ;;
+	esac
 }
 
 netns() {
@@ -39,10 +68,32 @@ netns() {
 	fi
 }
 
-ansi_colors() {
-	for c in {0..255}; do
-		tput setaf $c
-	   	tput setaf $c | cat -v
-		echo " =${c}"
-	done
-}
+if has xfreerdp; then
+	rdp() {
+		local store=$3
+		store=$(get-secret "rdp:${store}")
+		if [[ -z $store ]]; then
+			store=$3
+		fi
+
+		srun xfreerdp \
+			/network:auto /rfx /dvc:echo /w:1600 /h:900 /dvc:echo /geometry /cert:ignore \
+			+compression +async-channels +async-input -encryption -grab-keyboard \
+			/v:"${1}" /u:"${2}" /p:"${store}" "${@:4}"
+	}
+fi
+
+if has scrcpy; then
+	scc() {
+		srun scrcpy --max-size 1600 --bit-rate 12M --max-fps 60 --stay-awake --turn-screen-off "$@"
+	}
+fi
+
+if has xprop && has xdotool; then
+	xnobar() {
+		local -r window=$(xdotool getactivewindow)
+		xprop -id "$window" -f _MOTIF_WM_HINTS 32c \
+			-set _MOTIF_WM_HINTS '0x2, 0x0, 0x0, 0x0, 0x0'
+
+	}
+fi

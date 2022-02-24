@@ -1,6 +1,8 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
-
+# shellcheck disable=2155,1090
 # http://stackoverflow.com/a/1088763/49849
+
+on_debug
 
 _xdiscard() {
 	echo -n "${READLINE_LINE:0:READLINE_POINT}" | xclip
@@ -15,7 +17,7 @@ _xkill() {
 
 _xyank() {
 	local func=${1:-'xclip -o'}
-	local str=$(eval $func)
+	local str=$(eval "$func")
 	local len=${#str}
 	READLINE_LINE=${READLINE_LINE:0:READLINE_POINT}${str}${READLINE_LINE:READLINE_POINT}
 	READLINE_POINT=$((READLINE_POINT + len))
@@ -23,7 +25,8 @@ _xyank() {
 
 _xyankq() {
 	local func=${1:-'xclip -o'}
-	local str=$(eval $func); str="${str@Q} "
+	local str=$(eval "$func")
+	str="${str@Q} "
 	local len=${#str}
 	READLINE_LINE=${READLINE_LINE:0:READLINE_POINT}${str}${READLINE_LINE:READLINE_POINT}
 	READLINE_POINT=$((READLINE_POINT + len))

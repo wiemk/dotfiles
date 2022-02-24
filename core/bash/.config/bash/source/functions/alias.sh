@@ -2,9 +2,22 @@
 
 on_debug
 
-alias xnobar="xprop \
-	-id \$(xdotool getactivewindow) \
-	-f _MOTIF_WM_HINTS 32c \
-	-set _MOTIF_WM_HINTS '0x2, 0x0, 0x0, 0x0, 0x0'"
+alias ll='command ls -l --color=auto' 2>/dev/null
+alias l.='command ls -d .* --color=auto' 2>/dev/null
+alias ls='command ls --color=auto --show-control-chars --group-directories-first -AlhXF'
 
-rdp() { systemd-run --quiet --user --collect xfreerdp /network:auto /rfx /dvc:echo /w:1600 /h:900 /dvc:echo /geometry /cert:ignore +compression +async-channels +async-input -encryption -grab-keyboard /v:"${1}" /u:"${2}" /p:"${3}" "${@:4}"; }
+alias rm='command rm -vI'
+alias cp='command cp -avi'
+alias mv='command mv -vi'
+alias ln='command ln -vi'
+alias mkdir='command mkdir -v'
+alias grep='grep --color=auto'
+
+alias chmod='command chmod -c --preserve-root'
+alias chown='command chown -c --preserve-root'
+alias chgrp='command chgrp -c --preserve-root'
+
+alias v="\${EDITOR:-vi}"
+alias vi="\${EDITOR:-vi}"
+alias e="\${EDITOR:-editor}"
+alias c='command'

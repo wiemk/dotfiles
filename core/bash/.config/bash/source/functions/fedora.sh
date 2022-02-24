@@ -2,6 +2,8 @@
 
 on_debug
 
+# check if host is a fedora system
+# no -> return early
 (
 	source /etc/os-release
 	if [[ $ID == fedora ]]; then
@@ -13,10 +15,10 @@ on_debug
 
 if has koji; then
 	chkpkg() {
-		echo -n "$*" \
-			| tr ' ' '\0' \
-			| xargs -P8 -L1 -0 koji list-builds --state=COMPLETE --after="$(env LC_ALL=C date -d -'2 days')" --package
-		}
+		echo -n "$*" |
+			tr ' ' '\0' |
+			xargs -P8 -L1 -0 koji list-builds --state=COMPLETE --after="$(env LC_ALL=C date -d -'2 days')" --package
+	}
 fi
 
 dnf-reason() {
