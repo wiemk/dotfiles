@@ -1,6 +1,9 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
 # shellcheck disable=SC1090,SC1091
 
+# non-interactive, return early
+[[ -z "$PS1" ]] && return
+
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/bash/_debug" ]]; then
 	on_debug() {
@@ -60,6 +63,13 @@ history -a
 
 has() {
 	if hash "${1}" &>/dev/null; then
+		return 0
+	fi
+	return 1
+}
+
+has_line_editing() {
+	if [[ ${SHELLOPTS} =~ (vi|emacs) ]]; then
 		return 0
 	fi
 	return 1

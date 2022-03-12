@@ -12,7 +12,11 @@ if [[ -f ~/.profile ]]; then
 	source ~/.profile
 fi
 
-# load .bashrc for aliases and functions in login shells
-if [[ -f ~/.bashrc ]]; then
-	source ~/.bashrc
-fi
+# only load .bashrc for aliases and functions in
+# login shells if shell is interactive
+case "$-" in *i*)
+	if [ -r ~/.bashrc ]; then
+		source ~/.bashrc
+	fi
+	;;
+esac
