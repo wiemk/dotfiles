@@ -2,7 +2,7 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
 # shellcheck disable=SC2034
 
-# set up basic bash install
+# set up basic install
 
 set -eo pipefail
 
