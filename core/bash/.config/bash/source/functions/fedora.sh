@@ -21,27 +21,53 @@ if has koji; then
 	}
 fi
 
+dnf-extra() {
+	# list packages no loger available in enabled repos
+	sudo dnf list extras
+}
+
+dnf-retired() {
+	# list explicitly retired packages from last fedora version
+	local -r pkg=remove-retired-packages
+	if ! has $pkg; then
+		sudo dnf install $pkg
+	fi
+	$pkg
+}
+
+dnf-unsatisfied() {
+	# list potentially broken dependencies
+	sudo dnf repoquery --unsatisfied
+}
+
 dnf-reason() {
+	# list install reason for a package
 	sudo dnf -qC repoquery --installed --qf='%{name}-%{evr}.%{arch} (%{reason})' "${1}" | grep --color=never -oP '(?<=\()[\w-]+(?=\))'
 }
 
 dnf-group() {
+	# member of any group?
 	sudo dnf -qC repoquery --groupmember "${1}"
 }
 
 dnf-needed() {
+	# is it needed by anything?
 	sudo dnf -qC repoquery --unneeded "${1}"
 }
 
 dnf-history() {
+	# install history for a package
 	sudo dnf -qC history "${1}"
 }
 
-rpm-weakdeps() {
+rpm-weak() {
+	# weak dependencies of a package
 	rpm -q --whatsupplements "${1}"
+	rpm -q --whatrecommends "${1}"
 }
 
 pkginfo() {
+	# collect package specific information from abovec
 	local -r pkg=$1
 	if ! rpm -q "$pkg" &>/dev/null; then
 		echo "package not installed"
