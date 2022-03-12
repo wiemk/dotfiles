@@ -218,7 +218,7 @@ end
 vim.cmd [[
 	augroup Packer
 		autocmd!
-		autocmd BufWritePost init.lua PackerCompile
+		autocmd BufWritePost init.lua source <afile> | PackerCompile"
 	augroup end
 ]]
 

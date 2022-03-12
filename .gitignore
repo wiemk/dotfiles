@@ -16,9 +16,7 @@ staging/fish/.config/fish/fish_variables
 # systemd
 core/systemd/user/telegram-notification@.service.d/override.conf
 # neovim
-core/nvim/.config/nvim/*
-!core/nvim/.config/nvim/init.lua
-!core/nvim/.config/nvim/lua
+core/nvim/.config/lvim/plugin/*
 # kitty
 staging/kitty/.config/kitty/theme.conf
 # gnupg
