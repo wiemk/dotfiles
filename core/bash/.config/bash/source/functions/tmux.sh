@@ -1,4 +1,5 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
+
 on_debug
 
 if ! has tmux; then
@@ -7,15 +8,15 @@ fi
 
 tma() {
 	local sess='main'
-	if (( $# > 0 )); then
+	if (($# > 0)); then
 		sess=$1
 	fi
 	command tmux new-session -A -s "${sess}"
 }
 
 is_tmux() {
-	local -r tm=$(ps -p $(ps -p $$ -o ppid= | xargs -n 1) -o comm=)
-	[[ $tm == "tmux"* ]];
+	local -r tm=$(ps -p "$(ps -p $$ -o ppid= | xargs -n 1)" -o comm=)
+	[[ $tm == "tmux"* ]]
 }
 
 tmux_rename_window() {
@@ -59,7 +60,7 @@ tmux_rename_window() {
 
 # ssh wrapper for renaming window
 ssh() {
-	local param=( "$@" )
+	local param=("$@")
 
 	if ! has rg || ! is_tmux; then
 		eval "command ssh $*"

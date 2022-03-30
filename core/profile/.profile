@@ -9,7 +9,7 @@
 if [[ -e "${XDG_CONFIG_HOME}/bash/_debug" ]]; then
 	on_debug() {
 		local -r script=$(readlink -e -- "${BASH_SOURCE[1]}") || return
-		printf '%d%s\n' "${EPOCHSECONDS}" ": ${script}" >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
+		printf '%d%s\n' "${EPOCHSECONDS}" ": ${script}" >>"${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
 	}
 else
 	on_debug() { :; }
@@ -26,7 +26,7 @@ has() {
 	return 1
 }
 
-contains() { 
+contains() {
 	local -n arr=$1
 	local n=$2
 	for e in "${arr[@]}"; do
@@ -69,15 +69,15 @@ export SYSTEMD_PAGER='cat'
 
 #################################################
 # define additional PATH folders here
-path_exports=("${XDG_DATA_HOME}/../bin")
+PATH_EXPORTS=("${XDG_DATA_HOME}/../bin")
 # read by PAM through the pam_env module (man 8 pam_env) - be aware that fedora
 # is using a patched pam_env module which does not enable user_readenv by default
 # touch ${HOME}/.pam_environment for enabling
-pam_exports=(XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME PATH)
+PAM_EXPORTS=(XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME PATH)
 # environment.d (man 8 environment.d) read by systemd-environment-d-generator
-# (man 8 systemd-environment-d-generator), initialized with default pam_exports
+# (man 8 systemd-environment-d-generator), initialized with default PAM_EXPORTS
 # touch ${XDG_CONFIG_HOME}/environment.d/50-profile.conf for enabling
-env_exports=("${pam_exports[@]}")
+ENV_EXPORTS=("${PAM_EXPORTS[@]}")
 
 #################################################
 # source host specific profile
@@ -106,9 +106,10 @@ source_host_profile() {
 export_user_paths() {
 	local -a rpath
 	if has realpath; then
-		readarray -t -d ':' apath <<< "$PATH"
-		for (( i=0; i < ${#path_exports[@]}; i++ )); do
-			local realp="$(realpath -qms "${path_exports[$i]}")"
+		# shellcheck disable=SC2034
+		readarray -t -d ':' apath <<<"$PATH"
+		for ((i = 0; i < ${#PATH_EXPORTS[@]}; i++)); do
+			local realp="$(realpath -qms "${PATH_EXPORTS[$i]}")"
 			# check if already added,
 			if ! contains apath "$realp"; then
 				rpath+=("$realp")
@@ -124,7 +125,7 @@ export_user_paths() {
 # export for pam_env and avoid unnecessary writes
 create_pamd_export() {
 	local -a buf
-	for var in "${pam_exports[@]}"; do
+	for var in "${PAM_EXPORTS[@]}"; do
 		printf -v line '%-32s DEFAULT=%s' "$var" "${!var}"
 		buf+=("${line}")
 	done
@@ -135,7 +136,7 @@ create_pamd_export() {
 # same for environment.d
 create_envd_export() {
 	local -a buf
-	for var in "${env_exports[@]}"; do
+	for var in "${ENV_EXPORTS[@]}"; do
 		printf -v line '%s=%s' "$var" "${!var}"
 		buf+=("${line}")
 	done
@@ -154,7 +155,7 @@ write_pamd_exports() {
 	render_exp="$(create_pamd_export)"
 	if ! is_equal "${HOME}/.pam_environment" "$render_exp"; then
 		printf '%s\n' "${HOME}/.pam_environment updated!" >&2
-		printf '%s\n' "$render_exp" > "${HOME}/.pam_environment"
+		printf '%s\n' "$render_exp" >"${HOME}/.pam_environment"
 	fi
 }
 
@@ -162,7 +163,7 @@ write_envd_exports() {
 	render_exp="$(create_envd_export)"
 	if ! is_equal "${XDG_CONFIG_HOME}/environment.d/50-profile.conf" "$render_exp"; then
 		printf '%s\n' "${XDG_CONFIG_HOME}/environment.d/50-profile.conf updated!" >&2
-		printf '%s\n' "$render_exp" > "${XDG_CONFIG_HOME}/environment.d/50-profile.conf"
+		printf '%s\n' "$render_exp" >"${XDG_CONFIG_HOME}/environment.d/50-profile.conf"
 	fi
 }
 
@@ -172,8 +173,7 @@ export_envd() {
 	local -r envd="${XDG_CONFIG_HOME}/environment.d"
 	set -a
 	if [[ -d $fragment ]]; then
-		for fragment in "${envd}"/*.conf
-		do
+		for fragment in "${envd}"/*.conf; do
 			source "$fragment"
 		done
 	fi
@@ -186,7 +186,7 @@ source_machine_profile
 # load host specific profile
 source_host_profile
 
-# export canonicalized 'path_exports' entries after sourcing host specific profile
+# export canonicalized 'PATH_EXPORTS' entries after sourcing host specific profile
 export_user_paths
 
 # has to be manually called by the user

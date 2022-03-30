@@ -1,4 +1,6 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
+# shellcheck disable=2155,1090
+
 on_debug
 
 if ! has fzf; then
@@ -9,11 +11,10 @@ FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS:-"--height=50% --info=inline"}
 
 # https://github.com/junegunn/fzf/wiki/examples#command-history
 bind '"\C-r": "\C-x1\e^\er"'
-bind -x '"\C-x1": __fzf_history';
+bind -x '"\C-x1": __fzf_history'
 
 # Redraw prompt line
-__ehc()
-{
+__ehc() {
 	if [[ -n $1 ]]; then
 		bind -m emacs '"\er": redraw-current-line'
 		bind -m emacs '"\e^": magic-space'
@@ -26,12 +27,12 @@ __ehc()
 	fi
 }
 
-__fzf_history () {
+__fzf_history() {
 	__ehc "$(history | fzf --tac --tiebreak=index | grep -oP '^\s*([0-9]+)\s+\K.*$')"
 }
 
 fkill() {
-	local pid 
+	local pid
 	if [[ "$UID" != "0" ]]; then
 		pid=$(ps -f -u $UID --no-headers | fzf -m | awk '{print $2}')
 	else
@@ -39,7 +40,7 @@ fkill() {
 	fi
 
 	if [[ -n $pid ]]; then
-		echo $pid | xargs kill -${1:-15}
+		echo "$pid" | xargs kill -"${1:-15}"
 	fi
 }
 

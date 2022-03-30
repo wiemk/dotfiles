@@ -1,5 +1,4 @@
---glob
-!.git/**
+# theme
 --colors
 match:style:bold
 --colors
@@ -12,7 +11,13 @@ match:fg:green
 line:fg:magenta
 --colors
 column:fg:magenta
+
+# flags
+--glob
+!.git/**
+--glob
+!node_modules/**
 --column
 --smart-case
---hidden
 --trim
+--max-columns=256

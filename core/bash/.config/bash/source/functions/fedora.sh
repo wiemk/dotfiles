@@ -1,0 +1,91 @@
+# vi:set ft=bash ts=4 sw=4 noet noai:
+
+on_debug
+
+# check if host is a fedora system
+# no -> return early
+(
+	source /etc/os-release
+	if [[ $ID == fedora ]]; then
+		exit 1
+	else
+		exit 0
+	fi
+) && return
+
+if has koji; then
+	chkpkg() {
+		echo -n "$*" |
+			tr ' ' '\0' |
+			xargs -P8 -L1 -0 koji list-builds --state=COMPLETE --after="$(env LC_ALL=C date -d -'2 days')" --package
+	}
+fi
+
+dnf-extra() {
+	# list packages no loger available in enabled repos
+	sudo dnf list extras
+}
+
+dnf-retired() {
+	# list explicitly retired packages from last fedora version
+	local -r pkg=remove-retired-packages
+	if ! has $pkg; then
+		sudo dnf install $pkg
+	fi
+	$pkg
+}
+
+dnf-unsatisfied() {
+	# list potentially broken dependencies
+	sudo dnf repoquery --unsatisfied
+}
+
+dnf-reason() {
+	# list install reason for a package
+	sudo dnf -qC repoquery --installed --qf='%{name}-%{evr}.%{arch} (%{reason})' "${1}" | grep --color=never -oP '(?<=\()[\w-]+(?=\))'
+}
+
+dnf-group() {
+	# member of any group?
+	sudo dnf -qC repoquery --groupmember "${1}"
+}
+
+dnf-needed() {
+	# is it needed by anything?
+	sudo dnf -qC repoquery --unneeded "${1}"
+}
+
+dnf-history() {
+	# install history for a package
+	sudo dnf -qC history "${1}"
+}
+
+rpm-weak() {
+	# weak dependencies of a package
+	rpm -q --whatsupplements "${1}"
+	rpm -q --whatrecommends "${1}"
+}
+
+pkginfo() {
+	# collect package specific information from abovec
+	local -r pkg=$1
+	if ! rpm -q "$pkg" &>/dev/null; then
+		echo "package not installed"
+		return 1
+	fi
+	sudo -v
+	echo "=== Install reason ==="
+	dnf-reason "$pkg"
+	echo "=== Member of groups ==="
+	dnf-group "$pkg"
+	echo "=== Weak dependencies ==="
+	rpm-weakdeps "$pkg"
+	echo "=== Marked for autoremove ==="
+	if [[ $(dnf-needed "$pkg" | wc -l) -gt 0 ]]; then
+		echo "YES"
+	fi
+	printf "=== History ===\n"
+	dnf-history "$pkg"
+	printf "\n=== Description ===\n"
+	rpm -qi "$pkg"
+}

@@ -1,9 +1,0 @@
-# Basic vars
-set shell bash
-set shellopts '-eu'
-set ifs "\n"
-set scrolloff 10
-set icons
-set period 1
-
-map . set hidden!

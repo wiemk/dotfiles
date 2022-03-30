@@ -1,4 +1,5 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
+
 on_debug
 
 # Create own scope for neovim and child processes

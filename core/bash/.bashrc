@@ -1,10 +1,16 @@
 # vi:set ft=bash ts=4 sw=4 noet noai:
+# shellcheck disable=SC1090,SC1091
+
+# non-interactive, return early
+[[ -z "$PS1" ]] && return
 
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/bash/_debug" ]]; then
 	on_debug() {
-		local -r script=$(readlink -e -- "${BASH_SOURCE[1]}") || return
-		printf '%d%s\n' "${EPOCHSECONDS}" ": ${script}" >> "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
+		local -r script=$(readlink -e -- "${BASH_SOURCE[1]}") ||
+			return
+		printf '%d%s\n' "${EPOCHSECONDS}" ": ${script}" \
+			>>"${XDG_RUNTIME_DIR:-/run/user/${UID}}/profile_dbg.log"
 	}
 else
 	on_debug() { :; }
@@ -12,13 +18,13 @@ fi
 
 on_debug
 
-export BDOTDIR=${XDG_CONFIG_HOME:-~/.config/}/bash 
+export BDOTDIR=${XDG_CONFIG_HOME:-~/.config/}/bash
 
 if [[ -f /etc/bashrc ]]; then
 	source /etc/bashrc
 fi
 
-set -o physical
+#set -o physical
 set +o histexpand
 
 shopt -s histappend \
@@ -62,20 +68,28 @@ has() {
 	return 1
 }
 
-pathmunge () {
+has_line_editing() {
+	if [[ ${SHELLOPTS} =~ (vi|emacs) ]]; then
+		return 0
+	fi
+	return 1
+}
+
+pathmunge() {
 	case ":${PATH}:" in
-		*:"$1":*)
-			;;
-		*)
-			if [ "$2" = "after" ] ; then
-				PATH=$PATH:$1
-			else
-				PATH=$1:$PATH
-			fi
+	*:"$1":*) ;;
+
+	*)
+		if [ "$2" = "after" ]; then
+			PATH=$PATH:$1
+		else
+			PATH=$1:$PATH
+		fi
+		;;
 	esac
 }
 
-contains_assoc() { 
+contains_assoc() {
 	local haystack="$1[@]"
 	local needle=$2
 	for e in "${!haystack}"; do
@@ -84,7 +98,7 @@ contains_assoc() {
 	return 1
 }
 
-contains() { 
+contains() {
 	local -n haystack=$1
 	local needle=$2
 	for e in "${haystack[@]}"; do
@@ -100,22 +114,20 @@ trim() {
 	printf '%s' "$var"
 }
 
-if [[ -f /run/.containerenv ]] || systemd-detect-virt --quiet --container; then
+if [[ -f /run/.containerenv ]] ||
+	systemd-detect-virt --quiet --container &>/dev/null; then
 	export CONTAINER=1
 fi
 
-shopt -s nullglob
-# plugins are allowed to modify the environment via export
-if [[ -d $BDOTDIR/plugins ]]; then
-	for plug in "$BDOTDIR"/plugins/*; do
-		source "$plug"
-	done
-fi
-
-# functions should be pure
-if [[ -d $BDOTDIR/functions ]]; then
-	for func in "$BDOTDIR"/functions/*; do
-		source "$func"
+# note: files beginning with `99-' are not version controlled
+if [[ -d $BDOTDIR/source.d ]]; then
+	shopt -s nullglob
+	# Plugins are allowed to modify the environment via export
+	# but are self-contained and loading order shall not matter.
+	# Functions should be pure/side-effect free but may depend
+	# on each other.
+	for src in "$BDOTDIR"/source.d/*.sh; do
+		source "$src"
 	done
 fi
 shopt -u nullglob
