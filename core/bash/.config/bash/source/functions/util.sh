@@ -6,8 +6,8 @@ on_debug
 
 ansi-colors() {
 	for c in {0..255}; do
-		tput setaf $c
-		tput setaf $c | cat -v
+		tput setaf "$c"
+		tput setaf "$c" | cat -v
 		echo " =${c}"
 	done
 }
@@ -19,7 +19,7 @@ bashquote() {
 if has secret-tool; then
 	get-secret() {
 		local -r kv=$1
-		readarray -td \: arr < <(printf "%s\0" "$kv")
+		readarray -td : arr < <(printf "%s\0" "$kv")
 		secret-tool lookup "${arr[0]}" "${arr[1]}"
 	}
 else
@@ -39,12 +39,14 @@ up() {
 }
 
 mem() {
-	ps -eo rss,vsz,pid,euser,args --cols=100 --sort %mem |
-		grep -v grep |
-		grep -i "$@" |
-		awk '{
+	#shellcheck disable=2009
+	ps -eo rss,vsz,pid,euser,args --cols=100 --sort %mem \
+		| grep -v grep \
+		| grep -i "$@" \
+		| awk '{
 			rss=$1;vsz=$2;pid=$3;uid=$4;$1=$2=$3=$4="";sub(/^[ \t\r\n]+/, "", $0);
-			printf("%d: (%s) # %s\n\tRSS: %8.2f M\n\tVSZ: %8.2f M\n", pid, uid, $0, rss/1024, vsz/1024);
+			printf("%d: (%s) # %s\n\tRSS: %8.2f M\n\tVSZ: %8.2f M\n",
+		   	pid, uid, $0, rss/1024, vsz/1024);
 		}'
 }
 
@@ -64,7 +66,23 @@ netns() {
 	if has firejail; then
 		firejail --quiet --noprofile --rmenv=LS_COLORS --netns="$ns" "$@"
 	else
-		sudo -E ip netns exec "$ns" setpriv --reuid "$UID" --regid "${GROUPS[0]}" --clear-groups --reset-env "$@"
+		sudo -E ip netns exec "$ns" \
+			setpriv --reuid "$UID" --regid "${GROUPS[0]}" --clear-groups --reset-env "$@"
+	fi
+}
+
+share() {
+	local resp=$(ncat unsha.re 9999 | tee /dev/fd/2 \
+		| jq -r '{ expires, secret, url } | to_entries | .[] | "local " + .key + "=" + (.value | @sh)')
+
+	if [[ -n $resp ]]; then
+		eval "$resp"
+		#shellcheck disable=2154
+		xclip -i -select clipboard <(echo "$url")
+
+		if has notify-send; then
+			notify-send "Link copied to clipboard" 2>/dev/null
+		fi
 	fi
 }
 
@@ -97,3 +115,4 @@ if has xprop && has xdotool; then
 
 	}
 fi
+

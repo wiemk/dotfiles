@@ -6,6 +6,8 @@ if ! has zoxide; then
 	return
 fi
 
+export _ZO_EXCLUDE_DIRS='/media/*:/mnt/*:/tmp/*'
+
 eval "$(zoxide init bash)"
 if has fzf; then
 	bind -m emacs '"\C-xx": "\C-x2\e^\er"'

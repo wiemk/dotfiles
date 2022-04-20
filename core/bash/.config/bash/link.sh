@@ -6,7 +6,7 @@
 
 set -eo pipefail
 
-declare -A FUNC_PRIO=([alias]=50 [fedora]=50 [nvim]=51 [tmux]=50 [util]=30)
+declare -A FUNC_PRIO=([alias]=50 [fedora]=50 [editor]=51 [tmux]=50 [util]=30)
 declare -A PLUGIN_PRIO=([fzf]=10 [prompt]=10 [vivid]=10 [zoxide]=10)
 
 link() {
