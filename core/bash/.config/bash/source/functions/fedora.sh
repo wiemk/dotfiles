@@ -79,7 +79,7 @@ pkginfo() {
 	echo "=== Member of groups ==="
 	dnf-group "$pkg"
 	echo "=== Weak dependencies ==="
-	rpm-weakdeps "$pkg"
+	rpm-weak "$pkg"
 	echo "=== Marked for autoremove ==="
 	if [[ $(dnf-needed "$pkg" | wc -l) -gt 0 ]]; then
 		echo "YES"

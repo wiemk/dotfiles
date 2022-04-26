@@ -2,22 +2,25 @@
 
 on_debug
 
-alias ll='command ls -l --color=auto' 2>/dev/null
+alias c='command'
+
 alias l.='command ls -d .* --color=auto' 2>/dev/null
+alias ll='command ls -l --color=auto' 2>/dev/null
 alias ls='command ls --color=auto --show-control-chars --group-directories-first -AlhXF'
 
 alias e='edit'
 alias ve='visual'
 
-alias rm='command rm -vI'
 alias cp='command cp -avi'
-alias mv='command mv -vi'
+alias grep='grep --color=auto'
 alias ln='command ln -vi'
 alias mkdir='command mkdir -v'
-alias grep='grep --color=auto'
+alias mv='command mv -vi'
+alias rm='command rm -vI'
 
+alias chgrp='command chgrp -c --preserve-root'
 alias chmod='command chmod -c --preserve-root'
 alias chown='command chown -c --preserve-root'
-alias chgrp='command chgrp -c --preserve-root'
 
-alias c='command'
+alias unsh='ncat unsha.re 10000'
+
