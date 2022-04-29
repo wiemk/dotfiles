@@ -1,4 +1,5 @@
-# vi:set ft=bash ts=4 sw=4 noet noai:
+# vi:set ft=sh ts=4 sw=4 noet noai:
+# shellcheck shell=bash
 # shellcheck disable=2155,1090
 # http://stackoverflow.com/a/1088763/49849
 

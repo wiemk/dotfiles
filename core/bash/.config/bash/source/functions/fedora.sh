@@ -1,17 +1,18 @@
-# vi:set ft=bash ts=4 sw=4 noet noai:
+# vi:set ft=sh ts=4 sw=4 noet noai:
+# shellcheck shell=bash
 
 on_debug
 
 # check if host is a fedora system
+# and don't pollute namespace
 # no -> return early
 (
-	source /etc/os-release
+	source /usr/lib/os-release
 	if [[ $ID == fedora ]]; then
-		exit 1
-	else
 		exit 0
 	fi
-) && return
+	exit 1
+) || return
 
 if has koji; then
 	chkpkg() {
@@ -47,23 +48,25 @@ dnf-reason() {
 
 dnf-group() {
 	# member of any group?
-	sudo dnf -qC repoquery --groupmember "${1}"
+	sudo dnf -qC repoquery --groupmember "$1"
 }
 
 dnf-needed() {
 	# is it needed by anything?
-	sudo dnf -qC repoquery --unneeded "${1}"
+	sudo dnf -qC repoquery --unneeded "$1"
 }
 
 dnf-history() {
 	# install history for a package
-	sudo dnf -qC history "${1}"
+	sudo dnf -qC history "$1"
 }
 
 rpm-weak() {
 	# weak dependencies of a package
-	rpm -q --whatsupplements "${1}"
-	rpm -q --whatrecommends "${1}"
+	echo "=== Supplements ==="
+	rpm -q --whatsupplements "$1"
+	echo "=== Recommends ==="
+	rpm -q --whatrecommends "$1"
 }
 
 pkginfo() {
@@ -73,6 +76,7 @@ pkginfo() {
 		echo "package not installed"
 		return 1
 	fi
+	# prime sudo
 	sudo -v
 	echo "=== Install reason ==="
 	dnf-reason "$pkg"
@@ -84,8 +88,8 @@ pkginfo() {
 	if [[ $(dnf-needed "$pkg" | wc -l) -gt 0 ]]; then
 		echo "YES"
 	fi
-	printf "=== History ===\n"
+	echo "=== History ==="
 	dnf-history "$pkg"
-	printf "\n=== Description ===\n"
+	echo -e "\n=== Description ===\n"
 	rpm -qi "$pkg"
 }

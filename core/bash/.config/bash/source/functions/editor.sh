@@ -1,15 +1,16 @@
-# vi:set ft=bash ts=4 sw=4 noet noai:
+# vi:set ft=sh ts=4 sw=4 noet noai:
+# shellcheck shell=bash
 
 on_debug
 
 # Create own scope for neovim and child processes
-if has $EDITOR; then
+if has "$EDITOR"; then
 	if [[ -d /run/systemd/system && $CONTAINER != 1 ]]; then
 		function edit() {
 			if ! type -t is_tmux &>/dev/null || ! is_tmux; then
-				systemd-run --quiet --user --collect --scope $EDITOR "$@"
+				systemd-run --quiet --user --collect --scope "$EDITOR" "$@"
 			else
-				tmux_rename_window edit systemd-run --quiet --user --collect --scope $EDITOR "$@"
+				tmux_rename_window edit systemd-run --quiet --user --collect --scope "$EDITOR" "$@"
 			fi
 		}
 	else

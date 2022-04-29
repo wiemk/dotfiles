@@ -1,4 +1,4 @@
-# vim: ft=bash ts=4 sw=4 noet
+# vim: ft=sh ts=4 sw=4 noet
 # shellcheck shell=bash
 # shellcheck disable=2155,1090
 #

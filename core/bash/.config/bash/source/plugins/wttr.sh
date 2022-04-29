@@ -1,4 +1,5 @@
-# vi:set ft=bash ts=4 sw=4 noet noai:
+# vi:set ft=sh ts=4 sw=4 noet noai:
+# shellcheck shell=bash
 
 # If you source this file, it will set wttr_params as well as show weather.
 
@@ -14,10 +15,10 @@ _wttr_param() {
 
 		for tok in $(locale LC_MEASUREMENT); do
 			case $tok in
-				1) wttr_params+=('m') ;;
-				2) wttr_params+=('u') ;;
+			1) wttr_params+=('m') ;;
+			2) wttr_params+=('u') ;;
 			esac
-		done 2> /dev/null
+		done 2>/dev/null
 		wttr_params+=('F')
 	fi
 	echo "${wttr_params[*]}"
@@ -25,7 +26,8 @@ _wttr_param() {
 
 wttr() {
 	local location="${1// /+}"
-	local param; param=$(_wttr_param)
+	local param
+	param=$(_wttr_param)
 	command shift
 	local -a args
 	for p in "$param" "$@"; do
@@ -37,7 +39,8 @@ wttr() {
 
 wttr2() {
 	local location="${1// /+}"
-	local param; param=$(_wttr_param)
+	local param
+	param=$(_wttr_param)
 	command shift
 	local -a args
 	for p in "$param" "$@"; do

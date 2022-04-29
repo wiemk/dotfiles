@@ -1,4 +1,5 @@
-# vi:set ft=bash ts=4 sw=4 noet noai:
+# vi:set ft=sh ts=4 sw=4 noet noai:
+# shellcheck shell=bash
 
 on_debug
 
@@ -23,4 +24,3 @@ alias chmod='command chmod -c --preserve-root'
 alias chown='command chown -c --preserve-root'
 
 alias unsh='ncat unsha.re 10000'
-

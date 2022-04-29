@@ -9,4 +9,4 @@ if [[ -r "${HOME}/.profile" && -z $PROFILE_SOURCED ]]; then
 	source "${HOME}/.profile"
 fi
 
-# vim: ft=bash ts=4 sw=4 sts=0 noet
+# vim: ft=sh ts=4 sw=4 sts=0 noet

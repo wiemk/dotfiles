@@ -22,4 +22,3 @@ if [ $((now - last)) -gt "${sleep}" ]; then
 	touch "${ts}"
 	notify-send "TMUX:${session} [${index}:${name}]"
 fi
-

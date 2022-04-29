@@ -4,7 +4,7 @@
 #keep in mind that this is a .sh file, and can be used as such
 
 #this config file can be completely empty and ytfzf will still work (as these are the default settings),
-    #so feel free to get rid of anything you don't want in here
+#so feel free to get rid of anything you don't want in here
 
 ###################
 #  ENV VARIABLES  #
@@ -14,14 +14,12 @@
 
 #YTFZF_CONFIG_DIR=$HOME/.config/ytfzf
 
-
 #the file to source for config
 #the best way to use this would either be to export it in your shell's rc or
 #to run ytfzf as such:
-    #YTFZF_CONFIG_FILE=path/to/config ytfzf ...
+#YTFZF_CONFIG_FILE=path/to/config ytfzf ...
 
 #YTFZF_CONFIG_FILE=$YTFZF_CONFIG_DIR/conf.sh
-
 
 #each variable below can be set here, or using export
 #when setting them through export, use the variable in parentheses instead
@@ -65,16 +63,16 @@ external_menu="dmenu -i -l 30 -p Search:"
 
 #the method to use for displaying thumbnails
 #valid options:
-    #ueberzug
-    #jp2a
-    #jp2a-grey/gray
-    #jp2a-4
-    #jp2a-8
-    #catimg
-    #chafa
-    #chafa-grey/gray
-    #chafa-4
-    #chafa-8
+#ueberzug
+#jp2a
+#jp2a-grey/gray
+#jp2a-4
+#jp2a-8
+#catimg
+#chafa
+#chafa-grey/gray
+#chafa-4
+#chafa-8
 #(YTFZF_THUMB_DISP_METHOD)
 thumb_disp_method="ueberzug"
 
@@ -86,7 +84,7 @@ external_menu_len=220
 #the player to use for playing the video, must be able to stream from youtube-dl
 #vlc also works
 #(YTFZF_PLAYER)
-video_player="mpv" 
+video_player="mpv"
 
 #the player to use when choosing a video format with $YTFZF_PREF
 #(YTFZF_PLAYER_FORMAT)
@@ -216,7 +214,7 @@ sort_name=""
 #the filter id that will be used when searching youtube
 #same as --filter-id={filter}
 #to get a filter id go to youtube search for something, choose the filter you want,
-    #then take the part of the url that says &sp= (excluding the &sp=) and put it here
+#then take the part of the url that says &sp= (excluding the &sp=) and put it here
 #this will override any options having to do with the filter unless you explictly use --filter-id
 
 sp=""
@@ -247,7 +245,7 @@ sp=""
 #rating: CAESAhAB (--rating)
 
 #to combine any of these filters it would be best to go to youtube,
-    #filter how you want, then copy the &sp= part of the url
+#filter how you want, then copy the &sp= part of the url
 
 ####################
 #       MISC       #
@@ -259,28 +257,28 @@ sp=""
 
 #the shortcuts to use in fzf
 #the first 6 are used for
-    # printing the urls
-    # printing the title
-    # openeing selected urls in a browser
-    # watching the video
-    # downloading the video
-    # listening to the video
-    # search again
+# printing the urls
+# printing the title
+# openeing selected urls in a browser
+# watching the video
+# downloading the video
+# listening to the video
+# search again
 #in that order, these keys can be changed
 #any keys after will not have default behaviour and the behaviour must be defined in handle_custom_shortcuts
 shortcuts="alt-l,alt-t,alt-o,alt-v,alt-d,alt-m,alt-s,alt-enter"
 
 #some helpful variables to keep in mind:
-    #selected_key: they shortcut pressed
-    #selected_urls: the selected urls
-    #selected_data: the line that was selected
-    #play_url: a function that takes a url and plays it (play_url "$url") 
+#selected_key: they shortcut pressed
+#selected_urls: the selected urls
+#selected_data: the line that was selected
+#play_url: a function that takes a url and plays it (play_url "$url")
 #the return value matters in this function,
-    #returning 0 will continue the program as normal
-    #returning 1 will exit the program and will clean up after itself
-    #returning 2 will restart the main loop (this is used for the search_again shortcut)
-handle_custom_shortcuts () {
-    return 0
+#returning 0 will continue the program as normal
+#returning 1 will exit the program and will clean up after itself
+#returning 2 will restart the main loop (this is used for the search_again shortcut)
+handle_custom_shortcuts() {
+	return 0
 }
 
 #############
@@ -289,7 +287,6 @@ handle_custom_shortcuts () {
 
 #when no search is provided, or -s is given, use this prompt
 search_prompt="Search : "
-
 
 #useragent when using curl on youtube
 useragent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.152 Safari/537.36"
@@ -327,40 +324,39 @@ fancy_subscriptions_text="             -------%s-------"
 
 #this function is called when a video is selected in the menu to send a notification
 #available variables
-    #$videos_selected_count: the number of videos selected
-    #$video_title
-    #$video_channel
-    #$video_views
-    #$video_duration
-    #$video_date (the upload date)
-    #$video_shorturl (the id of the video)
+#$videos_selected_count: the number of videos selected
+#$video_title
+#$video_channel
+#$video_views
+#$video_duration
+#$video_date (the upload date)
+#$video_shorturl (the id of the video)
 
 #with video_title, channel, views, duration, date, and shorturl, be sure to use this syntax
-    # ${var#|}, that way the extra | at the start will be removed
-send_select_video_notif () {
-	#message=$title\nchannel: $channel        
-        #${var#|} removes the extra | at the start of the text
-        message="${video_title#|}\nChannel: ${video_channel#|}"
-        video_thumb="$config_dir/default_thumb.png"        
+# ${var#|}, that way the extra | at the start will be removed
+send_select_video_notif() {
+	#message=$title\nchannel: $channel
+	#${var#|} removes the extra | at the start of the text
+	message="${video_title#|}\nChannel: ${video_channel#|}"
+	video_thumb="$config_dir/default_thumb.png"
 
-        #if more than 1 video selected
-        if [ $videos_selected_count -gt 1 ]; then
-                message="Added $videos_selected_count video to play queue"
-        #if show thumbnails and videos_selected is 1 (it will never be less than 1)         
-        elif [ "$show_thumbnails" -eq 1 ]; then
-                video_thumb="$thumb_dir/${video_shorturl#|}.png"
-        fi
+	#if more than 1 video selected
+	if [ $videos_selected_count -gt 1 ]; then
+		message="Added $videos_selected_count video to play queue"
+	#if show thumbnails and videos_selected is 1 (it will never be less than 1)
+	elif [ "$show_thumbnails" -eq 1 ]; then
+		video_thumb="$thumb_dir/${video_shorturl#|}.png"
+	fi
 
 	#if downloading, say Downloading not currently playing
-        if [ $is_download -eq 1 ]; then                             
-            notify-send "Downloading" "$message" -i "$video_thumb"
-        else                                                            
-            notify-send "Current playing" "$message" -i "$video_thumb"
-        fi
+	if [ $is_download -eq 1 ]; then
+		notify-send "Downloading" "$message" -i "$video_thumb"
+	else
+		notify-send "Current playing" "$message" -i "$video_thumb"
+	fi
 
-        unset message video_thumb
+	unset message video_thumb
 }
-
 
 ###################
 #  VIDEO DISPLAY  #
@@ -368,25 +364,25 @@ send_select_video_notif () {
 
 #when using the menu, use the text printed in this function to display all the info, $shorturl must be present in order to work
 #available default colors (note: they are be bolded):
-    #c_red
-    #c_green
-    #c_yellow
-    #c_blue
-    #c_magenta
-    #c_cyan
-    #c_reset (sets it back to terminal defaults)
+#c_red
+#c_green
+#c_yellow
+#c_blue
+#c_magenta
+#c_cyan
+#c_reset (sets it back to terminal defaults)
 #available variables
-    #title
-    #title_len, the available tty columns for $title
-    #channel
-    #channel_len, the available tty columns for $channel
-    #duration
-    #dur_len, the available tty columns for $duration
-    #views
-    #view_len, the available tty columns for $views
-    #date (video upload date)
-    #date_len, the vailable tty columns for $date
-    #shorturl (the video ID)
+#title
+#title_len, the available tty columns for $title
+#channel
+#channel_len, the available tty columns for $channel
+#duration
+#dur_len, the available tty columns for $duration
+#views
+#view_len, the available tty columns for $views
+#date (video upload date)
+#date_len, the vailable tty columns for $date
+#shorturl (the video ID)
 video_info_text() {
 	printf "%-${title_len}.${title_len}s\t" "$title"
 	printf "%-${channel_len}.${channel_len}s\t" "$channel"
@@ -397,35 +393,33 @@ video_info_text() {
 	printf "\n"
 }
 
-
 #when displaying thumbnails, use the text printed in this function to show the title, views, etc..
 #available default colors (note: they are be bolded):
-    #c_red
-    #c_green
-    #c_yellow
-    #c_blue
-    #c_magenta
-    #c_cyan
-    #c_reset (sets it back to terminal defaults)
+#c_red
+#c_green
+#c_yellow
+#c_blue
+#c_magenta
+#c_cyan
+#c_reset (sets it back to terminal defaults)
 #available variables
-    #title
-    #channel
-    #duration
-    #views
-    #date (video upload date)
-    #description (the short description seen in search results)
-    #shorturl (the video ID)
+#title
+#channel
+#duration
+#views
+#date (video upload date)
+#description (the short description seen in search results)
+#shorturl (the video ID)
 #how this works:
-    #anything printed will stay on the screen in the fzf preview menu
-thumbnail_video_info_text () {
-         printf "\n ${c_cyan}%s" "$title"
-         printf "\n ${c_blue}Channel      ${c_green}%s" "$channel"
-         printf "\n ${c_blue}Duration     ${c_yellow}%s" "$duration"
-         printf "\n ${c_blue}Views        ${c_magenta}%s" "$views"
-         printf "\n ${c_blue}Date         ${c_cyan}%s" "$date"
-         printf "\n ${c_blue}Description  ${c_reset}: %s" "$description"
+#anything printed will stay on the screen in the fzf preview menu
+thumbnail_video_info_text() {
+	printf "\n ${c_cyan}%s" "$title"
+	printf "\n ${c_blue}Channel      ${c_green}%s" "$channel"
+	printf "\n ${c_blue}Duration     ${c_yellow}%s" "$duration"
+	printf "\n ${c_blue}Views        ${c_magenta}%s" "$views"
+	printf "\n ${c_blue}Date         ${c_cyan}%s" "$date"
+	printf "\n ${c_blue}Description  ${c_reset}: %s" "$description"
 }
-
 
 #####################
 #     SCRIPTING     #
@@ -444,63 +438,61 @@ exit_on_opt_error=1
 
 #this function is called when thumbnail_display_method is custom
 #parameters:
-    #$1: thumb_width
-    #$2: thumb_height
-    #$3: thumb_x
-    #$4: thumb_y
-    #$5: IMAGE (path to the image)
-handle_display_img () {
-    return 0
+#$1: thumb_width
+#$2: thumb_height
+#$3: thumb_x
+#$4: thumb_y
+#$5: IMAGE (path to the image)
+handle_display_img() {
+	return 0
 }
 
 #gets called when an opt gets passed
 #paramters
-    #$1 will be the opt name
-    #$2 will be the opt argument
+#$1 will be the opt name
+#$2 will be the opt argument
 #eg:
-    #ytfzf -a -n2
-    #this function will be called twice, on the first time
-	#$1 will be a, $2 will be empty
-    #on the 2nd time
-	#$1 will be n, $2 will be 2
+#ytfzf -a -n2
+#this function will be called twice, on the first time
+#$1 will be a, $2 will be empty
+#on the 2nd time
+#$1 will be n, $2 will be 2
 #long options are different
-    #ytfzf --link-count=2
-    #$1 will be -
-    #$2 will be link-count=2
-on_opt_parse () {
-    return 0
+#ytfzf --link-count=2
+#$1 will be -
+#$2 will be link-count=2
+on_opt_parse() {
+	return 0
 }
-
 
 #this function is called after videos_data has been set and ytfzf knows it's been set
 #parameters
-    #$1 will be videos_data
-    #$2 will be videos_json
-    #$3 will be yt_json
-on_video_data_gotten () {
-    return 0
+#$1 will be videos_data
+#$2 will be videos_json
+#$3 will be yt_json
+on_video_data_gotten() {
+	return 0
 }
 
-
 #this function is called after the search query is gotten, including the initial search used in the command
-    #eg: ytfzf search query
+#eg: ytfzf search query
 #parameters
-    #$1 will be the search query
-on_get_search () {
-    return 0
+#$1 will be the search query
+on_get_search() {
+	return 0
 }
 
 #this function will be called when all instances of ytfzf are closed, and the last one is closed
-on_exit () {
-    return 0
+on_exit() {
+	return 0
 }
 
 #when this function is set it will be called instead of open_player,
 #open_player handles downloading, and showing a video,
 #when handle_urls is defined you get all the urls passed in, and can do whatever you want with them,
 #you can call open_player yourself, as shown below
-handle_urls () {
-    open_player $*
+handle_urls() {
+	open_player $*
 }
 
 #############
@@ -509,40 +501,40 @@ handle_urls () {
 
 #returns the value that it will use to sort
 #parameters
-    #$1: video title
-    #$2: video channel
-    #$3: length of video
-    #$4: view count
-    #$5: upload date
-    #$6: video id
+#$1: video title
+#$2: video channel
+#$3: length of video
+#$4: view count
+#$5: upload date
+#$6: video id
 #be sure to use ${var#|} to get rid of the extra | at the start
-data_sort_key () {
-    sort_by="${5#|}"
-    sort_bey="${sort_by#Streamed}"
-    #this must return the value to sort by
-    printf "%d" "$(date -d "${sort_by}" '+%s')"
-    unset sort_by
+data_sort_key() {
+	sort_by="${5#|}"
+	sort_bey="${sort_by#Streamed}"
+	#this must return the value to sort by
+	printf "%d" "$(date -d "${sort_by}" '+%s')"
+	unset sort_by
 }
 
 #this can be anything but sort is a builtin function that sorts data
 #for random sort set this to "sort -R"
-data_sort_fn () {
-    sort -nr
+data_sort_fn() {
+	sort -nr
 }
 
 #a sort-name is a function that sets the values of data_sort_key and data_sort_fn
 #it is only necessary to set one of these functions, however it is a good idea to set both for clarity and to be sure it works as intended
 
-alphabetical () {
-    data_sort_key () {
-	sort_by="${1#|}"
-	#since sort by is the title of the video, not the upload date, use %s
-	printf "%s" "$sort_by"
-	unset sort_by
-    }
-    data_sort_fn () {
-	sort
-    }
+alphabetical() {
+	data_sort_key() {
+		sort_by="${1#|}"
+		#since sort by is the title of the video, not the upload date, use %s
+		printf "%s" "$sort_by"
+		unset sort_by
+	}
+	data_sort_fn() {
+		sort
+	}
 }
 
 #to use this run, "ytfzf --sort-name=alphabetical <search>"

@@ -4,8 +4,9 @@ lvim = global options object
 
 -- General
 lvim.log.level = "warn"
-lvim.format_on_save = true
+lvim.format_on_save = false
 lvim.colorscheme = "tokyonight"
+lvim.use_icons = true
 
 -- Override default options
 local opts = {
@@ -13,12 +14,12 @@ local opts = {
   colorcolumn = "100",
   -- adapt German keyboard layout
   langmap = "zy,yz,ZY,YZ,[ö,]ä",
-  list = true,
+  list = false,
   listchars = "tab:→ ,eol:↲,nbsp:␣,trail:•,lead:_,extends:⟩,precedes:⟨",
   relativenumber = true,
   showbreak = "↪ ",
   spelllang = "en",
-  timeoutlen = 150,
+  timeoutlen = 250,
 }
 
 (function(o)
@@ -38,13 +39,18 @@ vim.keymap.set({ 'n', 'v' }, '<C-e>', '<End>', { noremap = true, silent = true }
 lvim.keys.normal_mode["<S-l>"] = false
 lvim.keys.normal_mode["<S-h>"] = false
 
--- Remove some annoying default mappings
+-- Remove some default mappings
 lvim.keys.normal_mode["<F1>"] = "<Esc>"
 lvim.keys.insert_mode["<F1>"] = "<Esc>"
+
+-- Remove highlighting
+lvim.keys.normal_mode["<C-h>"] = ":nohlsearch<CR>"
 
 -- In-file navigation
 lvim.keys.normal_mode["<C-k>"] = "<C-u>"
 lvim.keys.normal_mode["<C-j>"] = "<C-d>"
+
+-- Arrow keys
 lvim.keys.normal_mode["<Up>"] = "<nop>"
 lvim.keys.normal_mode["<Down>"] = "<nop>"
 lvim.keys.normal_mode["<Left>"] = "<nop>"
@@ -56,16 +62,15 @@ lvim.keys.normal_mode["<M-Down>"] = ":m .+1<CR>=="
 lvim.keys.visual_block_mode["<M-Up>"] = ":m '<-2<CR>gv-gv"
 lvim.keys.visual_block_mode["<M-Down>"] = ":m '>+1<CR>gv-gv"
 
--- Save
-lvim.keys.normal_mode["<C-s>"] = ":w<CR>"
-lvim.keys.normal_mode["<C-x>"] = ":BufferKill<CR>"
+-- Buffer save/exit
+-- lvim.keys.normal_mode["<C-s>"] = ":w<CR>"
+-- lvim.keys.normal_mode["<C-x>"] = ":BufferKill<CR>"
 
 -- Buffer/Tab navigation
 lvim.keys.normal_mode["<M-,>"] = ":BufferLineCyclePrev<CR>"
 lvim.keys.normal_mode["<M-.>"] = ":BufferLineCycleNext<CR>"
 
 -- which-key
--- do not hook normal mde 'g'
 lvim.builtin.which_key.setup.triggers_blacklist = { n = { "g" } }
 lvim.builtin.which_key.mappings["<leader>"] = { "<C-^>", "Cycle Buffer" }
 lvim.builtin.which_key.mappings["S"] = {
@@ -73,6 +78,9 @@ lvim.builtin.which_key.mappings["S"] = {
 }
 lvim.builtin.which_key.mappings["W"] = {
   function() vim.opt.list = not vim.o.list end, "Whitespaces"
+}
+lvim.builtin.which_key.mappings["h"] = {
+  function() vim.opt.hlsearch = not vim.o.hlsearch end, "Toggle Highlight"
 }
 
 local ok, ts = pcall(require, "telescope.builtin")
@@ -91,36 +99,36 @@ if ok then
     function() ts.live_grep() end,
     "Live Grep",
   }
-  lvim.builtin.which_key.mappings["gf"] = {
+  local gitfiles = {
     function() pcall(ts.git_files) end,
-    "Files",
+    "Git Files",
   }
+  lvim.builtin.which_key.mappings["gf"] = gitfiles
+  lvim.builtin.which_key.mappings["sg"] = gitfiles
 end
 
 -- telescope
 local ivy = { theme = "ivy", previewer = false }
-lvim.builtin.telescope = {
-  pickers = {
-    find_files = ivy,
-    git_files = ivy,
-    registers = ivy,
-    buffers = vim.tbl_extend("force", ivy, {
-      sort_lastused = true,
-      mappings = {
-        i = {
-          ["<C-d>"] = require("telescope.actions").delete_buffer,
-        },
-        n = {
-          ["<C-d>"] = require("telescope.actions").delete_buffer,
-        }
-      }
-    })
-  }
+lvim.builtin.telescope.pickers = {
+  find_files = ivy,
+  git_files = ivy,
+  registers = ivy
 }
+lvim.builtin.telescope.pickers.buffers = vim.tbl_extend("force", ivy, {
+  sort_lastused = true,
+  mappings = {
+    i = {
+      ["<C-d>"] = require("telescope.actions").delete_buffer,
+    },
+    n = {
+      ["<C-d>"] = require("telescope.actions").delete_buffer,
+    }
+  }
+})
 
 -- alpha
 lvim.builtin.alpha.active = true
-lvim.builtin.alpha.mode = "dashboard"
+lvim.builtin.alpha.mode = "startify"
 
 -- notify
 lvim.builtin.notify.active = true
@@ -128,19 +136,19 @@ lvim.builtin.notify.active = true
 -- toggleterm
 lvim.builtin.terminal.active = true
 
--- nvimtr l
-lvim.builtin.nvimtree.active = true
+-- nvimtree
+lvim.builtin.nvimtree.active = false
 lvim.builtin.nvimtree.setup.view.side = "left"
 lvim.builtin.nvimtree.show_icons.git = 0
 
 -- project
 lvim.builtin.project.show_hidden = true
-lvim.builtin.project.silent_chdir = true
+lvim.builtin.project.silent_chdir = false
 
 -- lualine
 local components = require("lvim.core.lualine.components")
 
--- lvim.builtin.lualine.sections.lualine_a = { "mode" }
+lvim.builtin.lualine.sections.lualine_a = { "mode" }
 lvim.builtin.lualine.sections.lualine_y = {
   components.spaces,
   components.location
@@ -179,13 +187,17 @@ lvim.builtin.treesitter.highlight.enabled = true
 lvim.lsp.automatic_servers_installation = false
 
 -- Custom linters
-local linters = require "lvim.lsp.null-ls.linters"
-linters.setup {
-  {
-    command = "shellcheck",
-    args = { "--shell", "bash", "--external-sources" },
-    filetypes = { "sh", "bash" },
-  },
+local null_ls = require "null-ls"
+lvim.lsp.null_ls.setup.sources = {
+  -- null_ls.builtins.diagnostics.shellcheck.with { filetype = "sh", diagnostics_format = "#{m} [#{c}]" },
+  -- null_ls.builtins.formatting.sh mt.with({
+  --   extra_args = function(params)
+  --     return { "-i", vim.api.nvim_buf_get_option(params.bufnr, "shiftwidth") }
+  --   end,
+  -- })
+  null_ls.builtins.diagnostics.shellcheck,
+  null_ls.builtins.code_actions.shellcheck,
+  null_ls.builtins.formatting.shfmt
 }
 
 -- Additional Plugins
@@ -249,6 +261,11 @@ lvim.plugins = {
       "Gedit"
     },
     ft = { "fugitive" }
+  },
+  -- scrollbar
+  {
+    "petertriho/nvim-scrollbar",
+    setup = require "scrollbar".setup()
   },
 }
 
