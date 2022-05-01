@@ -1,4 +1,4 @@
-# vi:set ft=bash ts=4 sw=4 noet noai:
+# vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 # shellcheck disable=2155,1090
 
@@ -40,10 +40,10 @@ up() {
 
 mem() {
 	#shellcheck disable=2009
-	ps -eo rss,vsz,pid,euser,args --cols=100 --sort %mem \
-		| grep -v grep \
-		| grep -i "$@" \
-		| awk '{
+	ps -eo rss,vsz,pid,euser,args --cols=100 --sort %mem |
+		grep -v grep |
+		grep -i "$@" |
+		awk '{
 			rss=$1;vsz=$2;pid=$3;uid=$4;$1=$2=$3=$4="";sub(/^[ \t\r\n]+/, "", $0);
 			printf("%d: (%s) # %s\n\tRSS: %8.2f M\n\tVSZ: %8.2f M\n",
 		   	pid, uid, $0, rss/1024, vsz/1024);
@@ -51,12 +51,22 @@ mem() {
 }
 
 prompt() {
-	read -rp "${1} (y/n) " choice
-	case "$choice" in
-	y | Y) return 0 ;;
-	n | N) return 1 ;;
-	*) return 1 ;;
-	esac
+	local question="$1"
+	while true; do
+		msg "$question"
+		read -p "[y]es or [n]o (default: no) : " -r answer
+		case "$answer" in
+		y | Y | yes | YES | Yes)
+			return 0
+			;;
+		n | N | no | NO | No | *[[:blank:]]* | "")
+			return 1
+			;;
+		*)
+			msg "Please answer [y]es or [n]o."
+			;;
+		esac
+	done
 }
 
 netns() {
@@ -71,18 +81,53 @@ netns() {
 	fi
 }
 
+clip() {
+	# use OSC 52 for kitty, alacritty and tmux inside either of them
+	error() {
+		echo "no suitable copy method found" >&2
+		return 1
+	}
+	extern() {
+		if [[ $XDG_SESSION_TYPE == x11 ]]; then
+			if has xsel; then
+				xsel --input --clipboard --logfile /dev/null
+			elif has xclip; then
+				xclip -in -filter -select clipboard
+			else
+				error
+			fi
+		elif has wl-copy; then
+			wl-copy --paste-once
+		else
+			error
+		fi
+	}
+
+	if [[ -v KITTY_INSTALLATION_DIR ]]; then
+		if [[ $TERM_PROGRAM == tmux ]]; then
+			tmux load-buffer -w /dev/fd/0
+		else
+			kitty +kitten clipboard
+		fi
+	elif [[ -v ALACRITTY_SOCKET ]]; then
+		if [[ $TERM_PROGRAM == tmux ]]; then
+			tmux load-buffer -w /dev/fd/0
+		else
+			extern
+		fi
+	else
+		extern
+	fi
+}
+
 share() {
-	local resp=$(ncat unsha.re 9999 | tee /dev/fd/2 \
-		| jq -r '{ expires, secret, url } | to_entries | .[] | "local " + .key + "=" + (.value | @sh)')
+	local resp=$(ncat unsha.re 9999 | tee /dev/fd/2 |
+		jq -r '{ expires, secret, url } | to_entries | .[] | "local " + .key + "=" + (.value | @sh)')
 
 	if [[ -n $resp ]]; then
 		eval "$resp"
 		#shellcheck disable=2154
-		xclip -i -select clipboard <(echo "$url")
-
-		if has notify-send; then
-			notify-send "Link copied to clipboard" 2>/dev/null
-		fi
+		clip <<<"$url"
 	fi
 }
 
@@ -115,4 +160,3 @@ if has xprop && has xdotool; then
 
 	}
 fi
-
