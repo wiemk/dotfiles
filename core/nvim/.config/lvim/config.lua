@@ -13,7 +13,7 @@ local opts = {
   cmdheight = 1,
   colorcolumn = "100",
   -- adapt German keyboard layout
-  langmap = "zy,yz,ZY,YZ,[ö,]ä",
+  langmap = "zy,yz,ZY,YZ,ö},ä{",
   list = false,
   listchars = "tab:→ ,eol:↲,nbsp:␣,trail:•,lead:_,extends:⟩,precedes:⟨",
   relativenumber = true,
@@ -32,8 +32,8 @@ end)(opts);
 lvim.leader = "space"
 
 -- tmux bugfix (nvim 0.7 api)
-vim.keymap.set({ 'n', 'v' }, '<C-a>', '<Home>', { noremap = true, silent = true })
-vim.keymap.set({ 'n', 'v' }, '<C-e>', '<End>', { noremap = true, silent = true })
+vim.keymap.set({ 'i', 'n', 'v' }, '<C-a>', '<Home>', { noremap = true, silent = true })
+vim.keymap.set({ 'i', 'n', 'v' }, '<C-e>', '<End>', { noremap = true, silent = true })
 
 -- Use the default vim behavior for H and L
 lvim.keys.normal_mode["<S-l>"] = false
@@ -47,8 +47,8 @@ lvim.keys.insert_mode["<F1>"] = "<Esc>"
 lvim.keys.normal_mode["<C-h>"] = ":nohlsearch<CR>"
 
 -- In-file navigation
-lvim.keys.normal_mode["<C-k>"] = "<C-u>"
-lvim.keys.normal_mode["<C-j>"] = "<C-d>"
+lvim.keys.normal_mode["<C-k>"] = "{"
+lvim.keys.normal_mode["<C-j>"] = "}"
 
 -- Arrow keys
 lvim.keys.normal_mode["<Up>"] = "<nop>"
@@ -62,10 +62,6 @@ lvim.keys.normal_mode["<M-Down>"] = ":m .+1<CR>=="
 lvim.keys.visual_block_mode["<M-Up>"] = ":m '<-2<CR>gv-gv"
 lvim.keys.visual_block_mode["<M-Down>"] = ":m '>+1<CR>gv-gv"
 
--- Buffer save/exit
--- lvim.keys.normal_mode["<C-s>"] = ":w<CR>"
--- lvim.keys.normal_mode["<C-x>"] = ":BufferKill<CR>"
-
 -- Buffer/Tab navigation
 lvim.keys.normal_mode["<M-,>"] = ":BufferLineCyclePrev<CR>"
 lvim.keys.normal_mode["<M-.>"] = ":BufferLineCycleNext<CR>"
@@ -73,55 +69,59 @@ lvim.keys.normal_mode["<M-.>"] = ":BufferLineCycleNext<CR>"
 -- which-key
 lvim.builtin.which_key.setup.triggers_blacklist = { n = { "g" } }
 lvim.builtin.which_key.mappings["<leader>"] = { "<C-^>", "Cycle Buffer" }
+lvim.builtin.which_key.mappings["h"] = {
+  function() vim.opt.hlsearch = not vim.o.hlsearch end, "Toggle Highlight"
+}
+lvim.builtin.which_key.mappings["lo"] = { "<Cmd>SymbolsOutline<CR>", "Outline" }
+if lvim.builtin.project.active then
+  lvim.builtin.which_key.mappings["P"] = { "<Cmd>Telescope projects<CR>", "Projects" }
+end
 lvim.builtin.which_key.mappings["S"] = {
   function() vim.opt.spell = not vim.o.spell end, "Spellcheck"
 }
 lvim.builtin.which_key.mappings["W"] = {
   function() vim.opt.list = not vim.o.list end, "Whitespaces"
 }
-lvim.builtin.which_key.mappings["h"] = {
-  function() vim.opt.hlsearch = not vim.o.hlsearch end, "Toggle Highlight"
-}
 
 local ok, ts = pcall(require, "telescope.builtin")
 if ok then
   lvim.builtin.which_key.mappings["/"] = nil
-  lvim.builtin.which_key.mappings["sB"] = {
-    function() ts.builtin() end,
-    "Builtins",
-  }
+  lvim.builtin.which_key.mappings["sB"] = { ts.builtin, "Builtins" }
   lvim.builtin.which_key.mappings["B"] = lvim.builtin.which_key.mappings["b"]
-  lvim.builtin.which_key.mappings["b"] = {
-    function() ts.buffers() end,
-    "Buffers",
-  }
-  lvim.builtin.which_key.mappings["P"] = {
-    function() ts.live_grep() end,
-    "Live Grep",
-  }
-  local gitfiles = {
-    function() pcall(ts.git_files) end,
-    "Git Files",
-  }
+  lvim.builtin.which_key.mappings["b"] = { ts.buffers, "Buffers" }
+  local gitfiles = { pcall(ts.git_files), "Git Files" }
   lvim.builtin.which_key.mappings["gf"] = gitfiles
   lvim.builtin.which_key.mappings["sg"] = gitfiles
 end
 
--- telescope
-local ivy = { theme = "ivy", previewer = false }
-lvim.builtin.telescope.pickers = {
-  find_files = ivy,
-  git_files = ivy,
-  registers = ivy
+-- Remap umlauts mode
+lvim.builtin.which_key.mappings["U"] = {
+  function()
+    local opt = { noremap = true, silent = true }
+    vim.keymap.set({ 'i' }, 'ö', '{', opt)
+    vim.keymap.set({ 'i' }, 'ä', '}', opt)
+    vim.keymap.set({ 'i' }, 'Ö', '[', opt)
+    vim.keymap.set({ 'i' }, 'Ä', ']', opt)
+    vim.keymap.set({ 'i' }, 'ü', '(', opt)
+    vim.keymap.set({ 'i' }, 'Ü', ')', opt)
+  end, "Umlaut Remap"
 }
-lvim.builtin.telescope.pickers.buffers = vim.tbl_extend("force", ivy, {
-  sort_lastused = true,
-  mappings = {
-    i = {
-      ["<C-d>"] = require("telescope.actions").delete_buffer,
-    },
-    n = {
-      ["<C-d>"] = require("telescope.actions").delete_buffer,
+
+-- telescope
+-- set ivy as default for all pickers
+lvim.builtin.telescope.defaults = vim.tbl_extend("force", lvim.builtin.telescope.defaults or {},
+  require "telescope.themes".get_ivy({ prompt_prefix = ">> " }))
+-- close buffers with hotkey inside telescope
+lvim.builtin.telescope.pickers = vim.tbl_extend("force", lvim.builtin.telescope.pickers or {}, {
+  buffers = {
+    sort_lastused = true,
+    mappings = {
+      i = {
+        ["<C-d>"] = require("telescope.actions").delete_buffer,
+      },
+      n = {
+        ["<C-d>"] = require("telescope.actions").delete_buffer,
+      }
     }
   }
 })
@@ -137,7 +137,7 @@ lvim.builtin.notify.active = true
 lvim.builtin.terminal.active = true
 
 -- nvimtree
-lvim.builtin.nvimtree.active = false
+lvim.builtin.nvimtree.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
 lvim.builtin.nvimtree.show_icons.git = 0
 
@@ -266,6 +266,11 @@ lvim.plugins = {
   {
     "petertriho/nvim-scrollbar",
     setup = require "scrollbar".setup()
+  },
+  -- outline
+  {
+    "simrat39/symbols-outline.nvim",
+    cmd = "SymbolsOutline",
   },
 }
 
