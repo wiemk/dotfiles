@@ -18,6 +18,7 @@
 	di = diff
 	fa = fetch --all
 	ff = merge --ff-only
+	fp = push --force-with-lease
 	fpush = push --force-with-lease
 	in = log --oneline --decorate ..@{upstream}
 	inc = log --name-status origin/master..
@@ -77,15 +78,11 @@
 	status = never
 	tag = auto dense
 
-[commit]
-	gpgsign = true
-
 [core]
 	excludesFile = ~/.config/git/ignore
 	askpass =
 	autocrlf = input
 	logAllRefUpdates = true
-	pager = delta --paging=always
 
 [diff]
 	renames = copies
@@ -137,8 +134,8 @@
 	rebase = true
 
 [rebase]
-	autosquash = true
-	autoStash = true
+	autosquash = false
+	autostash = false
 
 [receive]
 	denyCurrentBranch = refuse

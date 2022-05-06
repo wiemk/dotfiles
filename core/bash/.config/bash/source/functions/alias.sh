@@ -13,6 +13,7 @@ alias e='edit'
 alias ve='visual'
 
 alias cp='command cp -avi'
+alias dust='dust -rx'
 alias grep='grep --color=auto'
 alias ln='command ln -vi'
 alias mkdir='command mkdir -v'
