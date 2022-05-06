@@ -1,5 +1,5 @@
 # git-config(1) - Git configuration
-# vim: ft=gitconfig
+# vim: ft=gitconfig ts=2 sw=2 sts=0 noet
 #
 
 [alias]
@@ -85,7 +85,7 @@
 	askpass =
 	autocrlf = input
 	logAllRefUpdates = true
-  pager = delta --paging=always || less
+	pager = delta --paging=always
 
 [diff]
 	renames = copies

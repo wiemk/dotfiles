@@ -13,7 +13,7 @@ local opts = {
   cmdheight = 1,
   colorcolumn = "100",
   -- adapt German keyboard layout
-  langmap = "zy,yz,ZY,YZ,ö},ä{",
+  langmap = "zy,yz,ZY,YZ,ö{,ä},Ö[,Ä],ü<,Ü>",
   list = false,
   listchars = "tab:→ ,eol:↲,nbsp:␣,trail:•,lead:_,extends:⟩,precedes:⟨",
   relativenumber = true,
@@ -76,12 +76,6 @@ lvim.builtin.which_key.mappings["lo"] = { "<Cmd>SymbolsOutline<CR>", "Outline" }
 if lvim.builtin.project.active then
   lvim.builtin.which_key.mappings["P"] = { "<Cmd>Telescope projects<CR>", "Projects" }
 end
-lvim.builtin.which_key.mappings["S"] = {
-  function() vim.opt.spell = not vim.o.spell end, "Spellcheck"
-}
-lvim.builtin.which_key.mappings["W"] = {
-  function() vim.opt.list = not vim.o.list end, "Whitespaces"
-}
 
 local ok, ts = pcall(require, "telescope.builtin")
 if ok then
@@ -94,17 +88,32 @@ if ok then
   lvim.builtin.which_key.mappings["sg"] = gitfiles
 end
 
--- Remap umlauts mode
-lvim.builtin.which_key.mappings["U"] = {
-  function()
-    local opt = { noremap = true, silent = true }
-    vim.keymap.set({ 'i' }, 'ö', '{', opt)
-    vim.keymap.set({ 'i' }, 'ä', '}', opt)
-    vim.keymap.set({ 'i' }, 'Ö', '[', opt)
-    vim.keymap.set({ 'i' }, 'Ä', ']', opt)
-    vim.keymap.set({ 'i' }, 'ü', '(', opt)
-    vim.keymap.set({ 'i' }, 'Ü', ')', opt)
-  end, "Umlaut Remap"
+vim.g.uremap = false
+lvim.builtin.which_key.mappings["u"] = {
+  name = "Utilities",
+  S = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
+  w = { function() vim.opt.list = not vim.o.list end, "Whitespaces" },
+  u = {
+    function()
+      local opt = { noremap = true, silent = true }
+      if not vim.g.uremap then
+        vim.keymap.set({ 'i' }, 'ö', '{', opt)
+        vim.keymap.set({ 'i' }, 'ä', '}', opt)
+        vim.keymap.set({ 'i' }, 'Ö', '[', opt)
+        vim.keymap.set({ 'i' }, 'Ä', ']', opt)
+        vim.keymap.set({ 'i' }, 'ü', '<', opt)
+        vim.keymap.set({ 'i' }, 'Ü', '>', opt)
+      else
+        vim.keymap.set({ 'i' }, 'ö', 'ö', opt)
+        vim.keymap.set({ 'i' }, 'ä', 'ä', opt)
+        vim.keymap.set({ 'i' }, 'Ö', 'Ö', opt)
+        vim.keymap.set({ 'i' }, 'Ä', 'Ä', opt)
+        vim.keymap.set({ 'i' }, 'ü', 'ü', opt)
+        vim.keymap.set({ 'i' }, 'Ü', 'Ü', opt)
+      end
+      vim.g.uremap = not vim.g.uremap
+    end, "Toggle Umlaut Remap"
+  },
 }
 
 -- telescope
@@ -271,6 +280,23 @@ lvim.plugins = {
   {
     "simrat39/symbols-outline.nvim",
     cmd = "SymbolsOutline",
+  },
+  -- spectre
+  {
+    "windwp/nvim-spectre",
+    event = "BufRead",
+    config = function()
+      require "spectre".setup()
+    end,
+    setup = function()
+      lvim.builtin.which_key.mappings["S"] = {
+        name = "Spectre",
+        t = { "<cmd>lua require('spectre').open()<CR>", "Spectre" },
+        w = { "<cmd>lua require('spectre').open_visual({select_word=true})<CR>", "Word" },
+        v = { "<cmd>lua require('spectre').open_visual()<CR>", "Visual" },
+        f = { "<cmd>sp viw:lua require('spectre').open_file_search()<CR>", "Current File" },
+      }
+    end,
   },
 }
 
