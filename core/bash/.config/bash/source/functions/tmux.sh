@@ -55,7 +55,7 @@ tmux_rename_window() {
 	fi
 
 	command tmux rename-window -t "$pane_id" "$title"
-	eval "command $cmd $*"
+	command $cmd "$@"
 	command tmux set-option -qwp -t "$pane_id" automatic-rename 'on'
 }
 
