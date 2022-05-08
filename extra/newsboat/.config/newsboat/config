@@ -26,14 +26,26 @@ browser "printf 'URL %s\n' %u | socat - TCP:127.0.0.1:55112 1>/dev/null 2>&1"
 macro v set browser "printf 'VIDEO %s\n' %u | socat - TCP:127.0.0.1:55112 1>/dev/null 2>&1" ; open-in-browser ; set browser "printf 'URL %s\n' %u | socat - TCP:127.0.0.1:55112 1>/dev/null 2>&1"
 macro a set browser "printf 'AUDIO %s\n' %u | socat - TCP:127.0.0.1:55112 1>/dev/null 2>&1" ; open-in-browser ; set browser "printf 'URL %s\n' %u | socat - TCP:127.0.0.1:55112 1>/dev/null 2>&1"
 
-include /usr/share/doc/newsboat/contrib/colorschemes/nord
-color background color248 default
-color listfocus_unread color236 color12
-
 ignore-mode "display"
 ignore-article "https://www.heise.de/rss/heise.rdf" "title =~ \"^heise\\+ \\| |^TechStage \\| \""
 # we get undramatized covid information from actual papers
-ignore-article "*" "title =~ \"Corona|Covid|Vacc|Sport|Werbung\""
+ignore-article "*" "title =~ \"Sport|Werbung\""
+
+
+# vim-like motion
+unbind-key h
+unbind-key l
+unbind-key j
+unbind-key k
+unbind-key J
+unbind-key K
+
+bind-key j down
+bind-key k up
+bind-key l open
+bind-key h quit
 
 bind-key a mark-all-above-as-read
 
+# theme
+include /usr/share/doc/newsboat/contrib/colorschemes/nord

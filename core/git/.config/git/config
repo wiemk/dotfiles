@@ -1,5 +1,5 @@
 # git-config(1) - Git configuration
-# vim: ft=gitconfig
+# vim: ft=gitconfig ts=2 sw=2 sts=0 noet
 #
 
 [alias]
@@ -18,6 +18,7 @@
 	di = diff
 	fa = fetch --all
 	ff = merge --ff-only
+	fp = push --force-with-lease
 	fpush = push --force-with-lease
 	in = log --oneline --decorate ..@{upstream}
 	inc = log --name-status origin/master..
@@ -77,16 +78,11 @@
 	status = never
 	tag = auto dense
 
-[commit]
-	gpgsign = true
-	template = ~/.config/git/template/.gitmessage
-
 [core]
 	excludesFile = ~/.config/git/ignore
 	askpass =
 	autocrlf = input
 	logAllRefUpdates = true
-  pager = delta --paging=always || less
 
 [diff]
 	renames = copies
@@ -138,8 +134,8 @@
 	rebase = true
 
 [rebase]
-	autosquash = true
-	autoStash = true
+	autosquash = false
+	autostash = false
 
 [receive]
 	denyCurrentBranch = refuse
