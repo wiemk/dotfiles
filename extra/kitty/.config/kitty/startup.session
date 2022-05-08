@@ -6,4 +6,3 @@ new_tab notes
 #launch /usr/bin/tmux new-session -A -s notes
 launch /usr/bin/tmux new-session -A -s notes "cd ~/Documents/dev; vim notes.txt; clear; fish -i"
 
-

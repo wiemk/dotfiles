@@ -136,4 +136,3 @@ shopt -u nullglob
 if [[ -f $BDOTDIR/rc.post ]]; then
 	source "${BDOTDIR}/rc.post"
 fi
-
