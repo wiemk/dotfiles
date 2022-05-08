@@ -80,8 +80,9 @@ lvim.builtin.which_key.mappings["h"] = {
   function() vim.opt.hlsearch = not vim.o.hlsearch end, "Toggle Highlight"
 }
 lvim.builtin.which_key.mappings["lo"] = { "<Cmd>SymbolsOutline<CR>", "Outline" }
+lvim.builtin.which_key.mappings["P"] = lvim.builtin.which_key.mappings["p"]
 if lvim.builtin.project.active then
-  lvim.builtin.which_key.mappings["P"] = { "<Cmd>Telescope projects<CR>", "Projects" }
+  lvim.builtin.which_key.mappings["p"] = { "<Cmd>Telescope projects<CR>", "Projects" }
 end
 
 local ok, builtin = pcall(require, "telescope.builtin")
@@ -121,6 +122,17 @@ lvim.builtin.which_key.mappings["u"] = {
 }
 
 -- telescope
+-- change default navigation mappings
+local actions = require("telescope.actions")
+lvim.builtin.telescope.defaults.mappings = vim.tbl_deep_extend("force",
+  lvim.builtin.telescope.defaults.mappings, {
+  i = {
+    ["<C-k>"] = actions.move_selection_previous,
+    ["<C-j>"] = actions.move_selection_next,
+    ["<C-p>"] = actions.cycle_history_prev,
+    ["<C-n>"] = actions.cycle_history_next,
+  }
+})
 -- set ivy as default for all pickers
 lvim.builtin.telescope.defaults = vim.tbl_extend("force", lvim.builtin.telescope.defaults or {},
   require "telescope.themes".get_ivy({ prompt_prefix = ">> " }))

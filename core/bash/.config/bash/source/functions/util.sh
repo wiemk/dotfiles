@@ -38,6 +38,14 @@ up() {
 	alias ..='up'
 }
 
+ps() {
+	if (($# > 0)); then
+		command ps "$@"
+	else
+		command ps -eF
+	fi
+}
+
 mem() {
 	#shellcheck disable=2009
 	ps -eo rss,vsz,pid,euser,args --cols=100 --sort %mem |
@@ -84,11 +92,13 @@ netns() {
 clip() {
 	# use OSC 52 for kitty, alacritty and tmux inside either of them
 	error() {
-		echo "no suitable copy method found" >&2
+		printf "%s: no suitable copy method found." "$1" >&2
 		return 1
 	}
+
 	extern() {
-		if [[ $XDG_SESSION_TYPE == x11 ]]; then
+		case "$XDG_SESSION_TYPE" in
+		x11)
 			if has xsel; then
 				xsel --input --clipboard --logfile /dev/null
 			elif has xclip; then
@@ -96,38 +106,46 @@ clip() {
 			else
 				error
 			fi
-		elif has wl-copy; then
-			wl-copy --paste-once
-		else
-			error
-		fi
+			;;
+		wayland)
+			if has wl-copy; then
+				wl-copy --paste-once
+			fi
+			error "wl-copy missing"
+			;;
+		tty)
+			error "tty unsupported session type"
+			;;
+		*)
+			error "unknown session type"
+			;;
+		esac
 	}
 
-	if [[ -v KITTY_INSTALLATION_DIR ]]; then
-		if [[ $TERM_PROGRAM == tmux ]]; then
-			tmux load-buffer -w /dev/fd/0
-		else
-			kitty +kitten clipboard
-		fi
+	if [[ $TERM_PROGRAM == tmux ]]; then
+		tmux load-buffer -w /dev/fd/0
+	elif [[ -v KITTY_INSTALLATION_DIR ]]; then
+		kitty +kitten clipboard
 	elif [[ -v ALACRITTY_SOCKET ]]; then
-		if [[ $TERM_PROGRAM == tmux ]]; then
-			tmux load-buffer -w /dev/fd/0
-		else
-			extern
-		fi
+		#TODO: some OSC 52 magic
+		extern
 	else
 		extern
 	fi
 }
 
 share() {
-	local resp=$(ncat unsha.re 9999 | tee /dev/fd/2 |
-		jq -r '{ expires, secret, url } | to_entries | .[] | "local " + .key + "=" + (.value | @sh)')
+	if has socat && has jq; then
+		local resp=$(socat -t 5 - tcp:unsha.re:9999 > >(tee >(jq -r >&2)) |
+			jq -r '{ expires, secret, url } | to_entries | .[] | "local " + .key + "=" + (.value | @sh)')
 
-	if [[ -n $resp ]]; then
-		eval "$resp"
-		#shellcheck disable=2154
-		clip <<<"$url"
+		if [[ -n $resp ]]; then
+			eval "$resp"
+			#shellcheck disable=2154
+			clip <<<"$url"
+		fi
+	else
+		echo "Please make sure you have socat and jq in your path." >&2
 	fi
 }
 
@@ -148,7 +166,7 @@ fi
 
 if has scrcpy; then
 	scc() {
-		srun scrcpy --max-size 1600 --bit-rate 12M --max-fps 60 --stay-awake --turn-screen-off "$@"
+		srun scrcpy --max-size 1600 --bit-rate 12M --max-fps 60 "$@"
 	}
 fi
 
