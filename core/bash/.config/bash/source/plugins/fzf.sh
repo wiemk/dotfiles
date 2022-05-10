@@ -10,21 +10,33 @@ fi
 
 FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS:-"--height=50% --info=inline"}
 
-# https://github.com/junegunn/fzf/wiki/examples#command-history
-bind '"\C-r": "\C-x1\e^\er"'
-bind -x '"\C-x1": __fzf_history'
+bind -m emacs '"\C-r": "\C-x1\e^\er"'
+bind -m emacs -x '"\C-x1": __fzf_history'
+bind -m vi-command '"\C-r": "\C-x1\e^\er"'
+bind -m vi-command -x '"\C-x1": __fzf_history'
+bind -m vi-insert '"\C-r": "\C-x1\e^\er"'
+bind -m vi-insert -x '"\C-x1": __fzf_history'
 
 # Redraw prompt line
 __ehc() {
 	if [[ -n $1 ]]; then
 		bind -m emacs '"\er": redraw-current-line'
 		bind -m emacs '"\e^": magic-space'
+		bind -m vi-command '"\er": redraw-current-line'
+		bind -m vi-command '"\e^": magic-space'
+		bind -m vi-insert '"\er": redraw-current-line'
+		bind -m vi-insert '"\e^": magic-space'
+
 		READLINE_LINE=${READLINE_LINE:+${READLINE_LINE:0:READLINE_POINT}}${1}${READLINE_LINE:+${READLINE_LINE:READLINE_POINT}}
 		READLINE_LINE=$(trim "$READLINE_LINE")
 		READLINE_POINT=$((READLINE_POINT + ${#1}))
 	else
 		bind -m emacs '"\er":'
 		bind -m emacs '"\e^":'
+		bind -m vi-command '"\er":'
+		bind -m vi-command '"\e^":'
+		bind -m vi-insert '"\er":'
+		bind -m vi-insert '"\e^":'
 	fi
 }
 
@@ -68,12 +80,20 @@ _fzfyank() {
 if has fd; then
 	bind -m emacs -x '"\ed": _fzfyank "fd --color=always --exact-depth=1 --type=d"'
 	bind -m emacs -x '"\ef": _fzfyank "fd --color=always --exact-depth=1"'
-	# Alt+Shift+[DF] - recursive dir/all selection
+	bind -m vi-command -x '"\ed": _fzfyank "fd --color=always --exact-depth=1 --type=d"'
+	bind -m vi-command -x '"\ef": _fzfyank "fd --color=always --exact-depth=1"'
+	# AltF] - recursive dir/all selection
 	bind -m emacs -x '"\eD": _fzfyank "fd --color=always --type=d"'
 	bind -m emacs -x '"\eF": _fzfyank "fd --color=always"'
+	bind -m vi-command -x '"\eD": _fzfyank "fd --color=always --type=d"'
+	bind -m vi-command -x '"\eF": _fzfyank "fd --color=always"'
 else
 	bind -m emacs -x '"\ed": _fzfyank "find . -xdev -maxdepth 1 -name .\?\* -prune -o -xtype d -printf %P\\\0"'
 	bind -m emacs -x '"\ef": _fzfyank "find . -xdev -maxdepth 1 -name .\?\* -prune -o -printf %P\\\0"'
 	bind -m emacs -x '"\eD": _fzfyank "find . -xdev -mindepth 1 -name .\?\* -prune -o -xtype d -printf %P\\\0"'
 	bind -m emacs -x '"\eF": _fzfyank "find . -xdev -mindepth 1 -name .\?\* -prune -o -printf %P\\\0"'
+	bind -m vi-command -x '"\ed": _fzfyank "find . -xdev -maxdepth 1 -name .\?\* -prune -o -xtype d -printf %P\\\0"'
+	bind -m vi-command -x '"\ef": _fzfyank "find . -xdev -maxdepth 1 -name .\?\* -prune -o -printf %P\\\0"'
+	bind -m vi-command -x '"\eD": _fzfyank "find . -xdev -mindepth 1 -name .\?\* -prune -o -xtype d -printf %P\\\0"'
+	bind -m vi-command -x '"\eF": _fzfyank "find . -xdev -mindepth 1 -name .\?\* -prune -o -printf %P\\\0"'
 fi

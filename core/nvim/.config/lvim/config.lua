@@ -63,6 +63,9 @@ lvim.keys.normal_mode["<Down>"] = "<nop>"
 lvim.keys.normal_mode["<Left>"] = "<nop>"
 lvim.keys.normal_mode["<Right>"] = "<nop>"
 
+-- Map useless tabulator
+lvim.keys.normal_mode["<Tab>"] = "%"
+
 -- Arrow key line swapping
 lvim.keys.normal_mode["<M-Up>"] = ":m .-2<CR>=="
 lvim.keys.normal_mode["<M-Down>"] = ":m .+1<CR>=="
@@ -93,32 +96,33 @@ if ok then
   lvim.builtin.which_key.mappings["b"] = { builtin.buffers, "Buffers" }
 end
 
+-- remap umlauts
 vim.g.uremap = false
+local uremap = function()
+  local opt = { noremap = true, silent = true }
+  if not vim.g.uremap then
+    vim.keymap.set({ 'i' }, 'ö', '{', opt)
+    vim.keymap.set({ 'i' }, 'ä', '}', opt)
+    vim.keymap.set({ 'i' }, 'Ö', '[', opt)
+    vim.keymap.set({ 'i' }, 'Ä', ']', opt)
+    vim.keymap.set({ 'i' }, 'ü', '<', opt)
+    vim.keymap.set({ 'i' }, 'Ü', '>', opt)
+  else
+    vim.keymap.set({ 'i' }, 'ö', 'ö', opt)
+    vim.keymap.set({ 'i' }, 'ä', 'ä', opt)
+    vim.keymap.set({ 'i' }, 'Ö', 'Ö', opt)
+    vim.keymap.set({ 'i' }, 'Ä', 'Ä', opt)
+    vim.keymap.set({ 'i' }, 'ü', 'ü', opt)
+    vim.keymap.set({ 'i' }, 'Ü', 'Ü', opt)
+  end
+  vim.g.uremap = not vim.g.uremap
+end
+uremap()
 lvim.builtin.which_key.mappings["u"] = {
   name = "Utilities",
   S = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
   w = { function() vim.opt.list = not vim.o.list end, "Whitespaces" },
-  u = {
-    function()
-      local opt = { noremap = true, silent = true }
-      if not vim.g.uremap then
-        vim.keymap.set({ 'i' }, 'ö', '{', opt)
-        vim.keymap.set({ 'i' }, 'ä', '}', opt)
-        vim.keymap.set({ 'i' }, 'Ö', '[', opt)
-        vim.keymap.set({ 'i' }, 'Ä', ']', opt)
-        vim.keymap.set({ 'i' }, 'ü', '<', opt)
-        vim.keymap.set({ 'i' }, 'Ü', '>', opt)
-      else
-        vim.keymap.set({ 'i' }, 'ö', 'ö', opt)
-        vim.keymap.set({ 'i' }, 'ä', 'ä', opt)
-        vim.keymap.set({ 'i' }, 'Ö', 'Ö', opt)
-        vim.keymap.set({ 'i' }, 'Ä', 'Ä', opt)
-        vim.keymap.set({ 'i' }, 'ü', 'ü', opt)
-        vim.keymap.set({ 'i' }, 'Ü', 'Ü', opt)
-      end
-      vim.g.uremap = not vim.g.uremap
-    end, "Toggle Umlaut Remap"
-  },
+  u = { uremap, "Toggle Umlaut Remap" },
 }
 
 -- telescope

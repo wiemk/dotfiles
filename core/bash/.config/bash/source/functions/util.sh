@@ -46,6 +46,18 @@ ps() {
 	fi
 }
 
+con() {
+	if has lsof; then
+		if ((UID != 0)); then
+			local -r priv=1
+		fi
+		local pids=$(pidof -S',' "$1")
+		if [[ -n $pids ]]; then
+			${priv:+sudo} lsof -r1 -iTCP -a -p "$pids"
+		fi
+	fi
+}
+
 mem() {
 	#shellcheck disable=2009
 	ps -eo rss,vsz,pid,euser,args --cols=100 --sort %mem |
@@ -135,9 +147,20 @@ clip() {
 }
 
 share() {
-	if has socat && has jq; then
-		local resp=$(socat -t 5 - tcp:unsha.re:9999 > >(tee >(jq -r >&2)) |
-			jq -r '{ expires, secret, url } | to_entries | .[] | "local " + .key + "=" + (.value | @sh)')
+	if has jq; then
+		local cmd
+		if has socat; then
+			cmd="socat -t 5 - tcp:unsha.re:9999"
+		elif has ncat; then
+			cmd="ncat unsha.re 9999"
+		else
+			echo "Please make sure you have either socat or ncat in your path." >&2
+			return 1
+		fi
+
+		local resp=$($cmd > >(tee >(jq '.' >&2)) \
+			| jq --raw-output \
+				'{ expires, secret, url } | to_entries | .[] | "local " + .key + "=" + (.value | @sh)')
 
 		if [[ -n $resp ]]; then
 			eval "$resp"
@@ -145,7 +168,8 @@ share() {
 			clip <<<"$url"
 		fi
 	else
-		echo "Please make sure you have socat and jq in your path." >&2
+		echo "Please make sure you have jq in your path." >&2
+		return 1
 	fi
 }
 

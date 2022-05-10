@@ -48,4 +48,4 @@ bind-key h quit
 bind-key a mark-all-above-as-read
 
 # theme
-include /usr/share/doc/newsboat/contrib/colorschemes/kinda-maia
+include /usr/share/doc/newsboat/contrib/colorschemes/nord
