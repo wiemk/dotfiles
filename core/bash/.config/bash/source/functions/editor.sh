@@ -6,7 +6,7 @@ on_debug
 # Create own scope for neovim and child processes
 if has "$EDITOR"; then
 	if [[ -d /run/systemd/system && $CONTAINER != 1 ]]; then
-		function edit() {
+		edit() {
 			if ! type -t is_tmux &>/dev/null || ! is_tmux; then
 				systemd-run --quiet --user --collect --scope "$EDITOR" "$@"
 			else
@@ -19,7 +19,7 @@ if has "$EDITOR"; then
 fi
 
 if has neovide; then
-	function visual() {
+	visual() {
 		if has lvim; then
 			local bin=$(command -v lvim)
 		fi

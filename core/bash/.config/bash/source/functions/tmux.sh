@@ -7,17 +7,17 @@ if ! has tmux; then
 	return
 fi
 
-tma() {
+is_tmux() {
+	local -r tm=$(ps -p "$(ps -p $$ -o ppid= | xargs -n 1)" -o comm=)
+	[[ $tm == "tmux"* ]]
+}
+
+tm() {
 	local sess='main'
 	if (($# > 0)); then
 		sess=$1
 	fi
-	command tmux new-session -A -s "${sess}"
-}
-
-is_tmux() {
-	local -r tm=$(ps -p "$(ps -p $$ -o ppid= | xargs -n 1)" -o comm=)
-	[[ $tm == "tmux"* ]]
+	exec tmux new-session -A -s "${sess}"
 }
 
 tmux_rename_window() {

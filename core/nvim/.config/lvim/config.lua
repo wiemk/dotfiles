@@ -58,10 +58,10 @@ lvim.keys.normal_mode["<C-k>"] = "{"
 lvim.keys.normal_mode["<C-j>"] = "}"
 
 -- Arrow keys
-lvim.keys.normal_mode["<Up>"] = "<nop>"
-lvim.keys.normal_mode["<Down>"] = "<nop>"
-lvim.keys.normal_mode["<Left>"] = "<nop>"
-lvim.keys.normal_mode["<Right>"] = "<nop>"
+lvim.keys.normal_mode["<Up>"] = "<NOP>"
+lvim.keys.normal_mode["<Down>"] = "<NOP>"
+lvim.keys.normal_mode["<Left>"] = "<NOP>"
+lvim.keys.normal_mode["<Right>"] = "<NOP>"
 
 -- Map useless tabulator
 lvim.keys.normal_mode["<Tab>"] = "%"

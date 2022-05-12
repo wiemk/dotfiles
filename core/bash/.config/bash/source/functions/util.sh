@@ -16,19 +16,6 @@ bashquote() {
 	printf '%q\n' "$(</dev/stdin)"
 }
 
-if has secret-tool; then
-	get-secret() {
-		local -r kv=$1
-		readarray -td : arr < <(printf "%s\0" "$kv")
-		secret-tool lookup "${arr[0]}" "${arr[1]}"
-	}
-else
-	# shim to avoid further checks
-	get-secret() {
-		printf "%s" "$*"
-	}
-fi
-
 srun() {
 	systemd-run --quiet --user --collect "$@"
 }
@@ -53,7 +40,7 @@ con() {
 		fi
 		local pids=$(pidof -S',' "$1")
 		if [[ -n $pids ]]; then
-			${priv:+sudo} lsof -r1 -iTCP -a -p "$pids"
+			${priv:+sudo} lsof -r1 -iTCP -a -P -p "$pids"
 		fi
 	fi
 }
@@ -172,33 +159,3 @@ share() {
 		return 1
 	fi
 }
-
-if has xfreerdp; then
-	rdp() {
-		local store=$3
-		store=$(get-secret "rdp:${store}")
-		if [[ -z $store ]]; then
-			store=$3
-		fi
-
-		srun xfreerdp \
-			/network:auto /rfx /dvc:echo /w:1600 /h:900 /dvc:echo /geometry /cert:ignore \
-			+compression +async-channels +async-input -encryption -grab-keyboard \
-			/v:"${1}" /u:"${2}" /p:"${store}" "${@:4}"
-	}
-fi
-
-if has scrcpy; then
-	scc() {
-		srun scrcpy --max-size 1600 --bit-rate 12M --max-fps 60 "$@"
-	}
-fi
-
-if has xprop && has xdotool; then
-	xnobar() {
-		local -r window=$(xdotool getactivewindow)
-		xprop -id "$window" -f _MOTIF_WM_HINTS 32c \
-			-set _MOTIF_WM_HINTS '0x2, 0x0, 0x0, 0x0, 0x0'
-
-	}
-fi
