@@ -1,0 +1,34 @@
+# ~/.inputrc
+# vim: ft=readline
+
+set keyseq-timeout 100
+set editing-mode vi
+
+set show-mode-in-prompt on
+set emacs-mode-string ""
+
+# cursor shape
+# tty
+$if term=linux
+  set vi-ins-mode-string \1\e[?0c\2
+  set vi-cmd-mode-string \1\e[?8c\2
+$else
+  set vi-ins-mode-string \1\e[2 q\2
+  set vi-cmd-mode-string \1\e[3 q\2
+$endif
+
+$if mode=vi
+  set keymap vi-command
+  "gg": beginning-of-history
+  "G": end-of-history
+  "k": history-search-backward
+  "j": history-search-forward
+  "?": reverse-search-history
+  "/": forward-search-history
+
+  set keymap vi-insert
+  "\C-l": clear-screen
+  "\C-w": backward-kill-word
+  "\C-a": beginning-of-line
+  "\C-e": end-of-line
+$endif

@@ -24,4 +24,4 @@ alias chgrp='command chgrp -c --preserve-root'
 alias chmod='command chmod -c --preserve-root'
 alias chown='command chown -c --preserve-root'
 
-alias unsh='ncat unsha.re 10000'
+alias unsha='socat -t 5 - tcp:unsha.re:10000'
