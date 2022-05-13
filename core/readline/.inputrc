@@ -2,7 +2,8 @@
 # vim: ft=readline
 
 set keyseq-timeout 100
-set editing-mode vi
+# set editing-mode vi
+set editing-mode emacs
 
 set show-mode-in-prompt on
 set emacs-mode-string ""

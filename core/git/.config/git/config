@@ -17,8 +17,8 @@
 	ff = merge --ff-only
 	fp = push --force-with-lease
 	l = log --color --pretty=format:'%Cgreen%h%Creset%C(yellow)%d%Creset %s%Creset' --abbrev-commit -n5
+	ln = log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --numstat --date=relative
 	ls = ls-files
-	m = merge --no-ff
 	mend = commit --all --amend --reuse-message HEAD
 	p = push
 	re = rebase
@@ -26,7 +26,6 @@
 	st = status -s -b
 	staged = diff --cached
 	stat = diff --stat
-	sti = status -s -b --ignored
 	undo = reset --soft HEAD^
 
 	# WIP aliases
