@@ -25,7 +25,7 @@ if has xfreerdp; then
 			store=$3
 		fi
 
-		srun xfreerdp \
+		sc-run xfreerdp \
 			/network:auto /rfx /dvc:echo /w:1600 /h:900 /dvc:echo /geometry /cert:ignore \
 			+compression +async-channels +async-input -encryption -grab-keyboard \
 			/v:"${1}" /u:"${2}" /p:"${store}" "${@:4}"
@@ -34,7 +34,7 @@ fi
 
 if has scrcpy; then
 	scc() {
-		srun scrcpy --max-size 1600 --bit-rate 12M --max-fps 60 "$@"
+		sc-run scrcpy --max-size 1600 --bit-rate 12M --max-fps 60 "$@"
 	}
 fi
 

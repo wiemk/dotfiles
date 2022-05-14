@@ -16,10 +16,6 @@ bashquote() {
 	printf '%q\n' "$(</dev/stdin)"
 }
 
-srun() {
-	systemd-run --quiet --user --collect "$@"
-}
-
 up() {
 	builtin cd "$(printf '../%.0s' $(seq 1 "$1"))" || return
 	alias ..='up'

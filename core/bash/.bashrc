@@ -28,21 +28,23 @@ fi
 #set -o physical
 set +o histexpand
 
-shopt -s histappend \
-	histreedit \
-	cmdhist \
-	extglob \
-	globstar \
-	dotglob \
-	lastpipe \
-	autocd \
-	direxpand \
-	checkwinsize \
-	cdspell \
-	assoc_expand_once \
-	checkhash \
-	lithist \
-	no_empty_cmd_completion
+{
+	shopt -s histappend \
+		histreedit \
+		cmdhist \
+		extglob \
+		globstar \
+		dotglob \
+		lastpipe \
+		autocd \
+		direxpand \
+		checkwinsize \
+		cdspell \
+		assoc_expand_once \
+		checkhash \
+		lithist \
+		no_empty_cmd_completion
+} 2>/dev/null
 
 if [[ -f $BDOTDIR/rc.pre ]]; then
 	source "${BDOTDIR}/rc.pre"

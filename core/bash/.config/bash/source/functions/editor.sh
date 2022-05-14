@@ -21,13 +21,13 @@ fi
 if has neovide; then
 	visual() {
 		if has lvim; then
-			local bin=$(command -v lvim)
+			local -r bin=$(command -v lvim)
 		fi
 		local cmd="neovide --nofork --multigrid --maximized ${bin:+--neovim-bin ${bin}}"
 		if ! type -t is_tmux &>/dev/null || ! is_tmux; then
-			systemd-run --quiet --user --collect --scope $cmd "$@"
+			systemd-run --quiet --user --collect --scope "$cmd" "$@"
 		else
-			tmux_rename_window edit systemd-run --quiet --user --collect --scope $cmd "$@"
+			tmux_rename_window edit systemd-run --quiet --user --collect --scope "$cmd" "$@"
 		fi
 	}
 fi

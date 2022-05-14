@@ -1,14 +1,29 @@
 #!/usr/bin/env bash
 # vi:set ft=sh ts=4 sw=4 noet noai:
+#
 # shellcheck shell=bash
 # shellcheck disable=SC2034
 
-# set up basic install
+# Link a default set of provided files into bash environment
 
 set -eo pipefail
 
-declare -A FUNC_PRIO=([alias]=50 [fedora]=50 [editor]=51 [tmux]=50 [util]=30)
-declare -A PLUGIN_PRIO=([fzf]=10 [prompt]=10 [vivid]=10 [zoxide]=10 [wttr]=99)
+declare -A FUNC=(
+	[alias]=50
+	[editor]=51
+	[fedora]=50
+	[info]=90
+	[systemd]=20
+	[tmux]=50
+	[util]=30
+)
+declare -A PLUGIN=(
+	[fzf]=10
+	[prompt]=10
+	[vivid]=10
+	[zoxide]=10
+	[wttr]=90
+)
 
 link() {
 	local -n prio=$1
@@ -25,5 +40,5 @@ link() {
 pushd "$(dirname "${BASH_SOURCE:0}")" &>/dev/null
 trap 'popd &>/dev/null' EXIT
 
-link FUNC_PRIO functions
-link PLUGIN_PRIO plugins
+link FUNC functions
+link PLUGIN plugins

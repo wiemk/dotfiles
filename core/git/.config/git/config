@@ -10,7 +10,7 @@
 	ch = cherry-pick
 	cm = commit --amend -o
 	co = checkout
-	d = diff --summary --stat --patch
+	d = diff --compact-summary --stat
 	dc = diff --cached
 	di = diff
 	fa = fetch --all

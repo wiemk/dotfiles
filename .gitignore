@@ -1,24 +1,17 @@
 # bash
 core/bash/.config/bash/rc.pre
 core/bash/.config/bash/rc.post
-core/bash/.config/bash/source/9[0-9]-*.sh
-core/bash/.config/bash/source.d/*[.in,.sh]
+core/bash/.config/bash/source.d/*
 core/bash/.config/bash/source/local/*.sh
 # git
 core/git/.config/git/*.local
-# fish
-staging/fish/.config/fish/fishd.*
-staging/fish/.config/fish/functions/*
-staging/fish/.config/fish/conf.d/*
-staging/fish/.config/fish/functions/fish_prompt.fish
-staging/fish/.config/fish/completions
-staging/fish/.config/fish/fish_variables
 # systemd
-core/systemd/user/telegram-notification@.service.d/override.conf
+**/systemd/user/**/override.conf
+# tmux
+core/tmux/.config/tmux/hooks/_*.hook
+core/tmux/.config/tmux/hooks/_*.sh
 # neovim
 core/nvim/.config/lvim/plugin/*
-# kitty
-staging/kitty/.config/kitty/theme.conf
 # gnupg
 core/gnupg/.gnupg/*
 !core/gnupg/.gnupg/*.conf
@@ -26,20 +19,18 @@ core/gnupg/.gnupg/*
 extra/mpv/.config/mpv/*
 !extra/mpv/.config/mpv/input.conf
 !extra/mpv/.config/mpv/mpv.conf
-# pulseaudio
-staging/pulse/.config/pulse/*
-!staging/pulse/.config/pulse/daemon.conf
-!staging/pulse/.config/pulse/pulse.pa
-# tmux
-core/tmux/.config/tmux/hooks/_*.hook
-core/tmux/.config/tmux/hooks/_*.sh
 # kitty
 extra/kitty/.config/kitty/*
 !extra/kitty/.config/kitty/kitty.conf
-!extra/kitty/.config/kitty/*.session
 # alacritty
 extra/alacritty/.config/alacritty/*
 !extra/alacritty/.config/alacritty/alacritty.yml
 # newsboat
 extra/newsboat/.config/newsboat/urls
-
+# fish
+staging/fish/.config/fish/fishd.*
+staging/fish/.config/fish/functions/*
+staging/fish/.config/fish/conf.d/*
+staging/fish/.config/fish/functions/fish_prompt.fish
+staging/fish/.config/fish/completions
+staging/fish/.config/fish/fish_variables
