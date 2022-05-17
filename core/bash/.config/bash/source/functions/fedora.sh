@@ -4,15 +4,15 @@
 on_debug
 
 # check if host is a fedora system
-# and don't pollute namespace
+# and don't clobber namespace
 # no -> return early
 (
-	source /usr/lib/os-release
+	source /usr/lib/os-release || source /etc/os-release
 	if [[ $ID == fedora ]]; then
 		exit 0
 	fi
 	exit 1
-) || return
+) &>/dev/null || return
 
 if has koji; then
 	chkpkg() {
@@ -69,7 +69,7 @@ rpm-weak() {
 	rpm -q --whatrecommends "$1"
 }
 
-pkginfo() {
+dnf-info() {
 	# collect package specific information from abovec
 	local -r pkg=$1
 	if ! rpm -q "$pkg" &>/dev/null; then

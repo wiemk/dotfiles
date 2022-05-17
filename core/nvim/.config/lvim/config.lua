@@ -22,8 +22,8 @@ end
     colorcolumn = "100",
     -- adapt German keyboard layout
     langmap = "zy,yz,ZY,YZ,ö{,ä},Ö[,Ä],ü<,Ü>",
-    list = false,
-    listchars = "tab:→ ,eol:↲,nbsp:␣,trail:•,lead:_,extends:⟩,precedes:⟨",
+    list = true,
+    listchars = "tab:→ ,eol:↲,nbsp:␣,trail:•,extends:⟩,precedes:⟨",
     relativenumber = true,
     showbreak = "↪ ",
     spelllang = "en",
@@ -34,6 +34,9 @@ end
     vim.opt[k] = v
   end
 end)()
+
+-- Highlight trailing whitespaces
+vim.fn.matchadd("ErrorMsg", [[\s\+$]])
 
 -- Keymappings [view all the defaults by pressing <leader>Lk]
 lvim.leader = "space"
@@ -58,10 +61,10 @@ lvim.keys.normal_mode["<C-k>"] = "{"
 lvim.keys.normal_mode["<C-j>"] = "}"
 
 -- Arrow keys
-lvim.keys.normal_mode["<Up>"] = "<nop>"
-lvim.keys.normal_mode["<Down>"] = "<nop>"
-lvim.keys.normal_mode["<Left>"] = "<nop>"
-lvim.keys.normal_mode["<Right>"] = "<nop>"
+lvim.keys.normal_mode["<Up>"] = "<NOP>"
+lvim.keys.normal_mode["<Down>"] = "<NOP>"
+lvim.keys.normal_mode["<Left>"] = "<NOP>"
+lvim.keys.normal_mode["<Right>"] = "<NOP>"
 
 -- Map useless tabulator
 lvim.keys.normal_mode["<Tab>"] = "%"
@@ -73,6 +76,7 @@ lvim.keys.visual_block_mode["<M-Up>"] = ":m '<-2<CR>gv-gv"
 lvim.keys.visual_block_mode["<M-Down>"] = ":m '>+1<CR>gv-gv"
 
 -- Buffer/Tab navigation
+lvim.keys.normal_mode["<C-x>"] = ":BufferKill<CR>"
 lvim.keys.normal_mode["<M-,>"] = ":BufferLineCyclePrev<CR>"
 lvim.keys.normal_mode["<M-.>"] = ":BufferLineCycleNext<CR>"
 
@@ -95,6 +99,8 @@ if ok then
   lvim.builtin.which_key.mappings["B"] = lvim.builtin.which_key.mappings["b"]
   lvim.builtin.which_key.mappings["b"] = { builtin.buffers, "Buffers" }
 end
+
+lvim.builtin.which_key.mappings["F"] = { "<Cmd>Telescope frecency<CR>", "Frecency" }
 
 -- remap umlauts
 vim.g.uremap = false
@@ -153,6 +159,11 @@ lvim.builtin.telescope.pickers = vim.tbl_extend("force", lvim.builtin.telescope.
       }
     }
   }
+})
+-- extensions
+lvim.builtin.telescope.extensions = vim.tbl_deep_extend("force",
+  lvim.builtin.telescope.extensions or {}, {
+  frecency = { db_root = get_cache_dir() }
 })
 
 -- alpha
@@ -321,4 +332,12 @@ lvim.plugins = {
       vim.g.matchup_matchparen_offscreen = { method = "popup" }
     end,
   },
+  -- telescope-frecency
+  {
+    "nvim-telescope/telescope-frecency.nvim",
+    config = function()
+      require "telescope".load_extension("frecency")
+    end,
+    requires = { "tami5/sqlite.lua" }
+  }
 }

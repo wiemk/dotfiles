@@ -2,7 +2,8 @@
 # vim: ft=readline
 
 set keyseq-timeout 100
-set editing-mode vi
+# set editing-mode vi
+set editing-mode emacs
 
 set show-mode-in-prompt on
 set emacs-mode-string ""
@@ -25,7 +26,6 @@ $if mode=vi
   "j": history-search-forward
   "?": reverse-search-history
   "/": forward-search-history
-
   set keymap vi-insert
   "\C-l": clear-screen
   "\C-w": backward-kill-word

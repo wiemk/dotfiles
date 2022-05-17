@@ -4,44 +4,33 @@
 
 [alias]
 	a = add --all
-	ainit = "!git init && git add --all && git commit -m 'initial commit'"
-	amend = commit --amend
-	amp = "!git add -u && git commit --amend --no-edit && git push --force-with-lease"
-	ampa = "!git commit --all --amend --no-edit && git push --force-with-lease"
 	b = branch -vv --sort=-committerdate
 	c = commit
 	ca = commit --amend --no-edit
+	ch = cherry-pick
 	cm = commit --amend -o
 	co = checkout
-	d = diff --summary --stat --patch
+	d = diff --compact-summary --stat
 	dc = diff --cached
 	di = diff
 	fa = fetch --all
 	ff = merge --ff-only
 	fp = push --force-with-lease
-	fpush = push --force-with-lease
-	in = log --oneline --decorate ..@{upstream}
-	inc = log --name-status origin/master..
-	l = log --format=format:'%C(auto)%h%d%C(reset) %s %C(bold blue)(%an, %ar)%C(reset)'
-	lg = log --oneline --decorate
+	l = log --color --pretty=format:'%Cgreen%h%Creset%C(yellow)%d%Creset %s%Creset' --abbrev-commit -n5
+	ln = log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --numstat --date=relative
 	ls = ls-files
-	m = merge --no-ff
 	mend = commit --all --amend --reuse-message HEAD
-	out = log --oneline --decorate @{upstream}..
 	p = push
 	re = rebase
 	rec = rebase --continue
-	ref = rev-parse --symbolic-full-name
-	rl = reflog --date=relative
-	sh = show --summary --stat --pretty=fuller --patch
 	st = status -s -b
 	staged = diff --cached
 	stat = diff --stat
-	sti = status -s -b --ignored
-	tg = log --oneline --decorate --graph
-	tig = !tig
-	tip = !git --no-pager log -1 --decorate --abbrev-commit --date=relative
 	undo = reset --soft HEAD^
+
+	# WIP aliases
+	wip = commit --squash=@^{/^WIP}
+	squash = rebase -i --autosquash @^{/^WIP}~1
 
 [advice]
 	detachedHead = false
@@ -92,9 +81,6 @@
 [diff "gpg"]
 	textconv = gpg -v
 	xfuncname = "^((pub|uid) .*)"
-
-[diff "ldif"]
-	xfuncname = "^(dn: .+)$"
 
 [gc]
 	reflogExpire = 30 days
