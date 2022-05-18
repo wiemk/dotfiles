@@ -41,7 +41,7 @@ core:
     foreground: term-fg
 
   directory:
-    foreground: comments
+    foreground: term-blue
     font-style: bold
 
   executable_file:

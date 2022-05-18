@@ -188,11 +188,12 @@ lvim.builtin.terminal.active = true
 -- nvimtree
 lvim.builtin.nvimtree.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
-lvim.builtin.nvimtree.show_icons.git = 0
 
 -- project
 lvim.builtin.project.show_hidden = true
 lvim.builtin.project.silent_chdir = false
+-- do not change project root automagically, require :ProjectRoot
+lvim.builtin.project.manual_mode = true
 
 -- lualine
 local components = require("lvim.core.lualine.components")
@@ -305,11 +306,6 @@ lvim.plugins = {
       "Gedit"
     },
     ft = { "fugitive" }
-  },
-  -- scrollbar
-  {
-    "petertriho/nvim-scrollbar",
-    setup = require "scrollbar".setup()
   },
   -- outline
   {
