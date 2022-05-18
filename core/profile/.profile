@@ -105,11 +105,11 @@ source_host_profile() {
 
 export_user_paths() {
 	local -a rpath
-	if has realpath; then
+	if has readlink; then
 		# shellcheck disable=SC2034
 		readarray -t -d ':' apath <<<"$PATH"
 		for ((i = 0; i < ${#PATH_EXPORTS[@]}; i++)); do
-			local realp="$(realpath -qms "${PATH_EXPORTS[$i]}")"
+			local realp="$(readlink -qms "${PATH_EXPORTS[$i]}")"
 			# check if already added,
 			if ! contains apath "$realp"; then
 				rpath+=("$realp")

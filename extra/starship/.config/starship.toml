@@ -1,0 +1,65 @@
+
+# Don't print a new line at the start of the prompt
+add_newline = false
+scan_timeout = 10
+
+[battery]
+disabled = true
+
+[character]
+success_symbol = '[\$](bold green)'
+error_symbol = '[\$](bold red)'
+vicmd_symbol = '[\$](bold green)'
+
+[cmd_duration]
+style = "bold green"
+
+[git_branch]
+disabled = false
+
+[git_commit]
+disabled = false
+commit_hash_length = 7
+
+[git_metrics]
+disabled = false
+
+[git_state]
+disabled = false
+
+[git_status]
+disabled = false
+
+[jobs]
+disabled = false
+
+[line_break]
+disabled = false
+
+[memory_usage]
+disabled = true
+
+[package]
+disabled = false
+
+[shlvl]
+disabled = false
+threshold = 1
+format = "[$shlvl]($style) "
+
+[status]
+disabled = false
+style = "fg:red dimmed"
+symbol = "✖"
+format = "[\\[$symbol \\($status\\)\\]]($style) "
+
+[sudo]
+disabled = false
+
+[time]
+disabled = true
+
+[username]
+style_root = "bold red"
+style_user = "bold green"
+show_always = false

@@ -124,9 +124,18 @@ local uremap = function()
   vim.g.uremap = not vim.g.uremap
 end
 uremap()
+
 lvim.builtin.which_key.mappings["u"] = {
   name = "Utilities",
-  S = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
+  S = {
+    [[
+      :%s/\(.\+\)\n/\1@/
+      :sort
+      :%s/@/\r/g<CR>
+    ]],
+    "Sort Paragraphs"
+  },
+  s = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
   w = { function() vim.opt.list = not vim.o.list end, "Whitespaces" },
   u = { uremap, "Toggle Umlaut Remap" },
 }
