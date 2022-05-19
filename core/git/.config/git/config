@@ -22,6 +22,7 @@
 	mend = commit --all --amend --reuse-message HEAD
 	p = push
 	re = rebase
+	reg = rebase --no-gpg-sign
 	rec = rebase --continue
 	st = status -s -b
 	staged = diff --cached

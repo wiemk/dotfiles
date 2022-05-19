@@ -1,0 +1,24 @@
+configuration {
+  modi: "window,combi";
+  font: "mono 14";
+  terminal: "alacritty";
+  combi-modi: "drun,run";
+  kb-secondary-paste: "Control+v,Insert";
+  kb-primary-paste: "Control+V,Shift+Insert";
+  kb-remove-to-eol: "";
+  kb-accept-entry: "Control+m,Return,KP_Enter";
+  kb-mode-next: "Shift+Right,Control+Tab,Control+space";
+  kb-row-up: "Up,Control+p,ISO_Left_Tab,Control+k";
+  kb-row-down: "Down,Control+n,Control+j";
+  kb-row-select: "";
+  timeout {
+      action: "kb-cancel";
+      delay:  0;
+  }
+  filebrowser {
+      directories-first: true;
+      sorting-method:    "name";
+  }
+}
+
+@theme "glue_pro_blue"

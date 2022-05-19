@@ -22,6 +22,8 @@ extra/mpv/.config/mpv/*
 # kitty
 extra/kitty/.config/kitty/*
 !extra/kitty/.config/kitty/kitty.conf
+!extra/kitty/.config/kitty/font.conf
+!extra/kitty/.config/kitty/kitty.conf.example
 # alacritty
 extra/alacritty/.config/alacritty/*
 !extra/alacritty/.config/alacritty/alacritty.yml

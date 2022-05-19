@@ -25,6 +25,8 @@ if [[ -f /etc/bashrc ]]; then
 	source /etc/bashrc
 fi
 
+umask 022
+
 #set -o physical
 set +o histexpand
 

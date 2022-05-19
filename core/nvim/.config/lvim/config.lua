@@ -48,6 +48,12 @@ vim.keymap.set({ 'i', 'n', 'v' }, '<C-e>', '<End>', { noremap = true, silent = t
 -- Use the default vim behavior for H and L
 lvim.keys.normal_mode["<S-l>"] = false
 lvim.keys.normal_mode["<S-h>"] = false
+-- vim.keymap.del("n", "<S-l>")
+-- vim.keymap.del("n", "<S-h:")
+
+-- Don't yank on backspace or x
+lvim.keys.normal_mode["<Del>"] = '"_x'
+lvim.keys.normal_mode["x"] = '"_x'
 
 -- Remove some default mappings
 lvim.keys.normal_mode["<F1>"] = "<Esc>"
@@ -101,6 +107,7 @@ if ok then
 end
 
 lvim.builtin.which_key.mappings["F"] = { "<Cmd>Telescope frecency<CR>", "Frecency" }
+lvim.builtin.which_key.mappings["C"] = { "<Cmd>ProjectRoot<CR>", "Project Root" }
 
 -- remap umlauts
 vim.g.uremap = false
@@ -236,6 +243,7 @@ lvim.builtin.treesitter.matchup.enable = true
 
 -- Generic LSP settings
 lvim.lsp.automatic_servers_installation = false
+vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "rust_analyzer" })
 
 -- Custom linters
 if vim.fn.executable("shellcheck") == 1 then
@@ -345,5 +353,27 @@ lvim.plugins = {
       require "telescope".load_extension("frecency")
     end,
     requires = { "tami5/sqlite.lua" }
-  }
+  },
+  {
+    "simrat39/rust-tools.nvim",
+    config = function()
+      local lsp_installer_servers = require "nvim-lsp-installer.servers"
+      local _, requested_server = lsp_installer_servers.get_server "rust_analyzer"
+      require("rust-tools").setup({
+        tools = {
+          autoSetHints = true,
+          hover_with_actions = true,
+          runnables = {
+            use_telescope = true,
+          },
+        },
+        server = {
+          cmd_env = requested_server._default_options.cmd_env,
+          on_attach = require("lvim.lsp").common_on_attach,
+          on_init = require("lvim.lsp").common_on_init,
+        },
+      })
+    end,
+    ft = { "rust", "rs" },
+  },
 }

@@ -7,12 +7,16 @@ on_debug
 # and don't clobber namespace
 # no -> return early
 (
-	source /usr/lib/os-release || source /etc/os-release
+	if [[ -e /usr/lib/os-release ]]; then
+		source /usr/lib/os-release
+	else
+		source /etc/os-release
+	fi
 	if [[ $ID == fedora ]]; then
 		exit 0
 	fi
 	exit 1
-) &>/dev/null || return
+) || return
 
 if has koji; then
 	chkpkg() {
