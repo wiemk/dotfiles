@@ -44,6 +44,31 @@ XDG_STATE_HOME=${XDG_STATE_HOME:-${HOME}/.local/state}
 
 export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME
 
+# define additional PATH folders here
+PATH_EXPORTS=("${XDG_DATA_HOME}/../bin")
+
+export_user_paths() {
+	local -a rpath
+	if has readlink; then
+		# shellcheck disable=SC2034
+		readarray -t -d ':' apath <<<"$PATH"
+		for ((i = 0; i < ${#PATH_EXPORTS[@]}; i++)); do
+			local realp="$(readlink -qms "${PATH_EXPORTS[$i]}")"
+			# check if already added,
+			if ! contains apath "$realp"; then
+				rpath+=("$realp")
+			fi
+		done
+	fi
+	local path=("${rpath[@]}" "$PATH")
+	printf -v spath '%s:' "${path[@]%/}"
+	PATH="${spath:0:-1}"
+	export PATH
+}
+
+# make new PATH available in machine profiles
+export_user_paths
+
 #################################################
 # you can override this in host specific profiles in
 # ${XDG_CONFIG_HOME}/profile/profile-${HOSTNAME}
@@ -68,8 +93,6 @@ export LESSHISTFILE="${XDG_CACHE_HOME}/lesshist"
 export SYSTEMD_PAGER='cat'
 
 #################################################
-# define additional PATH folders here
-PATH_EXPORTS=("${XDG_DATA_HOME}/../bin")
 # read by PAM through the pam_env module (man 8 pam_env) - be aware that fedora
 # is using a patched pam_env module which does not enable user_readenv by default
 # touch ${HOME}/.pam_environment for enabling
@@ -91,6 +114,7 @@ source_machine_profile() {
 		fi
 	fi
 }
+
 source_host_profile() {
 	local host=${HOSTNAME:-$(</proc/sys/kernel/hostname)}
 	host=${host,,}
@@ -101,25 +125,6 @@ source_host_profile() {
 			source "${HOME}/.profile-${host}.conf"
 		fi
 	fi
-}
-
-export_user_paths() {
-	local -a rpath
-	if has readlink; then
-		# shellcheck disable=SC2034
-		readarray -t -d ':' apath <<<"$PATH"
-		for ((i = 0; i < ${#PATH_EXPORTS[@]}; i++)); do
-			local realp="$(readlink -qms "${PATH_EXPORTS[$i]}")"
-			# check if already added,
-			if ! contains apath "$realp"; then
-				rpath+=("$realp")
-			fi
-		done
-	fi
-	local path=("${rpath[@]}" "$PATH")
-	printf -v spath '%s:' "${path[@]%/}"
-	PATH="${spath:0:-1}"
-	export PATH
 }
 
 # export for pam_env and avoid unnecessary writes
