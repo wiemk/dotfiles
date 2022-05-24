@@ -1,7 +1,7 @@
 # vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 
-on_debug
+init_debug
 
 sc-run() {
 	systemd-run --quiet --user --collect "$@"

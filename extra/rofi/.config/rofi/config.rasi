@@ -1,6 +1,6 @@
 configuration {
   modi: "window,combi";
-  font: "mono 14";
+  font: "mono 24";
   terminal: "alacritty";
   combi-modi: "drun,run";
   kb-secondary-paste: "Control+v,Insert";

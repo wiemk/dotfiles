@@ -7,15 +7,15 @@
 
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/bash/_debug" ]]; then
-	on_debug() {
+	init_debug() {
 		local -r script=$(readlink -e -- "${BASH_SOURCE[1]}") || return
 		printf '%d%s\n' "${EPOCHSECONDS}" ": ${script}" >>"${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
 	}
 else
-	on_debug() { :; }
+	init_debug() { :; }
 fi
 
-on_debug
+init_debug
 
 export PROFILE_SOURCED=1
 

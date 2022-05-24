@@ -1,7 +1,7 @@
 # vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 
-on_debug
+init_debug
 
 info_env() {
 	local -r cfg="$XDG_CONFIG_HOME/bash/source.d"

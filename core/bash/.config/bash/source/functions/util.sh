@@ -2,7 +2,7 @@
 # shellcheck shell=bash
 # shellcheck disable=2155,1090
 
-on_debug
+init_debug
 
 ansi-colors() {
 	for c in {0..255}; do

@@ -1,7 +1,7 @@
 # vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 
-on_debug
+init_debug
 
 # Dircolors matching theme
 if [[ -n $VIVID_LS_THEME ]] && has vivid; then

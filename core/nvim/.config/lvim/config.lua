@@ -55,6 +55,9 @@ lvim.keys.normal_mode["<S-h>"] = false
 lvim.keys.normal_mode["<Del>"] = '"_x'
 lvim.keys.normal_mode["x"] = '"_x'
 
+-- Don't move the cursor on *
+lvim.keys.normal_mode["*"] = "*<C-o>"
+
 -- Remove some default mappings
 lvim.keys.normal_mode["<F1>"] = "<Esc>"
 lvim.keys.insert_mode["<F1>"] = "<Esc>"

@@ -19,6 +19,7 @@ core/gnupg/.gnupg/*
 extra/mpv/.config/mpv/*
 !extra/mpv/.config/mpv/input.conf
 !extra/mpv/.config/mpv/mpv.conf
+!extra/mpv/.config/mpv/mpv.conf.nvidia
 # kitty
 extra/kitty/.config/kitty/*
 !extra/kitty/.config/kitty/kitty.conf
@@ -27,6 +28,8 @@ extra/kitty/.config/kitty/*
 # alacritty
 extra/alacritty/.config/alacritty/*
 !extra/alacritty/.config/alacritty/alacritty.yml
+!extra/alacritty/.config/alacritty/alacritty.yml.example
+!extra/alacritty/.config/alacritty/font.yml
 # newsboat
 extra/newsboat/.config/newsboat/urls
 # fish

@@ -7,19 +7,19 @@
 
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/bash/_debug" ]]; then
-	on_debug() {
+	init_debug() {
 		local -r script=$(readlink -e -- "${BASH_SOURCE[1]}") ||
 			return
 		printf '%d%s\n' "${EPOCHSECONDS}" ": ${script}" \
 			>>"${XDG_RUNTIME_DIR:-/run/user/${UID}}/profile_dbg.log"
 	}
 else
-	on_debug() { :; }
+	init_debug() { :; }
 fi
 
-on_debug
+init_debug
 
-export BDOTDIR=${XDG_CONFIG_HOME:-~/.config/}/bash
+export RCDIR=${XDG_CONFIG_HOME:-~/.config/}/bash
 
 if [[ -f /etc/bashrc ]]; then
 	source /etc/bashrc
@@ -48,11 +48,11 @@ set +o histexpand
 		no_empty_cmd_completion
 } 2>/dev/null
 
-if [[ -f $BDOTDIR/rc.pre ]]; then
-	source "${BDOTDIR}/rc.pre"
+if [[ -f $RCDIR/rc.pre ]]; then
+	source "${RCDIR}/rc.pre"
 fi
 
-BSTATE=${XDG_STATE_HOME:-~/.local/state}/bash
+BSTATE=${XDG_STATE_HOME:-${HOME}/.local/state}/bash
 
 HISTCONTROL=ignoreboth
 HISTIGNORE="history*:"
@@ -95,19 +95,19 @@ pathmunge() {
 }
 
 contains_assoc() {
-	local haystack="$1[@]"
-	local needle=$2
-	for e in "${!haystack}"; do
-		[[ $e == "$needle" ]] && return 0
+	local array="$1[@]"
+	local item=$2
+	for e in "${!array}"; do
+		[[ $e == "$item" ]] && return 0
 	done
 	return 1
 }
 
 contains() {
-	local -n haystack=$1
-	local needle=$2
-	for e in "${haystack[@]}"; do
-		[[ $e == "$needle" ]] && return 0
+	local -n array=$1
+	local item=$2
+	for e in "${array[@]}"; do
+		[[ $e == "$item" ]] && return 0
 	done
 	return 1
 }
@@ -125,18 +125,18 @@ if [[ -f /run/.containerenv ]] ||
 fi
 
 # note: files beginning with `99-' are not version controlled
-if [[ -d $BDOTDIR/source.d ]]; then
+if [[ -d $RCDIR/source.d ]]; then
 	shopt -s nullglob
 	# Plugins are allowed to modify the environment via export
 	# but are self-contained and loading order shall not matter.
 	# Functions should be pure/side-effect free but may depend
 	# on each other.
-	for src in "$BDOTDIR"/source.d/*.sh; do
+	for src in "$RCDIR"/source.d/*.sh; do
 		source "$src"
 	done
 fi
 shopt -u nullglob
 
-if [[ -f $BDOTDIR/rc.post ]]; then
-	source "${BDOTDIR}/rc.post"
+if [[ -f $RCDIR/rc.post ]]; then
+	source "${RCDIR}/rc.post"
 fi
