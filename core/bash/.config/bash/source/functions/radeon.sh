@@ -32,3 +32,5 @@ radeon-profile() {
   echo "$pp" | ${priv:+sudo} tee "$ppm" >/dev/null
   grep -E "^[[:space:]]*${pp}" "$ppm"
 }
+
+alias rpp='radeon-profile'

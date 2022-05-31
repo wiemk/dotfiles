@@ -4,6 +4,7 @@
 init_debug
 
 alias c='command'
+alias '+=''sudo'
 
 alias chgrp='command chgrp -c --preserve-root'
 alias chmod='command chmod -c --preserve-root'

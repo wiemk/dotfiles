@@ -86,7 +86,7 @@ export EDITOR
 
 export SUDO_EDITOR='vi'
 export ALTERNATE_EDITOR='vi'
-export VISUAL="${EDITOR}"
+# export VISUAL="${EDITOR}"
 export PAGER='less'
 export LESS='-F -g -i -M -R -S -w -X -z-4'
 export LESSHISTFILE="${XDG_CACHE_HOME}/lesshist"
@@ -131,8 +131,10 @@ source_host_profile() {
 create_pamd_export() {
 	local -a buf
 	for var in "${PAM_EXPORTS[@]}"; do
-		printf -v line '%-32s DEFAULT=%s' "$var" "${!var}"
-		buf+=("${line}")
+		if [[ -n ${!var} ]]; then
+			printf -v line '%-32s DEFAULT=%s' "$var" "${!var}"
+			buf+=("${line}")
+		fi
 	done
 	local IFS=$'\n'
 	printf '%s' "${buf[*]}"
@@ -142,8 +144,10 @@ create_pamd_export() {
 create_envd_export() {
 	local -a buf
 	for var in "${ENV_EXPORTS[@]}"; do
-		printf -v line '%s=%s' "$var" "${!var}"
-		buf+=("${line}")
+		if [[ -n ${!var} ]]; then
+			printf -v line '%s=%s' "$var" "${!var}"
+			buf+=("${line}")
+		fi
 	done
 	local IFS=$'\n'
 	printf '%s' "${buf[*]}"
