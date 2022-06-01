@@ -74,7 +74,7 @@ rpm-weak() {
 }
 
 dnf-info() {
-	# collect package specific information from abovec
+	# collect package specific information from above
 	local -r pkg=$1
 	if ! rpm -q "$pkg" &>/dev/null; then
 		echo "package not installed"

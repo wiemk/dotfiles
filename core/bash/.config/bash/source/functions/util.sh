@@ -105,8 +105,9 @@ clip() {
 		wayland)
 			if has wl-copy; then
 				wl-copy --paste-once
+			else
+				error "wl-copy missing"
 			fi
-			error "wl-copy missing"
 			;;
 		tty)
 			error "tty unsupported session type"

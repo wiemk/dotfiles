@@ -28,6 +28,7 @@ mouse:
   hide_when_typing: true
 
 mouse_bindings:
+  - { mouse: Middle, action: None }
   - { mouse: Middle, mods: Shift, action: PasteSelection }
 
 key_bindings:
