@@ -8,10 +8,6 @@ core/bash/.config/bash/source/local/*.sh
 core/git/.config/git/*.local
 # systemd
 **/systemd/user/**/override.conf
-# tmux
-core/tmux/.config/tmux/*
-!core/tmux/.config/tmux/hooks/_*.hook
-!core/tmux/.config/tmux/hooks/_*.sh
 # neovim
 core/nvim/.config/lvim/plugin/*
 # gnupg

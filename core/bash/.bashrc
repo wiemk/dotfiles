@@ -23,6 +23,8 @@ export RCDIR=${XDG_CONFIG_HOME:-~/.config/}/bash
 
 if [[ -f /etc/bashrc ]]; then
 	source /etc/bashrc
+elif [[ -f /etc/bash.bashrc ]]; then
+	source /etc/bash.bashrc
 fi
 
 umask 022

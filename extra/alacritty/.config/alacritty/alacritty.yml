@@ -12,7 +12,7 @@ window:
   decorations: none
 
 scrolling:
-  history: 1000
+  history: 10000
 
 selection:
   save_to_clipboard: false
@@ -33,3 +33,9 @@ mouse_bindings:
 
 key_bindings:
   - { key: Insert, mods: Control|Shift, action: Paste }
+  - { key: Slash, mods: Control|Shift, mode: ~Search, action: SearchForward }
+  - { key: Return, mode: Search, action: SearchConfirm }
+  - { key: N, mods: Control, mode: Search, action: SearchFocusNext }
+  - { key: N, mods: Control|Shift, mode: Search, action: SearchFocusPrevious }
+  - { key: P, mods: Control, mode: Search, action: SearchHistoryPrevious }
+  - { key: P, mods: Control|Shift, mode: Search, action: SearchHistoryNext }
