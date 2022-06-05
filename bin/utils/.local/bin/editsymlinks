@@ -1,0 +1,20 @@
+#! /bin/bash
+
+tmp=$(mktemp)
+trap "rm $tmp" EXIT
+
+while [ -n "$1" ]; do
+	filename="$1"
+	shift
+	if [ ! -h "$filename" ]; then
+		echo "Not a symlink: $filename"
+		continue
+	fi
+	stat -c "%N" "$filename" >>"$tmp"
+done
+echo "$tmp"
+$EDITOR "$tmp"
+
+while read -r filename linkname; do
+	ln -sf "$linkname" "$filename"
+done < <(sed "s/'\(.*\)' -> '\(.*\)'/\1 \2/" "$tmp")

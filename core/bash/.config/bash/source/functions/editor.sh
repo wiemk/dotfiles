@@ -5,7 +5,7 @@ init_debug
 
 # Create own scope for neovim and child processes
 if has "$EDITOR"; then
-	if [[ -d /run/systemd/system && $CONTAINER != 1 ]]; then
+	if [[ -d /run/systemd/system && -z $CONTAINER ]]; then
 		edit() {
 			if ! type -t is_tmux &>/dev/null || ! is_tmux; then
 				systemd-run --quiet --user --collect --scope "$EDITOR" "$@"

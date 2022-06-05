@@ -19,7 +19,7 @@ keep-articles-days 7
 
 # explicit default values
 auto-reload no
-confirm-exit no
+confirm-exit yes
 
 # remotely open URL, needs to be remote forwarded via ssh
 browser "printf 'URL %s\n' %u | socat - TCP:127.0.0.1:55112 1>/dev/null 2>&1"
@@ -33,6 +33,7 @@ ignore-article "*" "title =~ \"Sport|Werbung\""
 
 
 # vim-like motion
+unbind-key q
 unbind-key h
 unbind-key l
 unbind-key j
@@ -40,10 +41,11 @@ unbind-key k
 unbind-key J
 unbind-key K
 
+bind-key q hard-quit
 bind-key j down
 bind-key k up
 bind-key l open
-bind-key h quit
+bind-key h prev-dialog
 
 bind-key a mark-all-above-as-read
 

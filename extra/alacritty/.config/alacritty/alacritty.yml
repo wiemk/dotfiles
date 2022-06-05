@@ -19,11 +19,6 @@ selection:
   
 live_config_reload: false
 
-shell:
-  program: /usr/bin/bash
-  args:
-    - -i
-
 mouse:
   hide_when_typing: true
 

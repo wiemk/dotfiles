@@ -121,9 +121,20 @@ trim() {
 	printf '%s' "$var"
 }
 
-if [[ -f /run/.containerenv ]] ||
-	systemd-detect-virt --quiet --container &>/dev/null; then
-	export CONTAINER=1
+if has systemd-detect-virt; then
+	container() {
+		local -r container=$(systemd-detect-virt --container)
+		if [[ -n $container && $container != "none" ]]; then
+			echo "$container"
+			return 0
+		fi
+		return 1
+	}
+
+	container=$(container)
+	if [[ -n $container ]]; then
+		export CONTAINER=$container
+	fi
 fi
 
 # note: files beginning with `99-' are not version controlled

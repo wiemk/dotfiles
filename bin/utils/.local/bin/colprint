@@ -1,0 +1,31 @@
+#!/usr/bin/awk -f
+# ls -1 | awk -v ncol=3 -f $0
+
+function ceil(x) {
+	return (x == int(x) ? x : int(x + 1))
+}
+
+BEGIN {
+	len = 0
+	mlen = 32; gap = 2
+	if (!ncol) ncol = 3
+}
+
+{
+	if (length($0) > mlen) {
+		a[NR] = substr($0, 1, mlen - 1) "~"
+	}
+	else a[NR] = $0
+	ll = length(a[NR])
+	len = len > ll ? len : ll
+}
+
+END {
+	wrap = ceil(NR/ncol)
+	for (n = 1; n <= wrap; n++) {
+		for (col = 0; col < ncol; col++) {
+			printf("%-" len + gap "s", a[n+wrap*col])
+		}
+		print ""
+    }
+}
