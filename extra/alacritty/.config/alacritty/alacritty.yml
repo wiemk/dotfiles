@@ -1,6 +1,6 @@
 import:
-  - /home/zeno/.config/alacritty/theme.yml
   - /home/zeno/.config/alacritty/font.yml
+  - /home/zeno/.config/alacritty/theme.yml
 
 window:
   dimensions:
