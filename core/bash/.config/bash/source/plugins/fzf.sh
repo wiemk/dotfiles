@@ -8,7 +8,7 @@ if ! has fzf; then
 	return
 fi
 
-export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS:-"--height=50%"}
+export FZF_DEFAULT_OPTS=${FZF_DEFAULT_OPTS:-"--height=50% --color fg:-1,bg:-1,hl:5,fg+:2,bg+:-1,hl+:5,info:42,prompt:-1,spinner:42,pointer:51,marker:33"}
 
 bind -m emacs '"\C-r": "\C-x1\e^\er"'
 bind -m emacs -x '"\C-x1": __fzf_history'

@@ -13,11 +13,14 @@ line:fg:magenta
 column:fg:magenta
 
 # flags
---glob
-!.git/**
---glob
-!node_modules/**
+--hidden
 --column
 --smart-case
 --trim
 --max-columns=256
+--glob
+!.git/**
+--glob
+!node_modules/**
+--glob
+!.cache/**

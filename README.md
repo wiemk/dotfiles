@@ -1,12 +1,20 @@
 ### Installation
 
-The **core**, **extra**, or **staging** subdirectory must be part of the stow directory (`-d`):
+#### Dependencies
+
+Some scripts in **[bin](bin/)** require `dash` to be installed.
+
+#### Linking
+
+The `core`, `bin`, `extra`, or `staging` subdirectory must be part of the stow directory (`-d`):
+
+##### Using GNU Stow
 
 ```sh
-stow -d "$REPO/{core,extra,staging}" -t "$HOME" -S <config>
+stow -d "$REPO/{core,bin,extra,staging}" -t "$HOME" -S <config>
 ```
 
-#### Example
+#### Examples
 
 ```sh
 git clone --depth=1 --branch=master -- https://betaco.de/zeno/dotfiles.git dotfiles

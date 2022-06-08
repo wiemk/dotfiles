@@ -1,4 +1,4 @@
---[[
+  --[[
 lvim = global options object
 ]]
 
@@ -8,20 +8,11 @@ lvim.format_on_save = false
 lvim.colorscheme = "tokyonight"
 lvim.use_icons = true
 
--- when running in neovide gui
-if vim.g.neovide == true then
-  vim.o.guifont = "FiraCode Nerd Font Mono Retina:h14"
-  vim.g.neovide_cursor_vfx_mode = "sonicboom"
-  vim.g.neovide_refresh_rate = 120
-end
-
 -- Override default options
 (function()
   local opts = {
     cmdheight = 1,
     colorcolumn = "100",
-    -- adapt German keyboard layout
-    langmap = "zy,yz,ZY,YZ,ö{,ä},Ö[,Ä],ü<,Ü>",
     list = true,
     listchars = "tab:→ ,eol:↲,nbsp:␣,trail:•,extends:⟩,precedes:⟨",
     relativenumber = true,
@@ -111,30 +102,6 @@ end
 
 lvim.builtin.which_key.mappings["F"] = { "<Cmd>Telescope frecency<CR>", "Frecency" }
 lvim.builtin.which_key.mappings["C"] = { "<Cmd>ProjectRoot<CR>", "Project Root" }
-
--- remap umlauts
-vim.g.uremap = false
-local uremap = function()
-  local opt = { noremap = true, silent = true }
-  if not vim.g.uremap then
-    vim.keymap.set({ 'i' }, 'ö', '{', opt)
-    vim.keymap.set({ 'i' }, 'ä', '}', opt)
-    vim.keymap.set({ 'i' }, 'Ö', '[', opt)
-    vim.keymap.set({ 'i' }, 'Ä', ']', opt)
-    vim.keymap.set({ 'i' }, 'ü', '<', opt)
-    vim.keymap.set({ 'i' }, 'Ü', '>', opt)
-  else
-    vim.keymap.set({ 'i' }, 'ö', 'ö', opt)
-    vim.keymap.set({ 'i' }, 'ä', 'ä', opt)
-    vim.keymap.set({ 'i' }, 'Ö', 'Ö', opt)
-    vim.keymap.set({ 'i' }, 'Ä', 'Ä', opt)
-    vim.keymap.set({ 'i' }, 'ü', 'ü', opt)
-    vim.keymap.set({ 'i' }, 'Ü', 'Ü', opt)
-  end
-  vim.g.uremap = not vim.g.uremap
-end
-uremap()
-
 lvim.builtin.which_key.mappings["u"] = {
   name = "Utilities",
   S = {
@@ -147,7 +114,6 @@ lvim.builtin.which_key.mappings["u"] = {
   },
   s = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
   w = { function() vim.opt.list = not vim.o.list end, "Whitespaces" },
-  u = { uremap, "Toggle Umlaut Remap" },
 }
 
 -- telescope

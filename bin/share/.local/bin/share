@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# vi:set ft=sh ts=4 sw=4 noet noai:
+# shellcheck shell=bash
+# shellcheck disable=2155,1090
+
+has() {
+	if hash "${1}" 2>/dev/null; then
+		return 0
+	fi
+	return 1
+}
+
+if ! has jq; then
+	echo "Please make sure you have jq in your path." >&2
+	exit 1
+fi
+
+if ! type clip &>/dev/null; then
+	script=$(dirname "$(readlink -f "$0")")
+	src=${script}"/../../../clip/.local/bin/clip"
+	if [[ -f "$src" ]]; then
+		source "$src"
+	fi
+fi
+
+share() {
+	local cmd
+	if has socat; then
+		cmd="socat -t 5 - tcp:unsha.re:9999"
+	elif has ncat; then
+		cmd="ncat unsha.re 9999"
+	else
+		echo "Please make sure you have either socat or ncat in your path." >&2
+		return 1
+	fi
+
+	local resp=$($cmd > >(tee >(jq '.' >&2)) |
+		jq --raw-output \
+			'{ expires, secret, url } | to_entries | .[] | "local " + .key + "=" + (.value | @sh)')
+
+	if [[ -n $resp ]]; then
+		eval "$resp"
+		#shellcheck disable=2154
+		clip <<<"$url"
+	fi
+}
+
+share

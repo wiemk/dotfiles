@@ -47,6 +47,20 @@ export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME
 # define additional PATH folders here
 PATH_EXPORTS=("${XDG_DATA_HOME}/../bin")
 
+pathmunge() {
+	case ":${PATH}:" in
+	*:"$1":*) ;;
+
+	*)
+		if [[ $2 = "after" ]]; then
+			PATH=$PATH:$1
+		else
+			PATH=$1:$PATH
+		fi
+		;;
+	esac
+}
+
 export_user_paths() {
 	local -a rpath
 	if has readlink; then

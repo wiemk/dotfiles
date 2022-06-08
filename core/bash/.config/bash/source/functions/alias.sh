@@ -10,6 +10,8 @@ alias chgrp='command chgrp -c --preserve-root'
 alias chmod='command chmod -c --preserve-root'
 alias chown='command chown -c --preserve-root'
 
+alias info='info --vi-keys'
+
 alias l.='command ls -d .* --color=auto' 2>/dev/null
 alias ll='command ls -l --color=auto' 2>/dev/null
 alias ls='command ls --color=auto --show-control-chars --group-directories-first -AlhXF'
@@ -25,6 +27,8 @@ alias ve='visual'
 
 alias dust='dust -rx'
 alias grep='grep --color=auto'
+alias kc='koji-check'
+alias kdl='koji-arch'
 alias srun='sc-run'
 alias tma='tm'
 alias unsha='socat -t 5 - tcp:unsha.re:10000'

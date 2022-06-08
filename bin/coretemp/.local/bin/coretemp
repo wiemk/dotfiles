@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# vi:set ft=bash ts=4 sw=4 noet noai:
+# shellcheck shell=bash
+
+has() {
+	if hash "${1}" &>/dev/null; then
+		return 0
+	fi
+	return 1
+}
+
+if has sensors && has jq; then
+	coretemp() {
+		sensors -j | jq -r \
+			'to_entries[]
+					| select(.key | startswith("coretemp-")).value
+					| to_entries[]
+					| select(.key | startswith("Core ")).value
+					| to_entries[]
+					| select(.key | endswith("input")).value'
+	}
+fi
+
+coretemp
