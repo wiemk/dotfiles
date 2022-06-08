@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # vi:set ft=sh ts=4 sw=4 noet noai:
-#
 # shellcheck shell=bash
 # shellcheck disable=SC2034
 
@@ -23,7 +22,6 @@ declare -A PLUGIN=(
 	[prompt]=10
 	[vivid]=10
 	[zoxide]=10
-	[wttr]=90
 )
 
 link() {

@@ -10,6 +10,8 @@ alias chgrp='command chgrp -c --preserve-root'
 alias chmod='command chmod -c --preserve-root'
 alias chown='command chown -c --preserve-root'
 
+alias info='info --vi-keys'
+
 alias l.='command ls -d .* --color=auto' 2>/dev/null
 alias ll='command ls -l --color=auto' 2>/dev/null
 alias ls='command ls --color=auto --show-control-chars --group-directories-first -AlhXF'

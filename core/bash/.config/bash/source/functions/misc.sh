@@ -46,15 +46,3 @@ if has xprop && has xdotool; then
 
 	}
 fi
-
-if has sensors && has jq; then
-	coretemp() {
-		sensors -j | jq -r \
-			'to_entries[]
-			| select(.key | startswith("coretemp-")).value
-			| to_entries[]
-			| select(.key | startswith("Core ")).value
-			| to_entries[]
-			| select(.key | endswith("input")).value'
-	}
-fi
