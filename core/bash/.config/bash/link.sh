@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # vi:set ft=sh ts=4 sw=4 noet noai:
-#
 # shellcheck shell=bash
 # shellcheck disable=SC2034
 
@@ -13,6 +12,7 @@ declare -A FUNC=(
 	[editor]=51
 	[fedora]=50
 	[info]=90
+	[misc]=90
 	[systemd]=20
 	[tmux]=50
 	[util]=30
@@ -22,7 +22,6 @@ declare -A PLUGIN=(
 	[prompt]=10
 	[vivid]=10
 	[zoxide]=10
-	[wttr]=90
 )
 
 link() {

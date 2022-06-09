@@ -1,6 +1,8 @@
 # ~/.inputrc
 # vim: ft=readline
 
+set enable-bracketed-paste on
+
 set keyseq-timeout 100
 # set editing-mode vi
 set editing-mode emacs

@@ -7,15 +7,15 @@
 
 # DEBUG
 if [[ -e "${XDG_CONFIG_HOME}/bash/_debug" ]]; then
-	on_debug() {
+	init_debug() {
 		local -r script=$(readlink -e -- "${BASH_SOURCE[1]}") || return
 		printf '%d%s\n' "${EPOCHSECONDS}" ": ${script}" >>"${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
 	}
 else
-	on_debug() { :; }
+	init_debug() { :; }
 fi
 
-on_debug
+init_debug
 
 export PROFILE_SOURCED=1
 
@@ -44,6 +44,31 @@ XDG_STATE_HOME=${XDG_STATE_HOME:-${HOME}/.local/state}
 
 export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME
 
+# define additional PATH folders here
+PATH_EXPORTS=("${XDG_DATA_HOME}/../bin")
+
+export_user_paths() {
+	local -a rpath
+	if has readlink; then
+		# shellcheck disable=SC2034
+		readarray -t -d ':' apath <<<"$PATH"
+		for ((i = 0; i < ${#PATH_EXPORTS[@]}; i++)); do
+			local realp="$(readlink -qms "${PATH_EXPORTS[$i]}")"
+			# check if already added,
+			if ! contains apath "$realp"; then
+				rpath+=("$realp")
+			fi
+		done
+	fi
+	local path=("${rpath[@]}" "$PATH")
+	printf -v spath '%s:' "${path[@]%/}"
+	PATH="${spath:0:-1}"
+	export PATH
+}
+
+# make new PATH available in machine profiles
+export_user_paths
+
 #################################################
 # you can override this in host specific profiles in
 # ${XDG_CONFIG_HOME}/profile/profile-${HOSTNAME}
@@ -61,15 +86,13 @@ export EDITOR
 
 export SUDO_EDITOR='vi'
 export ALTERNATE_EDITOR='vi'
-export VISUAL="${EDITOR}"
+# export VISUAL="${EDITOR}"
 export PAGER='less'
 export LESS='-F -g -i -M -R -S -w -X -z-4'
 export LESSHISTFILE="${XDG_CACHE_HOME}/lesshist"
 export SYSTEMD_PAGER='cat'
 
 #################################################
-# define additional PATH folders here
-PATH_EXPORTS=("${XDG_DATA_HOME}/../bin")
 # read by PAM through the pam_env module (man 8 pam_env) - be aware that fedora
 # is using a patched pam_env module which does not enable user_readenv by default
 # touch ${HOME}/.pam_environment for enabling
@@ -91,6 +114,7 @@ source_machine_profile() {
 		fi
 	fi
 }
+
 source_host_profile() {
 	local host=${HOSTNAME:-$(</proc/sys/kernel/hostname)}
 	host=${host,,}
@@ -103,31 +127,14 @@ source_host_profile() {
 	fi
 }
 
-export_user_paths() {
-	local -a rpath
-	if has realpath; then
-		# shellcheck disable=SC2034
-		readarray -t -d ':' apath <<<"$PATH"
-		for ((i = 0; i < ${#PATH_EXPORTS[@]}; i++)); do
-			local realp="$(realpath -qms "${PATH_EXPORTS[$i]}")"
-			# check if already added,
-			if ! contains apath "$realp"; then
-				rpath+=("$realp")
-			fi
-		done
-	fi
-	local path=("${rpath[@]}" "$PATH")
-	printf -v spath '%s:' "${path[@]%/}"
-	PATH="${spath:0:-1}"
-	export PATH
-}
-
 # export for pam_env and avoid unnecessary writes
 create_pamd_export() {
 	local -a buf
 	for var in "${PAM_EXPORTS[@]}"; do
-		printf -v line '%-32s DEFAULT=%s' "$var" "${!var}"
-		buf+=("${line}")
+		if [[ -n ${!var} ]]; then
+			printf -v line '%-32s DEFAULT=%s' "$var" "${!var}"
+			buf+=("${line}")
+		fi
 	done
 	local IFS=$'\n'
 	printf '%s' "${buf[*]}"
@@ -137,8 +144,10 @@ create_pamd_export() {
 create_envd_export() {
 	local -a buf
 	for var in "${ENV_EXPORTS[@]}"; do
-		printf -v line '%s=%s' "$var" "${!var}"
-		buf+=("${line}")
+		if [[ -n ${!var} ]]; then
+			printf -v line '%s=%s' "$var" "${!var}"
+			buf+=("${line}")
+		fi
 	done
 	local IFS=$'\n'
 	printf '%s' "${buf[*]}"

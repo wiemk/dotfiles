@@ -3,7 +3,7 @@
 # shellcheck disable=2155,1090
 # http://stackoverflow.com/a/1088763/49849
 
-on_debug
+init_debug
 
 _xdiscard() {
 	echo -n "${READLINE_LINE:0:READLINE_POINT}" | xclip

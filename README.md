@@ -1,16 +1,20 @@
 ### Installation
 
-The **core**, **extra**, or **staging** subdirectory must be part of the stow directory (`-d`):
+#### Linking
+
+The `core`, `bin`, `extra`, or `staging` subdirectory must be part of the stow directory (`-d`):
+
+##### Using GNU Stow
 
 ```sh
-stow -d "$REPO/{core,extra,staging}" -t "$HOME" -S <config>
+stow -d "$REPO/{core,bin,extra,staging}" -t "$HOME" -S <config>
 ```
 
-#### Example
+#### Examples
 
 ```sh
-git clone --depth=1 --branch=master -- https://betaco.de/zeno/dotfiles.git zeno-dotfiles
-stow -d "$PWD/zeno-dotfiles/core" -t "$HOME" -S tmux
+git clone --depth=1 --branch=master -- https://betaco.de/zeno/dotfiles.git dotfiles
+stow -d "$PWD/dotfiles/core" -t "$HOME" -S tmux
 ```
 
 ##### This example will create the following symbolic links:

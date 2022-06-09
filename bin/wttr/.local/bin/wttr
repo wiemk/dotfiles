@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 
@@ -37,15 +38,4 @@ wttr() {
 	curl -fGsS -H "Accept-Language: ${LANG%_*}" "${args[@]}" --compressed "http://wttr.in/${location}"
 }
 
-wttr2() {
-	local location="${1// /+}"
-	local param
-	param=$(_wttr_param)
-	command shift
-	local -a args
-	for p in "$param" "$@"; do
-		args+=("--data-urlencode" "$p")
-	done
-
-	curl -fGsS -H "Accept-Language: ${LANG%_*}" "${args[@]}" --compressed "http://v2.wttr.in/${location}"
-}
+wttr "$@"

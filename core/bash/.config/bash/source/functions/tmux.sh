@@ -1,7 +1,7 @@
 # vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 
-on_debug
+init_debug
 
 if ! has tmux; then
 	return

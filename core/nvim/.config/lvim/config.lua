@@ -48,6 +48,15 @@ vim.keymap.set({ 'i', 'n', 'v' }, '<C-e>', '<End>', { noremap = true, silent = t
 -- Use the default vim behavior for H and L
 lvim.keys.normal_mode["<S-l>"] = false
 lvim.keys.normal_mode["<S-h>"] = false
+-- vim.keymap.del("n", "<S-l>")
+-- vim.keymap.del("n", "<S-h:")
+
+-- Don't yank on backspace or x
+lvim.keys.normal_mode["<Del>"] = '"_x'
+lvim.keys.normal_mode["x"] = '"_x'
+
+-- Don't move the cursor on *
+lvim.keys.normal_mode["*"] = "*<C-o>"
 
 -- Remove some default mappings
 lvim.keys.normal_mode["<F1>"] = "<Esc>"
@@ -101,6 +110,7 @@ if ok then
 end
 
 lvim.builtin.which_key.mappings["F"] = { "<Cmd>Telescope frecency<CR>", "Frecency" }
+lvim.builtin.which_key.mappings["C"] = { "<Cmd>ProjectRoot<CR>", "Project Root" }
 
 -- remap umlauts
 vim.g.uremap = false
@@ -124,9 +134,18 @@ local uremap = function()
   vim.g.uremap = not vim.g.uremap
 end
 uremap()
+
 lvim.builtin.which_key.mappings["u"] = {
   name = "Utilities",
-  S = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
+  S = {
+    [[
+      :%s/\(.\+\)\n/\1@/
+      :sort
+      :%s/@/\r/g<CR>
+    ]],
+    "Sort Paragraphs"
+  },
+  s = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
   w = { function() vim.opt.list = not vim.o.list end, "Whitespaces" },
   u = { uremap, "Toggle Umlaut Remap" },
 }
@@ -179,11 +198,12 @@ lvim.builtin.terminal.active = true
 -- nvimtree
 lvim.builtin.nvimtree.active = true
 lvim.builtin.nvimtree.setup.view.side = "left"
-lvim.builtin.nvimtree.show_icons.git = 0
 
 -- project
 lvim.builtin.project.show_hidden = true
 lvim.builtin.project.silent_chdir = false
+-- do not change project root automagically, require :ProjectRoot
+lvim.builtin.project.manual_mode = true
 
 -- lualine
 local components = require("lvim.core.lualine.components")
@@ -226,15 +246,17 @@ lvim.builtin.treesitter.matchup.enable = true
 
 -- Generic LSP settings
 lvim.lsp.automatic_servers_installation = false
+vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "rust_analyzer" })
 
 -- Custom linters
-local null_ls = require "null-ls"
-lvim.lsp.null_ls.setup.sources = {
-  null_ls.builtins.diagnostics.shellcheck,
-  null_ls.builtins.code_actions.shellcheck,
-  null_ls.builtins.formatting.shfmt
-}
-
+if vim.fn.executable("shellcheck") == 1 then
+  local null_ls = require "null-ls"
+  lvim.lsp.null_ls.setup.sources = {
+    null_ls.builtins.diagnostics.shellcheck,
+    null_ls.builtins.code_actions.shellcheck,
+    null_ls.builtins.formatting.shfmt
+  }
+end
 -- Additional Plugins
 lvim.plugins = {
   -- Theme
@@ -297,11 +319,6 @@ lvim.plugins = {
     },
     ft = { "fugitive" }
   },
-  -- scrollbar
-  {
-    "petertriho/nvim-scrollbar",
-    setup = require "scrollbar".setup()
-  },
   -- outline
   {
     "simrat39/symbols-outline.nvim",
@@ -339,5 +356,27 @@ lvim.plugins = {
       require "telescope".load_extension("frecency")
     end,
     requires = { "tami5/sqlite.lua" }
-  }
+  },
+  {
+    "simrat39/rust-tools.nvim",
+    config = function()
+      local lsp_installer_servers = require "nvim-lsp-installer.servers"
+      local _, requested_server = lsp_installer_servers.get_server "rust_analyzer"
+      require("rust-tools").setup({
+        tools = {
+          autoSetHints = true,
+          hover_with_actions = true,
+          runnables = {
+            use_telescope = true,
+          },
+        },
+        server = {
+          cmd_env = requested_server._default_options.cmd_env,
+          on_attach = require("lvim.lsp").common_on_attach,
+          on_init = require("lvim.lsp").common_on_init,
+        },
+      })
+    end,
+    ft = { "rust", "rs" },
+  },
 }

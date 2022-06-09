@@ -1,0 +1,23 @@
+#!/bin/bash
+# vi:set ft=sh ts=4 sw=4 noet noai:
+# shellcheck shell=bash
+
+tmp=$(mktemp)
+trap 'rm "$tmp"' EXIT
+
+while [[ -n $1 ]]; do
+	filename=$1
+	shift
+	if [[ ! -L $filename ]]; then
+		echo "Not a symlink: $filename" >&2
+		continue
+	fi
+	stat -c "%N" "$filename" >>"$tmp"
+done
+
+echo "$tmp"
+$EDITOR "$tmp"
+
+while read -r filename linkname; do
+	ln -sf "$linkname" "$filename"
+done < <(sed "s/'\(.*\)' -> '\(.*\)'/\1 \2/" "$tmp")

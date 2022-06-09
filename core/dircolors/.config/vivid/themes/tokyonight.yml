@@ -41,7 +41,7 @@ core:
     foreground: term-fg
 
   directory:
-    foreground: comments
+    foreground: term-blue
     font-style: bold
 
   executable_file:
@@ -85,6 +85,11 @@ core:
     background: comments
     font-style: bold
 
+  door:
+    foreground: functions
+    background: comments
+    font-style: bold
+
   character_device:
     foreground: regex
     background: term-black
@@ -108,6 +113,9 @@ core:
     {}
 
   sticky_other_writable:
+    {}
+
+  file_with_capability:
     {}
 
 text:

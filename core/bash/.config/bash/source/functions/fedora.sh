@@ -1,18 +1,22 @@
 # vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 
-on_debug
+init_debug
 
 # check if host is a fedora system
 # and don't clobber namespace
 # no -> return early
 (
-	source /usr/lib/os-release || source /etc/os-release
+	if [[ -e /usr/lib/os-release ]]; then
+		source /usr/lib/os-release
+	else
+		source /etc/os-release
+	fi
 	if [[ $ID == fedora ]]; then
 		exit 0
 	fi
 	exit 1
-) &>/dev/null || return
+) || return
 
 if has koji; then
 	chkpkg() {
@@ -70,7 +74,7 @@ rpm-weak() {
 }
 
 dnf-info() {
-	# collect package specific information from abovec
+	# collect package specific information from above
 	local -r pkg=$1
 	if ! rpm -q "$pkg" &>/dev/null; then
 		echo "package not installed"

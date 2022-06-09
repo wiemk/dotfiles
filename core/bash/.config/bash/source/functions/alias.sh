@@ -1,13 +1,16 @@
 # vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 
-on_debug
+init_debug
 
 alias c='command'
+alias '+=''sudo'
 
 alias chgrp='command chgrp -c --preserve-root'
 alias chmod='command chmod -c --preserve-root'
 alias chown='command chown -c --preserve-root'
+
+alias info='info --vi-keys'
 
 alias l.='command ls -d .* --color=auto' 2>/dev/null
 alias ll='command ls -l --color=auto' 2>/dev/null

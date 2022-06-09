@@ -2,7 +2,7 @@
 # shellcheck shell=bash
 # shellcheck disable=2155,1090
 
-on_debug
+init_debug
 
 ansi-colors() {
 	for c in {0..255}; do
@@ -105,8 +105,9 @@ clip() {
 		wayland)
 			if has wl-copy; then
 				wl-copy --paste-once
+			else
+				error "wl-copy missing"
 			fi
-			error "wl-copy missing"
 			;;
 		tty)
 			error "tty unsupported session type"
