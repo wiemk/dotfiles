@@ -25,6 +25,7 @@ mouse:
 mouse_bindings:
   - { mouse: Middle, action: None }
   - { mouse: Middle, mods: Shift, action: PasteSelection }
+  - { mouse: Right, mods: Shift, action: Paste }
 
 key_bindings:
   - { key: Insert, mods: Control|Shift, action: Paste }

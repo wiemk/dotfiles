@@ -19,10 +19,20 @@ init_debug
 ) || return
 
 if has koji; then
-	chkpkg() {
-		echo -n "$*" |
-			tr ' ' '\0' |
+	nullterm() {
+		printf '%s' "$*" | tr ' ' '\0'
+	}
+	koji-check() {
+		nullterm "$*" |
 			xargs -P8 -L1 -0 koji list-builds --state=COMPLETE --after="$(env LC_ALL=C date -d -'2 days')" --package
+	}
+	koji-arch() {
+		nullterm "$*" |
+			xargs -P8 -L1 -0 koji download-build --arch=x86_64
+	}
+	koji-noarch() {
+		nullterm "$*" |
+			xargs -P8 -L1 -0 koji download-build --arch=noarch
 	}
 fi
 

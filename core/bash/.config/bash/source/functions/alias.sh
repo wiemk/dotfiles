@@ -27,6 +27,8 @@ alias ve='visual'
 
 alias dust='dust -rx'
 alias grep='grep --color=auto'
+alias kc='koji-check'
+alias kdl='koji-arch'
 alias srun='sc-run'
 alias tma='tm'
 alias unsha='socat -t 5 - tcp:unsha.re:10000'

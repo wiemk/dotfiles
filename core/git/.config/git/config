@@ -106,13 +106,16 @@
 [merge]
 	conflictStyle = diff3
 	defaultToUpstream = true
-	tool = vimdiff
+	tool = fugitive
 
 [mergetool]
 	prompt = false
 
 [mergetool "vimdiff"]
-	cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+	cmd = edit -d "$BASE" "$LOCAL" "$REMOTE" "$MERGED" "+wincmd w" "+wincmd J"
+
+[mergetool "fugitive"]
+	cmd = edit -f "+Gdiffsplit!" "$MERGED"
 
 [push]
 	#default = upstream
