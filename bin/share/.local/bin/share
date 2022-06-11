@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
+# shellcheck disable=2155,1090
 
 has() {
-	if hash "${1}" &>/dev/null; then
+	if hash "${1}" 2>/dev/null; then
 		return 0
 	fi
 	return 1
@@ -15,51 +16,11 @@ if ! has jq; then
 fi
 
 if ! type clip &>/dev/null; then
-	clip() {
-		# use OSC 52 for kitty, alacritty and tmux inside either of them
-		error() {
-			printf "%s: no suitable copy method found." "$1" >&2
-			return 1
-		}
-
-		extern() {
-			case "$XDG_SESSION_TYPE" in
-				x11)
-					if has xsel; then
-						xsel --input --clipboard --logfile /dev/null
-					elif has xclip; then
-						xclip -in -filter -select clipboard
-					else
-						error
-					fi
-					;;
-				wayland)
-					if has wl-copy; then
-						wl-copy --paste-once
-					else
-						error "wl-copy missing"
-					fi
-					;;
-				tty)
-					error "tty unsupported session type"
-					;;
-				*)
-					error "unknown session type"
-					;;
-			esac
-		}
-
-		if [[ $TERM_PROGRAM == tmux ]]; then
-			tmux load-buffer -w /dev/fd/0
-		elif [[ -v KITTY_INSTALLATION_DIR ]]; then
-			kitty +kitten clipboard
-		elif [[ -v ALACRITTY_SOCKET ]]; then
-			#TODO: some OSC 52 magic
-			extern
-		else
-			extern
-		fi
-	}
+	script=$(dirname "$(readlink -f "$0")")
+	src=${script}"/../../../clip/.local/bin/clip"
+	if [[ -f "$src" ]]; then
+		source "$src"
+	fi
 fi
 
 share() {

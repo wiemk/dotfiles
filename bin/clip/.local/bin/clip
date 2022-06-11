@@ -1,9 +1,9 @@
-#!/usr/bin/env bash
+#!/usr/bin/env dash
 # vi:set ft=sh ts=4 sw=4 noet noai:
-# shellcheck shell=bash
+# shellcheck shell=sh
 
 has() {
-	if hash "${1}" &>/dev/null; then
+	if hash "${1}" 2>/dev/null; then
 		return 0
 	fi
 	return 1
@@ -43,11 +43,11 @@ clip() {
 		esac
 	}
 
-	if [[ $TERM_PROGRAM == tmux ]]; then
+	if [ "$TERM_PROGRAM" = tmux ]; then
 		tmux load-buffer -w /dev/fd/0
-	elif [[ -v KITTY_INSTALLATION_DIR ]]; then
+	elif [ -n "${KITTY_INSTALLATION_DIR+x}" ]; then
 		kitty +kitten clipboard
-	elif [[ -v ALACRITTY_SOCKET ]]; then
+	elif [ -n "${ALACRITTY_SOCKET+x}" ]; then
 		#TODO: some OSC 52 magic
 		extern
 	else
@@ -55,4 +55,6 @@ clip() {
 	fi
 }
 
-clip
+if [ "$(basename -- "$0")" = "clip" ]; then
+	clip
+fi
