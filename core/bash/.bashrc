@@ -82,20 +82,6 @@ has_line_editing() {
 	return 1
 }
 
-pathmunge() {
-	case ":${PATH}:" in
-	*:"$1":*) ;;
-
-	*)
-		if [ "$2" = "after" ]; then
-			PATH=$PATH:$1
-		else
-			PATH=$1:$PATH
-		fi
-		;;
-	esac
-}
-
 contains_assoc() {
 	local array="$1[@]"
 	local item=$2

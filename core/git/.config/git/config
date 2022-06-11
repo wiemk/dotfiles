@@ -3,36 +3,70 @@
 #
 
 [alias]
-	a = add --all
+	amend = commit --amend
 	b = branch -vv --sort=-committerdate
 	c = commit
 	ca = commit --amend --no-edit
 	ch = cherry-pick
+	cin = commit -e -F -
 	cm = commit --amend -o
 	co = checkout
 	d = diff --compact-summary --stat
 	dc = diff --cached
 	di = diff
+	emerge = merge --edit --no-ff
 	fa = fetch --all
 	ff = merge --ff-only
+	follow = log --oneline --follow --stat --summary --
 	fp = push --force-with-lease
+	in = log --oneline --decorate ..@{upstream}
+	inc = log --name-status origin/master..
 	l = log --color --pretty=format:'%Cgreen%h%Creset%C(yellow)%d%Creset %s%Creset' --abbrev-commit -n5
+	lg = log --oneline --decorate
+	lgs = log --format=\"%C(yellow)%h%C(reset)%C(cyan)% GK%C(reset) %s\"
+	ll = log --stat --decorate --abbrev-commit --date=relative
+	lll = log -p --stat --decorate --color-moved --pretty=fuller
+	lm = log --oneline --decorate --topo-order --merges --ancestry-path
 	ln = log --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --numstat --date=relative
+	logs = log --show-signature
 	ls = ls-files
+	lt = log --topo-order --format=format:'%C(auto)%h%d%C(reset) %s %C(bold blue)(%an, %ar)%C(reset)'
+	m = merge --no-ff
 	mend = commit --all --amend --reuse-message HEAD
+	mkobject = hash-object --stdin -w
+	mt = mergetool
+	out = log --oneline --decorate @{upstream}..
 	p = push
 	re = rebase
 	rebu = rebase -Xours
-	reg = rebase --no-gpg-sign
 	rec = rebase --continue
+	ref = rev-parse --symbolic-full-name
+	refs = for-each-ref
+	reg = rebase --no-gpg-sign
+	repack-to-alternate = repack -dal
+	repack-to-local = repack -da
+	rl = reflog --date=relative
+	rll = reflog --date=relative --stat
+	rlll = reflog --date=relative -p --stat --color-moved
+	sh = show --summary --stat --pretty=fuller --patch
+	short = rev-parse --short
+	sl = stash list --name-status --pretty='format:%gd [%ar]: %s'
+	squash = rebase -i --autosquash @^{/^WIP}~1
 	st = status -s -b
 	staged = diff --cached
 	stat = diff --stat
+	sti = status -s -b --ignored
+	tagv = !git tag -v $(git describe --abbrev=0)
+	tg = log --oneline --decorate --graph
+	tgs = log --format=\"%C(yellow)%h%C(reset)%C(cyan)% GS%C(reset) %s\" --graph
+	tig = !tig
+	tip = !git --no-pager log -1 --decorate --abbrev-commit --date=relative
+	uncommit = reset HEAD^
 	undo = reset --soft HEAD^
-
-	# WIP aliases
+	wdiff = diff --word-diff
+	whoami = !git var GIT_COMMITTER_IDENT | sed 's/>.*/>/'
 	wip = commit --squash=@^{/^WIP}
-	squash = rebase -i --autosquash @^{/^WIP}~1
+	wshow = show --word-diff
 
 [advice]
 	detachedHead = false
@@ -106,13 +140,16 @@
 [merge]
 	conflictStyle = diff3
 	defaultToUpstream = true
-	tool = vimdiff
+	tool = fugitive
 
 [mergetool]
 	prompt = false
 
 [mergetool "vimdiff"]
-	cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+	cmd = edit -d "$BASE" "$LOCAL" "$REMOTE" "$MERGED" "+wincmd w" "+wincmd J"
+
+[mergetool "fugitive"]
+	cmd = edit -f "+Gdiffsplit!" "$MERGED"
 
 [push]
 	#default = upstream
