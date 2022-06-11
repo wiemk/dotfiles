@@ -146,10 +146,10 @@
 	prompt = false
 
 [mergetool "vimdiff"]
-	cmd = edit -d "$BASE" "$LOCAL" "$REMOTE" "$MERGED" "+wincmd w" "+wincmd J"
+	cmd = $EDITOR -d "$BASE" "$LOCAL" "$REMOTE" "$MERGED" "+wincmd w" "+wincmd J"
 
 [mergetool "fugitive"]
-	cmd = edit -f "+Gdiffsplit!" "$MERGED"
+	cmd = $EDITOR -f "+Gdiffsplit!" "$MERGED"
 
 [push]
 	#default = upstream

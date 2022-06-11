@@ -1,5 +1,9 @@
 ### Installation
 
+#### Dependencies
+
+Some scripts in **[bin](bin/)** require `dash` to be installed.
+
 #### Linking
 
 The `core`, `bin`, `extra`, or `staging` subdirectory must be part of the stow directory (`-d`):
