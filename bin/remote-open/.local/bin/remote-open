@@ -1,0 +1,15 @@
+#!/bin/dash
+
+read -r type target
+if [ -z "${type}" ] || [ -z "${target}" ]; then
+	exit 1
+fi
+
+case "${type}" in
+	URL ) xdg-open "${target}" ;;
+	VIDEO ) setsid -f mpv --quiet --msg-level=ffmpeg=fatal --ytdl-format='bestvideo[fps<=60][height<=1080][vcodec=avc1]/mp4' "${target}" 1>/dev/null 2>&1 0</dev/null ;;
+	AUDIO ) setsid -f mpv --quiet --msg-level=ffmpeg=fatal --profile=low-latency --no-video --cache=auto --demuxer-max-back-bytes=2097152 --demuxer-max-bytes=2097152 --ytdl-format='bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio' "${target}" 1>/dev/null 2>&1 0</dev/null ;;
+	* ) printf '%s\n' 'Unsupported format.'; exit 2 ;;
+esac
+
+# vi:set ft=sh ts=4 sw=4 noet:
