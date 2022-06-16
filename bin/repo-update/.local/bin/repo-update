@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# vi:set ft=sh ts=4 sw=4 noet noai:
+# shellcheck shell=bash
+
+has() {
+	if hash "${1}" 2>/dev/null; then
+		return 0
+	fi
+	return 1
+}
+
+error() {
+	printf '%s\n' "$1" >&2
+	exit 1
+}
+
+if (($# < 1)); then
+	error "Repository parent path required"
+fi
+
+if [[ ! -d $1 ]]; then
+	error "Not a directory"
+fi
+
+if ! has parallel; then
+	error "GNU parallel required"
+fi
+
+export GIT_TERMINAL_PROMPT=0
+find "$1" -maxdepth 2 -name '.git' -prune -type d -printf '%h\n' |
+	parallel -j 16 'echo "%%%%%% {} %%%%%%"; git -C {} pull'

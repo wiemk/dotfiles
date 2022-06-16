@@ -1,4 +1,4 @@
-  --[[
+--[[
 lvim = global options object
 ]]
 
@@ -32,6 +32,12 @@ vim.fn.matchadd("ErrorMsg", [[\s\+$]])
 -- Keymappings [view all the defaults by pressing <leader>Lk]
 lvim.leader = "space"
 
+-- Arrow keys
+lvim.keys.normal_mode["<Up>"] = "<NOP>"
+lvim.keys.normal_mode["<Down>"] = "<NOP>"
+lvim.keys.normal_mode["<Left>"] = "<NOP>"
+lvim.keys.normal_mode["<Right>"] = "<NOP>"
+
 -- tmux bugfix (nvim 0.7 api)
 vim.keymap.set({ 'i', 'n', 'v' }, '<C-a>', '<Home>', { noremap = true, silent = true })
 vim.keymap.set({ 'i', 'n', 'v' }, '<C-e>', '<End>', { noremap = true, silent = true })
@@ -60,12 +66,6 @@ lvim.keys.normal_mode["<C-h>"] = ":nohlsearch<CR>"
 lvim.keys.normal_mode["<C-k>"] = "{"
 lvim.keys.normal_mode["<C-j>"] = "}"
 
--- Arrow keys
-lvim.keys.normal_mode["<Up>"] = "<NOP>"
-lvim.keys.normal_mode["<Down>"] = "<NOP>"
-lvim.keys.normal_mode["<Left>"] = "<NOP>"
-lvim.keys.normal_mode["<Right>"] = "<NOP>"
-
 -- Map useless tabulator
 lvim.keys.normal_mode["<Tab>"] = "%"
 
@@ -80,8 +80,15 @@ lvim.keys.normal_mode["<C-x>"] = ":BufferKill<CR>"
 lvim.keys.normal_mode["<M-,>"] = ":BufferLineCyclePrev<CR>"
 lvim.keys.normal_mode["<M-.>"] = ":BufferLineCycleNext<CR>"
 
+-- Terminal Mappings
+lvim.keys.term_mode["<Esc>"] = "<C-\\><C-n>"
+lvim.keys.term_mode["<C-h>"] = false
+lvim.keys.term_mode["<C-j>"] = false
+lvim.keys.term_mode["<C-k>"] = false
+lvim.keys.term_mode["<C-l>"] = false
+
 -- which-key
-lvim.builtin.which_key.setup.triggers_blacklist = { n = { "g" } }
+-- lvim.builtin.which_key.setup.triggers_blacklist = { n = { "g" } }
 lvim.builtin.which_key.mappings["<leader>"] = { "<C-^>", "Cycle Buffer" }
 lvim.builtin.which_key.mappings["h"] = {
   function() vim.opt.hlsearch = not vim.o.hlsearch end, "Toggle Highlight"
@@ -114,7 +121,9 @@ lvim.builtin.which_key.mappings["u"] = {
   },
   s = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
   w = { function() vim.opt.list = not vim.o.list end, "Whitespaces" },
+  t = { "<Cmd>Twilight<CR>", "Twilight Mode" },
 }
+lvim.builtin.which_key.mappings["Z"] = { "<cmd>ZenMode<CR>", "Zen Mode" }
 
 -- telescope
 -- change default navigation mappings
@@ -160,6 +169,7 @@ lvim.builtin.notify.active = true
 
 -- toggleterm
 lvim.builtin.terminal.active = true
+lvim.builtin.terminal.shading_factor = 1
 
 -- nvimtree
 lvim.builtin.nvimtree.active = true
@@ -168,8 +178,11 @@ lvim.builtin.nvimtree.setup.view.side = "left"
 -- project
 lvim.builtin.project.show_hidden = true
 lvim.builtin.project.silent_chdir = false
--- do not change project root automagically, require :ProjectRoot
-lvim.builtin.project.manual_mode = true
+-- do change project root automagically, require :ProjectRoot
+lvim.builtin.project.manual_mode = false
+
+-- DAP
+lvim.builtin.dap.active = false
 
 -- lualine
 local components = require("lvim.core.lualine.components")
@@ -206,7 +219,6 @@ lvim.builtin.treesitter.ensure_installed = {
   "yaml",
   "zig",
 }
-lvim.builtin.treesitter.ignore_install = { "haskell" }
 lvim.builtin.treesitter.highlight.enabled = true
 lvim.builtin.treesitter.matchup.enable = true
 
@@ -290,23 +302,6 @@ lvim.plugins = {
     "simrat39/symbols-outline.nvim",
     cmd = "SymbolsOutline",
   },
-  -- spectre
-  {
-    "windwp/nvim-spectre",
-    event = "BufRead",
-    config = function()
-      require "spectre".setup()
-    end,
-    setup = function()
-      lvim.builtin.which_key.mappings["S"] = {
-        name = "Spectre",
-        t = { "<cmd>lua require('spectre').open()<CR>", "Spectre" },
-        w = { "<cmd>lua require('spectre').open_visual({select_word=true})<CR>", "Word" },
-        v = { "<cmd>lua require('spectre').open_visual()<CR>", "Visual" },
-        f = { "<cmd>sp viw:lua require('spectre').open_file_search()<CR>", "Current File" },
-      }
-    end,
-  },
   -- matchup
   {
     "andymass/vim-matchup",
@@ -344,5 +339,68 @@ lvim.plugins = {
       })
     end,
     ft = { "rust", "rs" },
+  },
+  -- lazy loaded
+  {
+    "folke/zen-mode.nvim",
+    event = "BufRead",
+    cmd = "ZenMode",
+    config = function()
+      require("zen-mode").setup({
+        window = {
+          backdrop = 1,
+          height = 0.85,
+          options = {
+            signcolumn = "no",
+            number = false,
+            relativenumber = false,
+            -- cursorline = false,
+            -- cursorcolumn = false,
+            -- foldcolumn = "0",
+            -- list = false,
+          },
+        },
+        plugins = {
+          gitsigns = { enabled = false },
+        },
+      })
+    end,
+  },
+  {
+    "folke/twilight.nvim",
+    event = "BufRead",
+    config = function()
+      require("twilight").setup({
+        dimming = {
+          alpha = 0.25,
+          color = { "Normal", "#ffffff" },
+        },
+        context = 20,
+        expand = {
+          "function",
+          "method",
+          "table",
+          "if_statement",
+        },
+        exclude = {},
+      })
+    end,
+  },
+  -- spectre
+  {
+    "windwp/nvim-spectre",
+    event = "BufRead",
+    config = function()
+      require "spectre".setup()
+    end,
+    setup = function()
+      lvim.builtin.which_key.mappings["S"] = {
+        name = "Spectre",
+        t = { "<cmd>lua require('spectre').open()<CR>", "Spectre" },
+        w = { "<cmd>lua require('spectre').open_visual({select_word=true})<CR>", "Word" },
+        v = { "<cmd>lua require('spectre').open_visual()<CR>", "Visual" },
+        f = { "<cmd>sp viw:lua require('spectre').open_file_search()<CR>", "Current File" },
+      }
+    end,
   },
 }
