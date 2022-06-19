@@ -81,7 +81,7 @@ lvim.keys.normal_mode["<M-,>"] = ":BufferLineCyclePrev<CR>"
 lvim.keys.normal_mode["<M-.>"] = ":BufferLineCycleNext<CR>"
 
 -- Terminal Mappings
-lvim.keys.term_mode["<Esc>"] = "<C-\\><C-n>"
+-- lvim.keys.term_mode["<Esc>"] = "<C-\\><C-n>"
 lvim.keys.term_mode["<C-h>"] = false
 lvim.keys.term_mode["<C-j>"] = false
 lvim.keys.term_mode["<C-k>"] = false
@@ -247,8 +247,8 @@ lvim.plugins = {
       lvim.builtin.which_key.mappings["t"] = {
         name = "Diagnostics",
         t = { "<cmd>TroubleToggle<CR>", "trouble" },
-        w = { "<cmd>TroubleToggle lsp_workspace_diagnostics<CR>", "workspace" },
-        d = { "<cmd>TroubleToggle lsp_document_diagnostics<CR>", "document" },
+        w = { "<cmd>TroubleToggle workspace_diagnostics<CR>", "workspace" },
+        d = { "<cmd>TroubleToggle document_diagnostics<CR>", "document" },
         q = { "<cmd>TroubleToggle quickfix<CR>", "quickfix" },
         l = { "<cmd>TroubleToggle loclist<CR>", "loclist" },
         r = { "<cmd>TroubleToggle lsp_references<CR>", "references" },

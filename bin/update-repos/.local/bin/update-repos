@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# vi:set ft=sh ts=4 sw=4 noet noai:
+# shellcheck shell=bash
+
+has() {
+	if hash "${1}" 2>/dev/null; then
+		return 0
+	fi
+	return 1
+}
+
+msg() {
+	echo >&2 -e "${1-}"
+}
+
+die() {
+	local msg=$1
+	local code=${2-1}
+	msg "$msg"
+	exit "$code"
+}
+
+usage() {
+	cat <<EOF
+Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-p] <directory>
+
+Update all git repositories below given directory
+
+Available options:
+
+-h, --help      Print this help and exit
+-p, --parallel  Update in parallel
+-j  --jobs      Number of jobs when parallel (default 16)
+-d  --depth     Recursion depth
+EOF
+	exit
+}
+
+if has parallel; then
+	GNU_PARALLEL=1
+fi
+
+parse() {
+	declare -g parallel=0
+	declare -g jobs=16
+	declare -g depth=2
+
+	while :; do
+		case "${1-}" in
+		-h | --help) usage ;;
+		-v | --verbose) set -x ;;
+		--no-color) NO_COLOR=1 ;;
+		-p | --parallel) parallel=1 ;;
+		-j | --jobs)
+			jobs="${2-}"
+			shift
+			;;
+		-d | --depth)
+			depth="${2-}"
+			shift
+			;;
+		-?*) die "Unknown option: $1" ;;
+		*) break ;;
+		esac
+		shift
+	done
+
+	argv=("$@")
+	[[ ${#argv[@]} -eq 0 ]] && die "Missing script arguments"
+
+	return 0
+}
+
+# shellcheck disable=SC2034
+colors() {
+	set -a
+	if [[ -t 2 ]] && [[ -z "${NO_COLOR-}" ]] && [[ "${TERM-}" != "dumb" ]]; then
+		NOFORMAT='\033[0m' RED='\033[0;31m' GREEN='\033[0;32m' ORANGE='\033[0;33m'
+		BLUE='\033[0;34m' PURPLE='\033[0;35m' CYAN='\033[0;36m' YELLOW='\033[1;33m'
+	fi
+	set +a
+}
+
+update() {
+	export GIT_TERMINAL_PROMPT=0 GIT_CONFIG_GLOBAL=/dev/null
+	has_remote() {
+		git -C "$1" config --get branch."$(git -C "$1" symbolic-ref --short HEAD)".remote &>/dev/null
+	}
+	export -f has_remote
+
+	if ((parallel == 0)); then
+		find "${argv[0]}" -maxdepth "${depth}" -name '.git' -prune -type d -exec \
+			sh -c 'c=$(readlink -en "${1}/.."); printf "${PURPLE}[%s]${NOFORMAT}\n" "${c##*/}"; has_remote "${c}" && git -C "${c}" pull --ff-only' shell {} \;
+		return
+	fi
+	if ((GNU_PARALLEL == 1)); then
+		find "${argv[0]}" -maxdepth "${depth}" -name '.git' -prune -type d -printf '%h\0' |
+			parallel -0 -j "$jobs" --keep-order "printf \"${PURPLE}[%s]${NOFORMAT}\n\" {}; has_remote {} && git -C {} pull --ff-only"
+	else
+		find "${argv[0]}" -maxdepth "${depth}" -name '.git' -prune -type d -printf '%h\0' |
+			xargs -0 -I{} -P "$jobs" sh -c "printf \"${PURPLE}[%s]${NOFORMAT}\n\" {}; has_remote {} && git -C {} pull --ff-only"
+	fi
+}
+
+parse "$@"
+colors
+update
