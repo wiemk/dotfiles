@@ -12,7 +12,7 @@ has() {
 clip() {
 	# use OSC 52 for kitty, alacritty and tmux inside either of them
 	error() {
-		printf "%s: no suitable copy method found." "$1" >&2
+		printf "%s: no suitable copy method found.\n" "$1" >&2
 		return 1
 	}
 

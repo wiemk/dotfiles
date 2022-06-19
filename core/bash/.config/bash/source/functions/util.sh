@@ -29,6 +29,28 @@ ps() {
 	fi
 }
 
+calc() {
+	local result="$(printf "scale=10;%s\n" "$*" | bc --mathlib | tr -d '\\\n')"
+	#                       └─ default (when `--mathlib` is used) is 20
+	if [[ "$result" == *.* ]]; then
+		# improve the output for decimal numbers
+		printf '%s' "$result" |
+			sed -e 's/^\./0./' `# add "0" for cases like ".5"` \
+				-e 's/^-\./-0./' `# add "0" for cases like "-.5"` \
+				-e 's/0*$//;s/\.$//' `# remove trailing zeros`
+	else
+		printf '%s' "$result"
+	fi
+	printf "\n"
+}
+
+escape() {
+	# shellcheck disable=2046
+	printf "\\\x%s" $(printf '%s' "$*" | xxd -p -c1 -u)
+	printf '\n'
+}
+
+
 con() {
 	if has lsof; then
 		if ((UID != 0)); then
@@ -54,7 +76,13 @@ mem() {
 }
 
 prompt() {
-	local question="$1"
+	msg() {
+		local text=$1
+		local div_width="80"
+		printf "%${div_width}s\n" ' ' | tr ' ' -
+		printf "%s\n" "$text"
+	}
+	local question=$1
 	while true; do
 		msg "$question"
 		read -p "[y]es or [n]o (default: no) : " -r answer

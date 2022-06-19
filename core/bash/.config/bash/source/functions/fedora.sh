@@ -19,19 +19,17 @@ init_debug
 ) || return
 
 if has koji; then
-	nullterm() {
-		printf '%s' "$*" | tr ' ' '\0'
-	}
+	# transform space delimited input to null bytes
 	koji-check() {
-		nullterm "$*" |
+		printf '%s\0' "$@" |
 			xargs -P8 -L1 -0 koji list-builds --state=COMPLETE --after="$(env LC_ALL=C date -d -'2 days')" --package
 	}
 	koji-arch() {
-		nullterm "$*" |
+		printf '%s\0' "$@" |
 			xargs -P8 -L1 -0 koji download-build --arch=x86_64
 	}
 	koji-noarch() {
-		nullterm "$*" |
+		printf '%s\0' "$@" |
 			xargs -P8 -L1 -0 koji download-build --arch=noarch
 	}
 fi
