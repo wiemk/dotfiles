@@ -105,3 +105,7 @@ dnf-info() {
 	echo -e "\n=== Description ===\n"
 	rpm -qi "$pkg"
 }
+
+seerror() {
+	sudo ausearch -m AVC,USER_AVC,SELINUX_ERR,USER_SELINUX_ERR -ts recent
+}

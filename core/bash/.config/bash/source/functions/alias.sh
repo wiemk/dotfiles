@@ -27,6 +27,7 @@ alias ve='visual'
 
 alias dust='dust -rx'
 alias grep='grep --color=auto'
+alias htop='htop --drop-capabilities=strict'
 alias kc='koji-check'
 alias kdl='koji-arch'
 alias srun='sc-run'

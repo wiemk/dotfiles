@@ -215,6 +215,7 @@ lvim.builtin.treesitter.ensure_installed = {
   "rust",
   "toml",
   "typescript",
+  "v",
   "vim",
   "yaml",
   "zig",
