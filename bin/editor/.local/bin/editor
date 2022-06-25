@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# vi:set ft=sh ts=4 sw=4 noet noai:
+# shellcheck shell=bash
+
+has() {
+	if hash "${1}" 2>/dev/null; then
+		return 0
+	fi
+	return 1
+}
+
+if has nvim; then
+	nvim "$@"
+elif has vim; then
+	vim "$@"
+elif has nano; then
+	nano "$@"
+elif has emacs; then
+	emacs "$@"
+else
+	exit 1
+fi

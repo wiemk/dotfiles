@@ -86,21 +86,18 @@ export_user_paths
 #################################################
 # you can override this in host specific profiles in
 # ${XDG_CONFIG_HOME}/profile/profile-${HOSTNAME}
-# default: emacs > nvim > vim > vi
+# default: nvim > vim > vi
 EDITOR='vi'
-
-if has emacsclient; then
-	EDITOR='emacsclient -qc -a emacs'
-elif has nvim; then
+if has nvim; then
 	EDITOR='nvim'
 elif has vim; then
 	EDITOR='vim'
 fi
 export EDITOR
 
-export SUDO_EDITOR='vi'
+# EDITOR may be overriden later and only be available in user PATH so set SUDO_EDITOR now
+export SUDO_EDITOR=$EDITOR
 export ALTERNATE_EDITOR='vi'
-# export VISUAL="${EDITOR}"
 export PAGER='less'
 export LESS='-F -g -i -M -R -S -w -X -z-4'
 export LESSHISTFILE="${XDG_CACHE_HOME}/lesshist"

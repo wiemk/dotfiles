@@ -93,7 +93,6 @@ lvim.builtin.which_key.mappings["<leader>"] = { "<C-^>", "Cycle Buffer" }
 lvim.builtin.which_key.mappings["h"] = {
   function() vim.opt.hlsearch = not vim.o.hlsearch end, "Toggle Highlight"
 }
-lvim.builtin.which_key.mappings["lo"] = { "<Cmd>SymbolsOutline<CR>", "Outline" }
 lvim.builtin.which_key.mappings["P"] = lvim.builtin.which_key.mappings["p"]
 if lvim.builtin.project.active then
   lvim.builtin.which_key.mappings["p"] = { "<Cmd>Telescope projects<CR>", "Projects" }
@@ -103,11 +102,11 @@ local ok, builtin = pcall(require, "telescope.builtin")
 if ok then
   lvim.builtin.which_key.mappings["/"] = nil
   lvim.builtin.which_key.mappings["sB"] = { builtin.builtin, "Builtins" }
+  lvim.builtin.which_key.mappings["F"] = { builtin.live_grep, "Text" }
   lvim.builtin.which_key.mappings["B"] = lvim.builtin.which_key.mappings["b"]
   lvim.builtin.which_key.mappings["b"] = { builtin.buffers, "Buffers" }
 end
-
-lvim.builtin.which_key.mappings["F"] = { "<Cmd>Telescope frecency<CR>", "Frecency" }
+lvim.builtin.which_key.mappings["sF"] = { "<Cmd>Telescope frecency<CR>", "Frecency" }
 lvim.builtin.which_key.mappings["C"] = { "<Cmd>ProjectRoot<CR>", "Project Root" }
 lvim.builtin.which_key.mappings["u"] = {
   name = "Utilities",
@@ -121,9 +120,7 @@ lvim.builtin.which_key.mappings["u"] = {
   },
   s = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
   w = { function() vim.opt.list = not vim.o.list end, "Whitespaces" },
-  t = { "<Cmd>Twilight<CR>", "Twilight Mode" },
 }
-lvim.builtin.which_key.mappings["Z"] = { "<cmd>ZenMode<CR>", "Zen Mode" }
 
 -- telescope
 -- change default navigation mappings
@@ -159,6 +156,9 @@ lvim.builtin.telescope.extensions = vim.tbl_deep_extend("force",
   lvim.builtin.telescope.extensions or {}, {
   frecency = { db_root = get_cache_dir() }
 })
+
+-- autopairs
+lvim.builtin.autopairs.active = false
 
 -- alpha
 lvim.builtin.alpha.active = true
@@ -238,114 +238,16 @@ if vim.fn.executable("shellcheck") == 1 then
 end
 -- Additional Plugins
 lvim.plugins = {
-  -- Theme
   { "folke/tokyonight.nvim" },
-  -- diagnostics, references, telescope results, quickfix and location lists
-  {
-    "folke/trouble.nvim",
-    cmd = "TroubleToggle",
-    setup = function()
-      lvim.builtin.which_key.mappings["t"] = {
-        name = "Diagnostics",
-        t = { "<cmd>TroubleToggle<CR>", "trouble" },
-        w = { "<cmd>TroubleToggle workspace_diagnostics<CR>", "workspace" },
-        d = { "<cmd>TroubleToggle document_diagnostics<CR>", "document" },
-        q = { "<cmd>TroubleToggle quickfix<CR>", "quickfix" },
-        l = { "<cmd>TroubleToggle loclist<CR>", "loclist" },
-        r = { "<cmd>TroubleToggle lsp_references<CR>", "references" },
-      }
-    end,
-    config = function()
-      require "trouble".setup {
-        mode = "document_diagnostics",
-      }
-    end
-  },
-  -- indentation guides for every line
-  {
-    "lukas-reineke/indent-blankline.nvim",
-    event = "BufRead",
-    setup = function()
-      vim.g.indentLine_enabled = 1
-      vim.g.indent_blankline_char = "▏"
-      vim.g.indent_blankline_filetype_exclude = { "help", "terminal", "dashboard", "alpha" }
-      vim.g.indent_blankline_buftype_exclude = { "terminal", "nofile" }
-      vim.g.indent_blankline_show_trailing_blankline_indent = false
-      vim.g.indent_blankline_show_first_indent_level = false
-    end
-  },
-  -- rainbow parentheses
-  {
-    "p00f/nvim-ts-rainbow",
-  },
-  -- git wrapper
-  {
-    "tpope/vim-fugitive",
-    cmd = {
-      "G",
-      "Git",
-      "Gdiffsplit",
-      "Gread",
-      "Gwrite",
-      "Ggrep",
-      "GMove",
-      "GDelete",
-      "GBrowse",
-      "GRemove",
-      "GRename",
-      "Glgrep",
-      "Gedit"
-    },
-    ft = { "fugitive" }
-  },
-  -- outline
-  {
-    "simrat39/symbols-outline.nvim",
-    cmd = "SymbolsOutline",
-  },
-  -- matchup
-  {
-    "andymass/vim-matchup",
-    event = "CursorMoved",
-    config = function()
-      vim.g.matchup_matchparen_offscreen = { method = "popup" }
-    end,
-  },
-  -- telescope-frecency
-  {
-    "nvim-telescope/telescope-frecency.nvim",
-    config = function()
-      require "telescope".load_extension("frecency")
-    end,
-    requires = { "tami5/sqlite.lua" }
-  },
-  {
-    "simrat39/rust-tools.nvim",
-    config = function()
-      local lsp_installer_servers = require "nvim-lsp-installer.servers"
-      local _, requested_server = lsp_installer_servers.get_server "rust_analyzer"
-      require("rust-tools").setup({
-        tools = {
-          autoSetHints = true,
-          hover_with_actions = true,
-          runnables = {
-            use_telescope = true,
-          },
-        },
-        server = {
-          cmd_env = requested_server._default_options.cmd_env,
-          on_attach = require("lvim.lsp").common_on_attach,
-          on_init = require("lvim.lsp").common_on_init,
-        },
-      })
-    end,
-    ft = { "rust", "rs" },
-  },
-  -- lazy loaded
+  { "p00f/nvim-ts-rainbow" },
+  { "machakann/vim-sandwich" },
   {
     "folke/zen-mode.nvim",
-    event = "BufRead",
     cmd = "ZenMode",
+    module = "zen-mode",
+    setup = function()
+      lvim.builtin.which_key.mappings["Z"] = { "<cmd>ZenMode<CR>", "Zen Mode" }
+    end,
     config = function()
       require("zen-mode").setup({
         window = {
@@ -369,7 +271,11 @@ lvim.plugins = {
   },
   {
     "folke/twilight.nvim",
-    event = "BufRead",
+    cmd = "Twilight",
+    module = "twilight",
+    setup = function()
+      lvim.builtin.which_key.mappings["ut"] = { "<Cmd>Twilight<CR>", "Twilight Mode" }
+    end,
     config = function()
       require("twilight").setup({
         dimming = {
@@ -387,10 +293,10 @@ lvim.plugins = {
       })
     end,
   },
-  -- spectre
   {
     "windwp/nvim-spectre",
-    event = "BufRead",
+    -- event = "BufRead",
+    module = 'spectre',
     config = function()
       require "spectre".setup()
     end,
@@ -403,5 +309,106 @@ lvim.plugins = {
         f = { "<cmd>sp viw:lua require('spectre').open_file_search()<CR>", "Current File" },
       }
     end,
+  },
+  {
+    "simrat39/symbols-outline.nvim",
+    cmd = "SymbolsOutline",
+    setup = function()
+      lvim.builtin.which_key.mappings["lo"] = { "<Cmd>SymbolsOutline<CR>", "Outline" }
+    end,
+  },
+  {
+    "folke/trouble.nvim",
+    cmd = "TroubleToggle",
+    setup = function()
+      lvim.builtin.which_key.mappings["t"] = {
+        name = "Diagnostics",
+        t = { "<cmd>TroubleToggle<CR>", "trouble" },
+        w = { "<cmd>TroubleToggle workspace_diagnostics<CR>", "workspace" },
+        d = { "<cmd>TroubleToggle document_diagnostics<CR>", "document" },
+        q = { "<cmd>TroubleToggle quickfix<CR>", "quickfix" },
+        l = { "<cmd>TroubleToggle loclist<CR>", "loclist" },
+        r = { "<cmd>TroubleToggle lsp_references<CR>", "references" },
+      }
+    end,
+    config = function()
+      require "trouble".setup {
+        mode = "document_diagnostics",
+      }
+    end
+  },
+  {
+    "mbbill/undotree",
+    cmd = "UndotreeToggle",
+    setup = function()
+      lvim.builtin.which_key.mappings["U"] = { "<cmd>UndotreeToggle<CR>", "UndoTree" }
+    end,
+  },
+  {
+    "nvim-telescope/telescope-frecency.nvim",
+    config = function()
+      require "telescope".load_extension("frecency")
+    end,
+    requires = { "tami5/sqlite.lua" }
+  },
+  {
+    "lukas-reineke/indent-blankline.nvim",
+    event = "BufRead",
+    setup = function()
+      vim.g.indentLine_enabled = 1
+      vim.g.indent_blankline_char = "▏"
+      vim.g.indent_blankline_filetype_exclude = { "help", "terminal", "dashboard", "alpha" }
+      vim.g.indent_blankline_buftype_exclude = { "terminal", "nofile" }
+      vim.g.indent_blankline_show_trailing_blankline_indent = false
+      vim.g.indent_blankline_show_first_indent_level = false
+    end
+  },
+  {
+    "tpope/vim-fugitive",
+    cmd = {
+      "G",
+      "Git",
+      "Gdiffsplit",
+      "Gread",
+      "Gwrite",
+      "Ggrep",
+      "GMove",
+      "GDelete",
+      "GBrowse",
+      "GRemove",
+      "GRename",
+      "Glgrep",
+      "Gedit"
+    },
+    ft = { "fugitive" }
+  },
+  {
+    "andymass/vim-matchup",
+    event = "CursorMoved",
+    config = function()
+      vim.g.matchup_matchparen_offscreen = { method = "popup" }
+    end,
+  },
+  {
+    "simrat39/rust-tools.nvim",
+    config = function()
+      local lsp_installer_servers = require "nvim-lsp-installer.servers"
+      local _, requested_server = lsp_installer_servers.get_server "rust_analyzer"
+      require("rust-tools").setup({
+        tools = {
+          autoSetHints = true,
+          hover_with_actions = true,
+          runnables = {
+            use_telescope = true,
+          },
+        },
+        server = {
+          cmd_env = requested_server._default_options.cmd_env,
+          on_attach = require("lvim.lsp").common_on_attach,
+          on_init = require("lvim.lsp").common_on_init,
+        },
+      })
+    end,
+    ft = { "rust", "rs" },
   },
 }
