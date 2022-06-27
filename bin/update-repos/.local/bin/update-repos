@@ -41,22 +41,22 @@ if has parallel; then
 fi
 
 parse() {
-	declare -g parallel=0
-	declare -g jobs=16
-	declare -g depth=2
+	declare -g flag_parallel=0
+	declare -g flag_jobs=16
+	declare -g flag_depth=2
 
 	while :; do
 		case "${1-}" in
 		-h | --help) usage ;;
 		-v | --verbose) set -x ;;
 		--no-color) NO_COLOR=1 ;;
-		-p | --parallel) parallel=1 ;;
+		-p | --parallel) flag_parallel=1 ;;
 		-j | --jobs)
-			jobs="${2-}"
+			flag_jobs="${2-}"
 			shift
 			;;
 		-d | --depth)
-			depth="${2-}"
+			flag_depth="${2-}"
 			shift
 			;;
 		-?*) die "Unknown option: $1" ;;
@@ -83,22 +83,26 @@ colors() {
 
 update() {
 	export GIT_TERMINAL_PROMPT=0 GIT_CONFIG_GLOBAL=/dev/null
-	has_remote() {
-		git -C "$1" config --get branch."$(git -C "$1" symbolic-ref --short HEAD)".remote &>/dev/null
+	git_pull() {
+		if git -C "$1" config --get branch."$(git -C "$1" symbolic-ref --short HEAD)".remote &>/dev/null; then
+			# Redirection order is intentional: suppress git errors and redirect stdout to stderr
+			# shellcheck disable=SC2069
+			if ! git -C "$1" -c color.ui=always pull --ff-only 2>&1 2>/dev/null; then
+				printf "${RED}\t\t==> ERROR: %s${NOFORMAT}\n" "${1##*/}" >&2
+			fi
+		fi
 	}
-	export -f has_remote
+	export -f git_pull
 
-	if ((parallel == 0)); then
-		find "${argv[0]}" -maxdepth "${depth}" -name '.git' -prune -type d -exec \
-			sh -c 'c=$(readlink -en "${1}/.."); printf "${PURPLE}[%s]${NOFORMAT}\n" "${c##*/}"; has_remote "${c}" && git -C "${c}" pull --ff-only' shell {} \;
-		return
-	fi
-	if ((GNU_PARALLEL == 1)); then
-		find "${argv[0]}" -maxdepth "${depth}" -name '.git' -prune -type d -printf '%h\0' |
-			parallel -0 -j "$jobs" --keep-order "printf \"${PURPLE}[%s]${NOFORMAT}\n\" {}; has_remote {} && git -C {} pull --ff-only"
+	if ((flag_parallel == 0)); then
+		find "${argv[0]}" -maxdepth "${flag_depth}" -name '.git' -prune -type d -exec \
+			bash -c 'c=$(readlink -en "${1}/.."); printf "${PURPLE}[%s]${NOFORMAT}\n" "${c##*/}"; git_pull "$c"' shell {} \;
+	elif ((GNU_PARALLEL == 1)); then
+		find "${argv[0]}" -maxdepth "${flag_depth}" -name '.git' -prune -type d -printf '%h\0' |
+			parallel -0 -j "$flag_jobs" --keep-order "printf \"${PURPLE}[%s]${NOFORMAT}\n\" {}; git_pull {}"
 	else
-		find "${argv[0]}" -maxdepth "${depth}" -name '.git' -prune -type d -printf '%h\0' |
-			xargs -0 -I{} -P "$jobs" sh -c "printf \"${PURPLE}[%s]${NOFORMAT}\n\" {}; has_remote {} && git -C {} pull --ff-only"
+		find "${argv[0]}" -maxdepth "${flag_depth}" -name '.git' -prune -type d -printf '%h\0' |
+			xargs -0 -I{} -P "$flag_jobs" sh -c "printf \"${PURPLE}[%s]${NOFORMAT}\n\" {}; git_pull {}"
 	fi
 }
 

@@ -34,6 +34,12 @@ if has koji; then
 	}
 fi
 
+if has jq; then
+	latest-kernel() {
+		curl -Ls https://kernel.org/releases.json | jq -r '.releases[] | .moniker + ":" + .version'
+	}
+fi
+
 dnf-extra() {
 	# list packages no loger available in enabled repos
 	sudo dnf list extras
@@ -104,4 +110,8 @@ dnf-info() {
 	dnf-history "$pkg"
 	echo -e "\n=== Description ===\n"
 	rpm -qi "$pkg"
+}
+
+seerror() {
+	sudo ausearch -m AVC,USER_AVC,SELINUX_ERR,USER_SELINUX_ERR -ts recent
 }

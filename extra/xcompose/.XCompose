@@ -10,14 +10,5 @@
 
 include "%L"
 
-<Multi_key> <l> <q>			: "“"   U201c # LEFT DOUBLE QUOTATION MARK
-<Multi_key> <r> <q>			: "”"   U201d # RIGHT DOUBLE QUOTATION MARK
-
-<Multi_key> <l> <s>			: "‘"	U201c # LEFT DOUBLE QUOT. MARK <"
-<Multi_key> <r> <s>			: "’"   U2019 # RIGHT SINGLE QUOTATION MARK
-
-<Multi_key> <l> <d>			: "„"   U201e # DOUBLE LOW-9 QUOTATION MARK
-<Multi_key> <r> <d>			: "”"   U201d # RIGHT DOUBLE QUOTATION MARK
-
-<Multi_key> <l> <f>         : "«"   guillemotleft # LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
-<Multi_key> <r> <f>         : "»"   guillemotright # RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+<Multi_key> <period> <period> : "…" U2026 # HORIZONTAL ELLIPSIS
+<Multi_key> <bar> <period> : "⋮" U22EE  # VERTICAL ELLIPSIS
