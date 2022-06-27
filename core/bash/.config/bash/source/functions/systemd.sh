@@ -9,10 +9,10 @@ sc-run() {
 
 sc-running() {
 	if (($# > 0)); then
-		if [[ $1 == "--user" ]]; then
+		if [[ $1 == --user ]]; then
 			local -r user=1
 		else
-			echo "Only --user is supported." >&2
+			msg 'Only --user is supported.'
 			return 1
 		fi
 	fi
@@ -22,7 +22,7 @@ sc-running() {
 
 jc-last() {
 	if (($# < 1)); then
-		echo "Function takes systemd unit name as argument." >&2
+		msg 'Function takes systemd unit name as argument.'
 		return 1
 	fi
 
@@ -34,7 +34,7 @@ _jc-last-compl() {
 	local cur=${COMP_WORDS[COMP_CWORD]}
 
 	if ! [[ $cur =~ '\\' ]]; then
-		cur="$(printf '%q' "$cur")"
+		cur=$(printf '%q' "$cur")
 	fi
 
 	compopt -o filenames

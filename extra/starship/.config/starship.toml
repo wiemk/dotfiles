@@ -14,6 +14,10 @@ vicmd_symbol = '[λ](bold green)'
 [cmd_duration]
 style = "bold green"
 
+[container]
+style = "bold cyan dimmed"
+format = "[$symbol ]($style)"
+
 [git_branch]
 disabled = false
 

@@ -4,11 +4,11 @@
 init_debug
 
 info_env() {
-	local -r cfg="$XDG_CONFIG_HOME/bash/source.d"
+	local -r cfg=$XDG_CONFIG_HOME/bash/source.d
 	local -r abs=$(readlink -f -- "$cfg/..")
 	if [[ -d $abs ]]; then
 		if has tree; then
-			tree -aC -I '.gitkeep' "${abs}"
+			tree -aC -I '.gitkeep' "$abs"
 		else
 			command ls -1 "$cfg"
 		fi
