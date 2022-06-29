@@ -1,11 +1,10 @@
 [Unit]
 Description=Creates restic snapshots
-OnFailure=telegram-notification@%n.service
+#OnFailure=telegram-notification@%n.service
 Before=restic-runner-check@%i.service restic-runner-expire@%i.service
 
 [Service]
 Type=oneshot
-
-ExecStart=restic-runner --repo "%i" --set live backup
-KillMode=none
+SyslogIdentifier=restic-runner
 TimeoutSec=5min
+ExecStart=/usr/bin/flock --verbose --no-fork "%h/.config/backup/restic/repos/%i" restic-runner --repo "%i" --set live backup

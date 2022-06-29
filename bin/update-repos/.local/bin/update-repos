@@ -88,8 +88,10 @@ update() {
 			# Redirection order is intentional: suppress git errors and redirect stdout to stderr
 			# shellcheck disable=SC2069
 			if ! git -C "$1" -c color.ui=always pull --ff-only 2>&1 2>/dev/null; then
-				printf "${RED}\t\t==> ERROR: %s${NOFORMAT}\n" "${1##*/}" >&2
+				printf "${RED}╚═[ERROR]: %s${NOFORMAT}\n" "${1##*/}" >&2
 			fi
+		else
+			printf "${BLUE}╚═[INFO]: No remote configured for %s${NOFORMAT}\n" "${1##*/}" >&2
 		fi
 	}
 	export -f git_pull

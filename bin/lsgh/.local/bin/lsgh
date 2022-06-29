@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# vi:set ft=sh ts=4 sw=4 noet noai:
+# shellcheck shell=bash
+
+# Example usage:
+#   $ lsgh torvalds | xargs -n1 git clone
+
+if (($# < 1)); then
+	echo 'usage: lsgh <user>'
+	exit 1
+fi
+
+page=1
+while :; do
+	repos="$(curl -s "https://api.github.com/users/$1/repos?page=$page&per_page=100" |
+		jq -r '.[] | select(.fork or .archived | not) | .clone_url')"
+	if [[ -z $repos ]]; then
+		break
+	fi
+	printf '%s\n' "$repos"
+	page=$((page + 1))
+done

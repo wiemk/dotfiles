@@ -1,10 +1,10 @@
 [Unit]
 Description=Deletes old restic snapshots
-OnFailure=telegram-notification@%n.service
+#OnFailure=telegram-notification@%n.service
 #After=restic-runner-backup@%i.service
 Before=restic-runner-check@%i.service
 
 [Service]
 Type=oneshot
-
-ExecStart=restic-runner --repo "%i" --set live expire
+SyslogIdentifier=restic-runner
+ExecStart=/usr/bin/flock --verbose --no-fork "%h/.config/backup/restic/repos/%i" restic-runner --repo "%i" --set live expire

@@ -1,0 +1,13 @@
+[Unit]
+Description=Daily rsync of restic backup %i to NAS
+# stop timer when parent exits
+PartOf=backup@%i.target
+
+[Timer]
+OnCalendar=00/2:30
+Persistent=true
+RandomizedDelaySec=120
+Unit=%p@%i.service
+
+[Install]
+WantedBy=backup@%i.target

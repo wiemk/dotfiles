@@ -6,6 +6,7 @@ lvim = global options object
 lvim.log.level = "warn"
 lvim.format_on_save = false
 lvim.colorscheme = "tokyonight"
+-- vim.g.tokyonight_style = "night"
 lvim.use_icons = true
 
 -- Override default options
@@ -55,9 +56,8 @@ lvim.keys.normal_mode["x"] = '"_x'
 -- Don't move the cursor on *
 lvim.keys.normal_mode["*"] = "*<C-o>"
 
--- Remove some default mappings
-lvim.keys.normal_mode["<F1>"] = "<Esc>"
-lvim.keys.insert_mode["<F1>"] = "<Esc>"
+lvim.keys.normal_mode["<F1>"] = ":make<CR>"
+lvim.keys.insert_mode["<F1>"] = ":make<CR>"
 
 -- Remove highlighting
 lvim.keys.normal_mode["<C-h>"] = ":nohlsearch<CR>"
@@ -238,9 +238,9 @@ if vim.fn.executable("shellcheck") == 1 then
 end
 -- Additional Plugins
 lvim.plugins = {
-  { "folke/tokyonight.nvim" },
   { "p00f/nvim-ts-rainbow" },
   { "machakann/vim-sandwich" },
+  { "folke/tokyonight.nvim" },
   {
     "folke/zen-mode.nvim",
     cmd = "ZenMode",

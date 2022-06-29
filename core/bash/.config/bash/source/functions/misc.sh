@@ -46,3 +46,9 @@ if has xprop && has xdotool; then
 
 	}
 fi
+
+if has htop; then
+	htop() {
+		command htop --drop-capabilities=strict 2>/dev/null || command htop
+	}
+fi

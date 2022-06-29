@@ -1,5 +1,6 @@
 # compiled
 *.com
+!*.com/
 *.class
 *.dll
 *.elc

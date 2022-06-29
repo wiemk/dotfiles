@@ -1,13 +1,13 @@
 [Unit]
 Description=Restic backup service on shutdown
-OnFailure=telegram-notification@%n.service
+#OnFailure=telegram-notification@%n.service
 PartOf=backup@%i.target
 
 [Service]
 Type=oneshot
-ExecStop=restic-runner --repo "%i" --set shutdown backup
+ExecStop=/usr/bin/flock --verbose --no-fork "%h/.config/backup/restic/repos/%i" restic-runner --repo "%i" --set shutdown backup
+SyslogIdentifier=restic-runner
 RemainAfterExit=true
-KillMode=none
 TimeoutSec=5min
 
 [Install]
