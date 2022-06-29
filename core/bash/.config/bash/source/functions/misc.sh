@@ -13,7 +13,7 @@ if has secret-tool; then
 else
 	# shim to avoid further checks
 	get-secret() {
-		printf "%s" "$*"
+		printf '%s' "$*"
 	}
 fi
 

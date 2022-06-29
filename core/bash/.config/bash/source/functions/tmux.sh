@@ -9,11 +9,11 @@ fi
 
 is_tmux() {
 	local -r tm=$(ps -p "$(ps -p $$ -o ppid= | xargs -n 1)" -o comm=)
-	[[ $tm == "tmux"* ]]
+	[[ $tm == tmux* ]]
 }
 
 tm() {
-	local sess='main'
+	local sess=main
 	if (($# > 0)); then
 		sess=$1
 	fi

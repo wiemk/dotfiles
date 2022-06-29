@@ -26,13 +26,13 @@ _wttr_param() {
 }
 
 wttr() {
-	local location="${1// /+}"
+	local location=${1// /+}
 	local param
 	param=$(_wttr_param)
 	command shift
 	local -a args
-	for p in "$param" "$@"; do
-		args+=("--data-urlencode" "$p")
+	for p in $param "$@"; do
+		args+=('--data-urlencode' "$p")
 	done
 
 	curl -fGsS -H "Accept-Language: ${LANG%_*}" "${args[@]}" --compressed "http://wttr.in/${location}"

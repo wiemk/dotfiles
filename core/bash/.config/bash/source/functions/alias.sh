@@ -22,9 +22,6 @@ alias mkdir='command mkdir -v'
 alias mv='command mv -vi'
 alias rm='command rm -vI'
 
-alias e='edit'
-alias ve='visual'
-
 alias dust='dust -rx'
 alias grep='grep --color=auto'
 alias htop='htop --drop-capabilities=strict'

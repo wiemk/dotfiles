@@ -35,8 +35,8 @@ if has koji; then
 fi
 
 if has jq; then
-	latest-kernel() {
-		curl -Ls https://kernel.org/releases.json | jq -r '.releases[] | .moniker + ":" + .version'
+	current-kernels() {
+		curl -Ls https://kernel.org/releases.json | jq -r '.releases[] | select(.moniker != "longterm") | .moniker + ":" + .version'
 	}
 fi
 
@@ -81,9 +81,9 @@ dnf-history() {
 
 rpm-weak() {
 	# weak dependencies of a package
-	echo "=== Supplements ==="
+	msg "=== Supplements ==="
 	rpm -q --whatsupplements "$1"
-	echo "=== Recommends ==="
+	msg "=== Recommends ==="
 	rpm -q --whatrecommends "$1"
 }
 
@@ -91,24 +91,24 @@ dnf-info() {
 	# collect package specific information from above
 	local -r pkg=$1
 	if ! rpm -q "$pkg" &>/dev/null; then
-		echo "package not installed"
+		msg "package not installed"
 		return 1
 	fi
 	# prime sudo
 	sudo -v
-	echo "=== Install reason ==="
+	msg "=== Install reason ==="
 	dnf-reason "$pkg"
-	echo "=== Member of groups ==="
+	msg "=== Member of groups ==="
 	dnf-group "$pkg"
-	echo "=== Weak dependencies ==="
+	msg "=== Weak dependencies ==="
 	rpm-weak "$pkg"
-	echo "=== Marked for autoremove ==="
+	msg "=== Marked for autoremove ==="
 	if [[ $(dnf-needed "$pkg" | wc -l) -gt 0 ]]; then
-		echo "YES"
+		msg "YES"
 	fi
-	echo "=== History ==="
+	msg "=== History ==="
 	dnf-history "$pkg"
-	echo -e "\n=== Description ===\n"
+	msg "\n=== Description ===\n"
 	rpm -qi "$pkg"
 }
 

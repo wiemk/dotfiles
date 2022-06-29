@@ -6,7 +6,7 @@
 # in ${XDG_CONFIG_HOME}/profile/${HOSTNAME}.conf
 
 # DEBUG
-if [[ -e "${XDG_CONFIG_HOME}/bash/_debug" ]]; then
+if [[ -e ${XDG_CONFIG_HOME}/bash/_debug ]]; then
 	init_debug() {
 		local -r script=$(readlink -e -- "${BASH_SOURCE[1]}") || return
 		printf '%d%s\n' "${EPOCHSECONDS}" ": ${script}" >>"${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/profile_dbg.log"
@@ -20,7 +20,7 @@ init_debug
 export PROFILE_SOURCED=1
 
 has() {
-	if hash "${1}" &>/dev/null; then
+	if hash "$1" &>/dev/null; then
 		return 0
 	fi
 	return 1
@@ -52,7 +52,7 @@ pathmunge() {
 	*:"$1":*) ;;
 
 	*)
-		if [[ $2 = "after" ]]; then
+		if [[ $2 = 'after' ]]; then
 			PATH=$PATH:$1
 		else
 			PATH=$1:$PATH
@@ -67,7 +67,7 @@ export_user_paths() {
 		# shellcheck disable=SC2034
 		readarray -t -d ':' apath <<<"$PATH"
 		for ((i = 0; i < ${#PATH_EXPORTS[@]}; i++)); do
-			local realp="$(readlink -qms "${PATH_EXPORTS[$i]}")"
+			local realp=$(readlink -qms "${PATH_EXPORTS[$i]}")
 			# check if already added,
 			if ! contains apath "$realp"; then
 				rpath+=("$realp")
@@ -76,7 +76,7 @@ export_user_paths() {
 	fi
 	local path=("${rpath[@]}" "$PATH")
 	printf -v spath '%s:' "${path[@]%/}"
-	PATH="${spath:0:-1}"
+	PATH=${spath:0:-1}
 	export PATH
 }
 
@@ -100,7 +100,7 @@ export SUDO_EDITOR=$EDITOR
 export ALTERNATE_EDITOR='vi'
 export PAGER='less'
 export LESS='-F -g -i -M -R -S -w -X -z-4'
-export LESSHISTFILE="${XDG_CACHE_HOME}/lesshist"
+export LESSHISTFILE=${XDG_CACHE_HOME}/lesshist
 export SYSTEMD_PAGER='cat'
 
 #################################################
@@ -118,9 +118,9 @@ ENV_EXPORTS=("${PAM_EXPORTS[@]}")
 source_machine_profile() {
 	local machine=$(</etc/machine-id)
 	if [[ -n $machine ]]; then
-		if [[ -r "${XDG_CONFIG_HOME}/profile/${machine}.conf" ]]; then
+		if [[ -r ${XDG_CONFIG_HOME}/profile/${machine}.conf ]]; then
 			source "${XDG_CONFIG_HOME}/profile/${machine}.conf"
-		elif [[ -r "${HOME}/.profile-${machine}.conf" ]]; then
+		elif [[ -r ${HOME}/.profile-${machine}.conf ]]; then
 			source "${HOME}/.profile-${machine}.conf"
 		fi
 	fi
@@ -130,9 +130,9 @@ source_host_profile() {
 	local host=${HOSTNAME:-$(</proc/sys/kernel/hostname)}
 	host=${host,,}
 	if [[ -n $host ]]; then
-		if [[ -r "${XDG_CONFIG_HOME}/profile/${host}.conf" ]]; then
+		if [[ -r ${XDG_CONFIG_HOME}/profile/${host}.conf ]]; then
 			source "${XDG_CONFIG_HOME}/profile/${host}.conf"
-		elif [[ -r "${HOME}/.profile-${host}.conf" ]]; then
+		elif [[ -r ${HOME}/.profile-${host}.conf ]]; then
 			source "${HOME}/.profile-${host}.conf"
 		fi
 	fi
@@ -165,8 +165,8 @@ create_envd_export() {
 }
 
 is_equal() {
-	local file="$1" nbuf="$2"
-	if [[ -r "${file}" ]]; then
+	local file=$1 nbuf=$2
+	if [[ -r $file ]]; then
 		command cmp -s "$file" <(printf '%s\n' "${nbuf}")
 	fi
 }
@@ -180,7 +180,7 @@ write_pamd_exports() {
 }
 
 write_envd_exports() {
-	render_exp="$(create_envd_export)"
+	render_exp=$(create_envd_export)
 	if ! is_equal "${XDG_CONFIG_HOME}/environment.d/50-profile.conf" "$render_exp"; then
 		printf '%s\n' "${XDG_CONFIG_HOME}/environment.d/50-profile.conf updated!" >&2
 		printf '%s\n' "$render_exp" >"${XDG_CONFIG_HOME}/environment.d/50-profile.conf"
@@ -190,7 +190,7 @@ write_envd_exports() {
 export_envd() {
 	# unused for now, synchronizes env.d + profile variables in a 1:1 fashion
 	shopt -s nullglob
-	local -r envd="${XDG_CONFIG_HOME}/environment.d"
+	local -r envd=${XDG_CONFIG_HOME}/environment.d
 	set -a
 	if [[ -d $fragment ]]; then
 		for fragment in "${envd}"/*.conf; do

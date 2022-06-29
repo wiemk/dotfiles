@@ -3,10 +3,10 @@
 # shellcheck disable=SC1090,SC1091
 
 # non-interactive, return early
-[[ -z "$PS1" ]] && return
+[[ -z $PS1 ]] && return
 
 # DEBUG
-if [[ -e "${XDG_CONFIG_HOME}/bash/_debug" ]]; then
+if [[ -e ${XDG_CONFIG_HOME}/bash/_debug ]]; then
 	init_debug() {
 		local -r script=$(readlink -e -- "${BASH_SOURCE[1]}") ||
 			return
@@ -57,7 +57,7 @@ fi
 BSTATE=${XDG_STATE_HOME:-${HOME}/.local/state}/bash
 
 HISTCONTROL=ignoreboth
-HISTIGNORE="history*:"
+HISTIGNORE='history*:'
 HISTFILE=${BSTATE}/history
 HISTSIZE=10000
 HISTFILESIZE=50000
@@ -69,10 +69,14 @@ unset BSTATE
 history -a
 
 has() {
-	if hash "${1}" &>/dev/null; then
+	if hash "$1" &>/dev/null; then
 		return 0
 	fi
 	return 1
+}
+
+msg() {
+	echo >&2 -e "${1-}"
 }
 
 has_line_editing() {
@@ -101,10 +105,35 @@ contains() {
 }
 
 trim() {
-	local var="$*"
+	local var=$*
 	var="${var#"${var%%[![:space:]]*}"}"
 	var="${var%"${var##*[![:space:]]}"}"
 	printf '%s' "$var"
+}
+
+prompt() {
+	msg_bar() {
+		local text=$1
+		local div_width="80"
+		printf "%${div_width}s\n" ' ' | tr ' ' -
+		printf '%s\n' "$text"
+	}
+	local question=$1
+	while true; do
+		msg_bar "$question"
+		read -p "[y]es or [n]o (default: no) : " -r answer
+		case "$answer" in
+		y | Y | yes | YES | Yes)
+			return 0
+			;;
+		n | N | no | NO | No | *[[:blank:]]* | "")
+			return 1
+			;;
+		*)
+			msg_bar "Please answer [y]es or [n]o."
+			;;
+		esac
+	done
 }
 
 if has systemd-detect-virt; then

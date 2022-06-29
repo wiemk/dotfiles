@@ -30,9 +30,9 @@ ps() {
 }
 
 calc() {
-	local result="$(printf "scale=10;%s\n" "$*" | bc --mathlib | tr -d '\\\n')"
+	local result=$(printf "scale=10;%s\n" "$*" | bc --mathlib | tr -d '\\\n')
 	#                       └─ default (when `--mathlib` is used) is 20
-	if [[ "$result" == *.* ]]; then
+	if [[ $result == *.* ]]; then
 		# improve the output for decimal numbers
 		printf '%s' "$result" |
 			sed -e 's/^\./0./' `# add "0" for cases like ".5"` \
@@ -41,7 +41,7 @@ calc() {
 	else
 		printf '%s' "$result"
 	fi
-	printf "\n"
+	printf '\n'
 }
 
 escape() {
@@ -73,31 +73,6 @@ mem() {
 			printf("%d: (%s) # %s\n\tRSS: %8.2f M\n\tVSZ: %8.2f M\n",
 		   	pid, uid, $0, rss/1024, vsz/1024);
 		}'
-}
-
-prompt() {
-	msg() {
-		local text=$1
-		local div_width="80"
-		printf "%${div_width}s\n" ' ' | tr ' ' -
-		printf "%s\n" "$text"
-	}
-	local question=$1
-	while true; do
-		msg "$question"
-		read -p "[y]es or [n]o (default: no) : " -r answer
-		case "$answer" in
-		y | Y | yes | YES | Yes)
-			return 0
-			;;
-		n | N | no | NO | No | *[[:blank:]]* | "")
-			return 1
-			;;
-		*)
-			msg "Please answer [y]es or [n]o."
-			;;
-		esac
-	done
 }
 
 netns() {
