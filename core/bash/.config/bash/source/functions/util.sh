@@ -4,12 +4,17 @@
 
 init_debug
 
-ansi-colors() {
+lsansi() {
 	for c in {0..255}; do
 		tput setaf "$c"
 		tput setaf "$c" | cat -v
 		echo " =${c}"
 	done
+}
+
+lsmono() {
+	fc-list : family spacing outline scalable | \
+		grep -E 'spacing=(100|90).*?outline=True.*?scalable=True' | cut -d':' -f1 | sort -u
 }
 
 bashquote() {

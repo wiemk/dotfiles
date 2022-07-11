@@ -27,7 +27,7 @@ if (($# < 1)); then
 elif [[ -d $1 ]]; then
 	workdir=$1
 else
-	die "Not a valid directoru: ${1}"
+	die "Not a valid directory: ${1}"
 fi
 
 prompt() {

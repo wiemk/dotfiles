@@ -193,6 +193,9 @@ lvim.builtin.lualine.sections.lualine_y = {
   components.location
 }
 
+-- bufferline
+-- lvim.builtin.bufferline.options.mode = "tabs"
+
 -- tree-sitter
 lvim.builtin.treesitter.ensure_installed = {
   "bash",
