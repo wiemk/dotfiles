@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 # shellcheck disable=2155,1090
 
@@ -29,6 +28,7 @@ elif [[ -d $1 ]]; then
 else
 	die "Not a valid directory: ${1}"
 fi
+workdir=$(readlink -f "$workdir")
 
 prompt() {
 	msg() {
@@ -63,3 +63,5 @@ if prompt "Fix permissions of '${workdir}'?"; then
 		fi
 	fi
 fi
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

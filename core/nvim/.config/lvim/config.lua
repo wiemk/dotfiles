@@ -107,7 +107,9 @@ if ok then
   lvim.builtin.which_key.mappings["b"] = { builtin.buffers, "Buffers" }
 end
 lvim.builtin.which_key.mappings["sF"] = { "<Cmd>Telescope frecency<CR>", "Frecency" }
+lvim.builtin.which_key.mappings["R"] = { "<Cmd>Telescope frecency<CR>", "Frecency" }
 lvim.builtin.which_key.mappings["C"] = { "<Cmd>ProjectRoot<CR>", "Project Root" }
+lvim.builtin.which_key.mappings["M"] = { function() require("modeline").insertModeline() end, "Insert Modeline" }
 lvim.builtin.which_key.mappings["u"] = {
   name = "Utilities",
   S = {
@@ -119,7 +121,8 @@ lvim.builtin.which_key.mappings["u"] = {
     "Sort Paragraphs"
   },
   s = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
-  w = { function() vim.opt.list = not vim.o.list end, "Whitespaces" },
+  w = { function() vim.opt.list = not vim.o.list end, "Show whitespaces" },
+  m = { function() require("modeline").insertModeline() end, "Insert Modeline" },
 }
 
 -- telescope
@@ -244,6 +247,7 @@ lvim.plugins = {
   { "p00f/nvim-ts-rainbow" },
   { "machakann/vim-sandwich" },
   { "folke/tokyonight.nvim" },
+  { "gpanders/editorconfig.nvim" },
   {
     "folke/zen-mode.nvim",
     cmd = "ZenMode",

@@ -1,6 +1,5 @@
-# vim ft=tmux ts=4 sw=4 noet
+# vi: set ft=tmux ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:
 
 %if #{!=:#{TMUX_NOALERT_HOOK},1}
 	set-hook -g alert-bell 'run-shell -b "#{@HOOK_HOME}/alert.sh 10 #{window_active} #{window_id} #{session_name} #{window_index} \"#{window_name}\""'
 %endif
-

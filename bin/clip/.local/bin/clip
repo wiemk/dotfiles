@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 
 has() {
@@ -58,3 +57,5 @@ clip() {
 if [[ $(basename -- "$0") = clip ]]; then
 	clip
 fi
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

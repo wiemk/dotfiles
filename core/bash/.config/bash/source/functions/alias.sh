@@ -1,4 +1,4 @@
-# vi:set ft=sh ts=4 sw=4 noet noai:
+# vi: set ft=sh ts=4 sw=4 sts=-1 sr et si tw=0 fdm=manual:
 # shellcheck shell=bash
 
 init_debug
@@ -22,6 +22,7 @@ alias mkdir='command mkdir -v'
 alias mv='command mv -vi'
 alias rm='command rm -vI'
 
+alias dnf='sudo dnf'
 alias dust='dust -rx'
 alias grep='grep --color=auto'
 alias kc='koji-check'

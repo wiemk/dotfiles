@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 # shellcheck disable=2155,1090
 
@@ -46,3 +45,5 @@ share() {
 }
 
 share
+
+# vi: set ft=sh ts=4 sw=4 sts=0 sr et si tw=0 fdm=manual:

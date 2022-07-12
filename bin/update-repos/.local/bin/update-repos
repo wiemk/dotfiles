@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 
 has() {
@@ -22,16 +21,16 @@ die() {
 
 usage() {
 	cat <<EOF
-Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-p] <directory>
+	Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-p] <directory>
 
-Update all git repositories below given directory
+	Update all git repositories below given directory
 
-Available options:
+	Available options:
 
--h, --help      Print this help and exit
--p, --parallel  Update in parallel
--j  --jobs      Number of jobs when parallel (default 16)
--d  --depth     Recursion depth
+	-h, --help      Print this help and exit
+	-p, --parallel  Update in parallel
+	-j  --jobs      Number of jobs when parallel (default 16)
+	-d  --depth     Recursion depth
 EOF
 	exit
 }
@@ -111,3 +110,5 @@ update() {
 parse "$@"
 colors
 update
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

@@ -1,6 +1,4 @@
-# git-config(1) - Git configuration
-# vim: ft=gitconfig ts=2 sw=2 sts=0 noet
-#
+# vi: set ft=gitconfig ts=2 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:
 
 [alias]
 	amend = commit --amend
@@ -144,6 +142,7 @@
 
 [mergetool]
 	prompt = false
+	keepBackup = false
 
 [mergetool "vimdiff"]
 	cmd = $EDITOR -d "$BASE" "$LOCAL" "$REMOTE" "$MERGED" "+wincmd w" "+wincmd J"
@@ -186,4 +185,3 @@
   path = ~/.config/git/alias.conf
 	path = ~/.config/git/identity.local
 	path = ~/.config/git/config.local
-

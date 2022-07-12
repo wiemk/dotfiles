@@ -1,5 +1,5 @@
+# vi: set ft=readline ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:
 # ~/.inputrc
-# vim: ft=readline
 
 set enable-bracketed-paste on
 
@@ -13,24 +13,24 @@ set emacs-mode-string ""
 # cursor shape
 # tty
 $if term=linux
-  set vi-ins-mode-string \1\e[?0c\2
-  set vi-cmd-mode-string \1\e[?8c\2
+	set vi-ins-mode-string \1\e[?0c\2
+	set vi-cmd-mode-string \1\e[?8c\2
 $else
-  set vi-ins-mode-string \1\e[2 q\2
-  set vi-cmd-mode-string \1\e[3 q\2
+	set vi-ins-mode-string \1\e[2 q\2
+	set vi-cmd-mode-string \1\e[3 q\2
 $endif
 
 $if mode=vi
-  set keymap vi-command
-  "gg": beginning-of-history
-  "G": end-of-history
-  "k": history-search-backward
-  "j": history-search-forward
-  "?": reverse-search-history
-  "/": forward-search-history
-  set keymap vi-insert
-  "\C-l": clear-screen
-  "\C-w": backward-kill-word
-  "\C-a": beginning-of-line
-  "\C-e": end-of-line
+	set keymap vi-command
+	"gg": beginning-of-history
+	"G": end-of-history
+	"k": history-search-backward
+	"j": history-search-forward
+	"?": reverse-search-history
+	"/": forward-search-history
+	set keymap vi-insert
+	"\C-l": clear-screen
+	"\C-w": backward-kill-word
+	"\C-a": beginning-of-line
+	"\C-e": end-of-line
 $endif

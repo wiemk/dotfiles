@@ -1,4 +1,4 @@
-# vi:set ft=sh ts=4 sw=4 noet noai:
+# vi: set ft=sh ts=4 sw=4 sts=-1 sr et si tw=0 fdm=manual:
 # shellcheck shell=bash
 
 init_debug
@@ -13,10 +13,10 @@ eval "$(zoxide init bash)"
 if has fzf; then
 	bind -m emacs '"\C-g": "\C-x2\e^\C-m"'
 	bind -m emacs -x '"\C-x2": zi'
-	
+
 	bind -m vi-insert '"\C-g": "\C-x2\e^\C-m"'
 	bind -m vi-insert -x '"\C-x2": zi'
-	
+
 	bind -m vi-command '"\C-g": "\C-x2\e^\C-m"'
 	bind -m vi-command -x '"\C-x2": zi'
 fi

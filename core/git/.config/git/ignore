@@ -1,3 +1,6 @@
+# vi: set ft=conf ts=2 sw=2 sts=0 sr et si tw=0 fdm=manual:
+# merge
+*.orig
 # compiled
 *.com
 !*.com/
@@ -67,4 +70,3 @@ tags
 
 # vim
 .vim-bookmarks
-
