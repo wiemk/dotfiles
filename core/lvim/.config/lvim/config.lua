@@ -6,8 +6,11 @@ lvim = global options object
 lvim.log.level = "warn"
 lvim.format_on_save = false
 lvim.colorscheme = "tokyonight"
--- vim.g.tokyonight_style = "night"
 lvim.use_icons = true
+
+-- Don't redraw during macro execution
+vim.opt.lazyredraw = true
+vim.opt.synmaxcol = 256
 
 -- Override default options
 (function()
@@ -89,6 +92,7 @@ lvim.keys.term_mode["<C-l>"] = false
 
 -- which-key
 -- lvim.builtin.which_key.setup.triggers_blacklist = { n = { "g" } }
+lvim.builtin.which_key.mappings["w"] = nil
 lvim.builtin.which_key.mappings["<leader>"] = { "<C-^>", "Cycle Buffer" }
 lvim.builtin.which_key.mappings["h"] = {
   function() vim.opt.hlsearch = not vim.o.hlsearch end, "Toggle Highlight"
@@ -100,7 +104,12 @@ end
 
 local ok, builtin = pcall(require, "telescope.builtin")
 if ok then
-  lvim.builtin.which_key.mappings["/"] = nil
+  lvim.builtin.which_key.mappings["/"] = {
+    function()
+      builtin.current_buffer_fuzzy_find({ layout_config = { width = 0.5 } })
+    end,
+    "Buffer Fuzzy"
+  }
   lvim.builtin.which_key.mappings["sB"] = { builtin.builtin, "Builtins" }
   lvim.builtin.which_key.mappings["F"] = { builtin.live_grep, "Text" }
   lvim.builtin.which_key.mappings["B"] = lvim.builtin.which_key.mappings["b"]
@@ -152,6 +161,9 @@ lvim.builtin.telescope.pickers = vim.tbl_extend("force", lvim.builtin.telescope.
         ["<C-d>"] = require("telescope.actions").delete_buffer,
       }
     }
+  },
+  current_buffer_fuzzy_find = {
+    theme = "dropdown",
   }
 })
 -- extensions
@@ -253,7 +265,7 @@ lvim.plugins = {
     cmd = "ZenMode",
     module = "zen-mode",
     setup = function()
-      lvim.builtin.which_key.mappings["Z"] = { "<cmd>ZenMode<CR>", "Zen Mode" }
+      lvim.builtin.which_key.mappings["uz"] = { "<cmd>ZenMode<CR>", "Zen Mode" }
     end,
     config = function()
       require("zen-mode").setup({
@@ -348,7 +360,7 @@ lvim.plugins = {
     "mbbill/undotree",
     cmd = "UndotreeToggle",
     setup = function()
-      lvim.builtin.which_key.mappings["U"] = { "<cmd>UndotreeToggle<CR>", "UndoTree" }
+      lvim.builtin.which_key.mappings["uU"] = { "<cmd>UndotreeToggle<CR>", "UndoTree" }
     end,
   },
   {

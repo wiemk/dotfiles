@@ -9,7 +9,7 @@ core/git/.config/git/*.local
 # systemd
 **/systemd/user/**/override.conf
 # neovim
-core/nvim/.config/lvim/plugin/*
+core/[nl]vim/.config/[nl]vim/plugin/*
 # gnupg
 core/gnupg/.gnupg/*
 !core/gnupg/.gnupg/*.conf

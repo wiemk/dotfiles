@@ -63,6 +63,22 @@ fkill() {
 	fi
 }
 
+fcd() {
+	local dir
+	while :; do
+		dir="$({
+			echo ..
+			fd --max-depth=1 --hidden --unrestricted --fixed-strings --follow --type=d --type=l --color=always
+		} |
+			fzf --reverse --ansi --no-multi --preview='pwd' --preview-window=up,1,border-none --no-info)"
+		if [[ -z "${dir}" ]]; then
+			break
+		else
+			builtin cd "${dir}" || return
+		fi
+	done
+}
+
 _fzfyank() {
 	local cmd=$1
 	if [[ $cmd != "fd "* ]]; then
@@ -87,10 +103,10 @@ _fzfyank() {
 # Alt+[df] - local dir/all selection
 if has fd; then
 	bind -m emacs -x '"\ef": _fzfyank "fd --hidden --unrestricted --exclude=.git/ --color=always"'
-	bind -m emacs -x '"\ed": _fzfyank "fd --hidden --unrestricted --exclude=.git/ --color=always --type=d"'
+	bind -m emacs -x '"\ed": _fzfyank "fd --hidden --unrestricted --exclude=.git/ --color=always --type=d --type=s"'
 
 	bind -m vi-command -x '"\ef": _fzfyank "fd --hidden --unrestricted --exclude=.git/ --color=always"'
-	bind -m vi-command -x '"\ed": _fzfyank "fd --hidden --unrestricted --exclude=.git/ --color=always --type=d"'
+	bind -m vi-command -x '"\ed": _fzfyank "fd --hidden --unrestricted --follow --exclude=.git/ --color=always --type=d --type=s"'
 else
 	bind -m emacs -x '"\ef": _fzfyank "find . -xdev -name .\?\* -prune -o -printf %P\\\0"'
 	bind -m emacs -x '"\ed": _fzfyank "find . -xdev -name .\?\* -prune -o -xtype d -printf %P\\\0"'

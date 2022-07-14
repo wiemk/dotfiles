@@ -1,6 +1,6 @@
-local modeline = {}
+local M = {}
 
-modeline.generateModeline = function()
+M.generateModeline = function()
   local commentString = vim.opt.commentstring:get()
 
   local modelineElements =
@@ -73,19 +73,19 @@ modeline.generateModeline = function()
     end)(),
   }
 
-  local line = table.concat(modelineElements)
-  return commentString:gsub("%%s", line)
+  local modeline = table.concat(modelineElements)
+  return commentString:gsub("%%s", modeline)
 end
 
-modeline.insertModeline = function()
-  local line        = modeline.generateModeline()
+M.insertModeline = function()
+  local modeline    = M.generateModeline()
   local currentLine = vim.api.nvim_buf_get_lines(vim.api.nvim_win_get_buf(0), 0, 1, true)[1]
 
   if string.match(currentLine, "vi:") then
-    vim.api.nvim_buf_set_lines(0, 0, 1, true, { line })
+    vim.api.nvim_buf_set_lines(0, 0, 1, true, { modeline })
   else
-    vim.api.nvim_buf_set_lines(0, 0, 0, true, { line })
+    vim.api.nvim_buf_set_lines(0, 0, 0, true, { modeline })
   end
 end
 
-return modeline
+return M
