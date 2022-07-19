@@ -1,4 +1,4 @@
-# vi:set ft=conf ts=4 sw=4 noet noai:
+# vi: set ft=conf ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:
 refresh-on-startup no
 reload-threads 32
 prepopulate-query-feeds yes
@@ -45,7 +45,7 @@ bind-key q quit
 bind-key j down
 bind-key k up
 bind-key l open
-bind-key h prev-dialog
+bind-key h quit
 
 bind-key a mark-all-above-as-read
 

@@ -1,3 +1,5 @@
+# vi: set ft=yaml ts=2 sw=2 sts=-1 sr et si tw=0 fdm=manual:
+
 import:
   - /home/zeno/.config/alacritty/font.yml
   - /home/zeno/.config/alacritty/theme.yml
@@ -16,7 +18,7 @@ scrolling:
 
 selection:
   save_to_clipboard: false
-  
+
 live_config_reload: false
 
 mouse:

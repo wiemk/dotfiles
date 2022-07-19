@@ -6,10 +6,13 @@ if [ -z "${type}" ] || [ -z "${target}" ]; then
 fi
 
 case "${type}" in
-	URL ) xdg-open "${target}" ;;
-	VIDEO ) setsid -f mpv --quiet --msg-level=ffmpeg=fatal --ytdl-format='bestvideo[fps<=60][height<=1080][vcodec=avc1]/mp4' "${target}" 1>/dev/null 2>&1 0</dev/null ;;
-	AUDIO ) setsid -f mpv --quiet --msg-level=ffmpeg=fatal --profile=low-latency --no-video --cache=auto --demuxer-max-back-bytes=2097152 --demuxer-max-bytes=2097152 --ytdl-format='bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio' "${target}" 1>/dev/null 2>&1 0</dev/null ;;
-	* ) printf '%s\n' 'Unsupported format.'; exit 2 ;;
+URL) xdg-open "${target}" ;;
+VIDEO) setsid -f mpv --quiet --msg-level=ffmpeg=fatal --ytdl-format='bestvideo[fps<=60][height<=1080][vcodec=avc1]/mp4' "${target}" 1>/dev/null 2>&1 0</dev/null ;;
+AUDIO) setsid -f mpv --quiet --msg-level=ffmpeg=fatal --profile=low-latency --no-video --cache=auto --demuxer-max-back-bytes=2097152 --demuxer-max-bytes=2097152 --ytdl-format='bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio' "${target}" 1>/dev/null 2>&1 0</dev/null ;;
+*)
+	printf '%s\n' 'Unsupported format.'
+	exit 2
+	;;
 esac
 
-# vi:set ft=sh ts=4 sw=4 noet:
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

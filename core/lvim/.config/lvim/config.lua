@@ -8,6 +8,10 @@ lvim.format_on_save = false
 lvim.colorscheme = "tokyonight"
 lvim.use_icons = true
 
+-- Don't redraw during macro execution
+vim.opt.lazyredraw = true
+vim.opt.synmaxcol = 256
+
 -- Override default options
 (function()
   local opts = {
@@ -55,9 +59,8 @@ lvim.keys.normal_mode["x"] = '"_x'
 -- Don't move the cursor on *
 lvim.keys.normal_mode["*"] = "*<C-o>"
 
--- Remove some default mappings
-lvim.keys.normal_mode["<F1>"] = "<Esc>"
-lvim.keys.insert_mode["<F1>"] = "<Esc>"
+lvim.keys.normal_mode["<F1>"] = ":make<CR>"
+lvim.keys.insert_mode["<F1>"] = ":make<CR>"
 
 -- Remove highlighting
 lvim.keys.normal_mode["<C-h>"] = ":nohlsearch<CR>"
@@ -89,6 +92,7 @@ lvim.keys.term_mode["<C-l>"] = false
 
 -- which-key
 -- lvim.builtin.which_key.setup.triggers_blacklist = { n = { "g" } }
+lvim.builtin.which_key.mappings["w"] = nil
 lvim.builtin.which_key.mappings["<leader>"] = { "<C-^>", "Cycle Buffer" }
 lvim.builtin.which_key.mappings["h"] = {
   function() vim.opt.hlsearch = not vim.o.hlsearch end, "Toggle Highlight"
@@ -100,13 +104,19 @@ end
 
 local ok, builtin = pcall(require, "telescope.builtin")
 if ok then
-  lvim.builtin.which_key.mappings["/"] = nil
+  lvim.builtin.which_key.mappings["/"] = {
+    function()
+      builtin.current_buffer_fuzzy_find({ layout_config = { width = 0.5 } })
+    end,
+    "Buffer Fuzzy"
+  }
   lvim.builtin.which_key.mappings["sB"] = { builtin.builtin, "Builtins" }
   lvim.builtin.which_key.mappings["F"] = { builtin.live_grep, "Text" }
   lvim.builtin.which_key.mappings["B"] = lvim.builtin.which_key.mappings["b"]
   lvim.builtin.which_key.mappings["b"] = { builtin.buffers, "Buffers" }
 end
 lvim.builtin.which_key.mappings["sF"] = { "<Cmd>Telescope frecency<CR>", "Frecency" }
+lvim.builtin.which_key.mappings["R"] = { "<Cmd>Telescope frecency<CR>", "Frecency" }
 lvim.builtin.which_key.mappings["C"] = { "<Cmd>ProjectRoot<CR>", "Project Root" }
 lvim.builtin.which_key.mappings["u"] = {
   name = "Utilities",
@@ -119,7 +129,7 @@ lvim.builtin.which_key.mappings["u"] = {
     "Sort Paragraphs"
   },
   s = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
-  w = { function() vim.opt.list = not vim.o.list end, "Whitespaces" },
+  w = { function() vim.opt.list = not vim.o.list end, "Show whitespaces" },
 }
 
 -- telescope
@@ -149,6 +159,9 @@ lvim.builtin.telescope.pickers = vim.tbl_extend("force", lvim.builtin.telescope.
         ["<C-d>"] = require("telescope.actions").delete_buffer,
       }
     }
+  },
+  current_buffer_fuzzy_find = {
+    theme = "dropdown",
   }
 })
 -- extensions
@@ -192,6 +205,9 @@ lvim.builtin.lualine.sections.lualine_y = {
   components.spaces,
   components.location
 }
+
+-- bufferline
+-- lvim.builtin.bufferline.options.mode = "tabs"
 
 -- tree-sitter
 lvim.builtin.treesitter.ensure_installed = {
@@ -238,15 +254,25 @@ if vim.fn.executable("shellcheck") == 1 then
 end
 -- Additional Plugins
 lvim.plugins = {
-  { "folke/tokyonight.nvim" },
   { "p00f/nvim-ts-rainbow" },
   { "machakann/vim-sandwich" },
+  { "folke/tokyonight.nvim" },
+  { "gpanders/editorconfig.nvim" },
+  {
+    "https://betaco.de/zeno/modeline.nvim",
+    cmd = "InsertModeline",
+    module = "modeline",
+    setup = function()
+      lvim.builtin.which_key.mappings["M"] = { function() require("modeline").insertModeline() end, "Insert Modeline" }
+      lvim.builtin.which_key.mappings["uM"] = lvim.builtin.which_key.mappings["M"]
+    end,
+  },
   {
     "folke/zen-mode.nvim",
     cmd = "ZenMode",
     module = "zen-mode",
     setup = function()
-      lvim.builtin.which_key.mappings["Z"] = { "<cmd>ZenMode<CR>", "Zen Mode" }
+      lvim.builtin.which_key.mappings["uz"] = { "<cmd>ZenMode<CR>", "Zen Mode" }
     end,
     config = function()
       require("zen-mode").setup({
@@ -341,7 +367,7 @@ lvim.plugins = {
     "mbbill/undotree",
     cmd = "UndotreeToggle",
     setup = function()
-      lvim.builtin.which_key.mappings["U"] = { "<cmd>UndotreeToggle<CR>", "UndoTree" }
+      lvim.builtin.which_key.mappings["uU"] = { "<cmd>UndotreeToggle<CR>", "UndoTree" }
     end,
   },
   {

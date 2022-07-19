@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 # shellcheck disable=SC2034
 
@@ -41,3 +40,5 @@ trap 'popd &>/dev/null' EXIT
 
 link FUNC functions
 link PLUGIN plugins
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

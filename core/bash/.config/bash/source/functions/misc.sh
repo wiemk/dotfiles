@@ -1,4 +1,4 @@
-# vi:set ft=sh ts=4 sw=4 noet noai:
+# vi: set ft=sh ts=4 sw=4 sts=-1 sr et si tw=0 fdm=manual:
 # shellcheck shell=bash
 # shellcheck disable=2155,1090
 
@@ -44,5 +44,11 @@ if has xprop && has xdotool; then
 		xprop -id "$window" -f _MOTIF_WM_HINTS 32c \
 			-set _MOTIF_WM_HINTS '0x2, 0x0, 0x0, 0x0, 0x0'
 
+	}
+fi
+
+if has htop; then
+	htop() {
+		command htop --drop-capabilities=strict 2>/dev/null || command htop
 	}
 fi

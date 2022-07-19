@@ -1,3 +1,5 @@
+# vi: set ft=yaml ts=2 sw=2 sts=-1 sr et si tw=0 fdm=manual:
+
 colors:
   # This keyword, HTML elements, Regex group symbol, CSS units, Terminal Red
   term-red: 'f7768e'

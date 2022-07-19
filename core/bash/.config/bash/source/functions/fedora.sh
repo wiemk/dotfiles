@@ -1,4 +1,4 @@
-# vi:set ft=sh ts=4 sw=4 noet noai:
+# vi: set ft=sh ts=4 sw=4 sts=-1 sr et si tw=0 fdm=manual:
 # shellcheck shell=bash
 
 init_debug

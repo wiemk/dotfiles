@@ -1,5 +1,4 @@
 #!/bin/bash
-# vi:set ft=sh ts=4 sw=4 noet noai:
 # shellcheck shell=bash
 
 tmp=$(mktemp)
@@ -21,3 +20,5 @@ $EDITOR "$tmp"
 while read -r filename linkname; do
 	ln -sf "$linkname" "$filename"
 done < <(sed "s/'\(.*\)' -> '\(.*\)'/\1 \2/" "$tmp")
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

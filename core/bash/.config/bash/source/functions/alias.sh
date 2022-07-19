@@ -1,4 +1,4 @@
-# vi:set ft=sh ts=4 sw=4 noet noai:
+# vi: set ft=sh ts=4 sw=4 sts=-1 sr et si tw=0 fdm=manual:
 # shellcheck shell=bash
 
 init_debug
@@ -22,11 +22,15 @@ alias mkdir='command mkdir -v'
 alias mv='command mv -vi'
 alias rm='command rm -vI'
 
+alias dnf='sudo dnf'
 alias dust='dust -rx'
 alias grep='grep --color=auto'
-alias htop='htop --drop-capabilities=strict'
 alias kc='koji-check'
 alias kdl='koji-arch'
+alias mm='neomutt'
+alias mutt='neomutt'
 alias srun='sc-run'
 alias tma='tm'
+alias top='htop'
 alias unsha='socat -t 5 - tcp:unsha.re:10000'
+alias ydl='yt-dlp'

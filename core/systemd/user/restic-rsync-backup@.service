@@ -1,0 +1,14 @@
+[Unit]
+Description=Rsync restic backups to NAS
+#OnFailure=telegram-notification@%n.service
+
+[Service]
+Type=oneshot
+SyslogIdentifier=restic-rsync
+TimeoutSec=5min
+
+# set via override
+#Environment=RESTIC_REPOSITORY=/dev/null
+#Environment=RSYNC_TARGET=user@path
+#Environment=KEYFILE
+ExecStart=/usr/bin/flock --verbose --no-fork "%h/.config/backup/restic/repos/%i" sh -c 'if [ -n "${RESTIC_REPOSITORY}" ] && [ -n "${RSYNC_TARGET}" ]; then rsync -vrltD --numeric-ids --delete -e "ssh -o Compression=no -o BatchMode=yes -i ${KEYFILE}" "${RESTIC_REPOSITORY}" ${RSYNC_TARGET}; else echo "rsync target not configured." >&2; fi'

@@ -1,0 +1,22 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.3.0
+  hooks:
+  - id: check-added-large-files
+  - id: check-shebang-scripts-are-executable
+  - id: check-case-conflict
+  - id: check-merge-conflict
+  - id: mixed-line-ending
+    args: [ --fix=no ]
+# - repo: https://github.com/zricethezav/gitleaks
+#   rev: v8.8.12
+#   hooks:
+#     - id: gitleaks
+- repo: local
+  hooks:
+  - id: gitleaks
+    name: Detect hardcoded secrets
+    description: Detect hardcoded secrets using Gitleaks
+    entry: gitleaks protect --verbose --staged
+    language: system
+    pass_filenames: false
