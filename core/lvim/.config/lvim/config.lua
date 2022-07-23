@@ -113,6 +113,8 @@ if ok then
   lvim.builtin.which_key.mappings["sB"] = { builtin.builtin, "Builtins" }
   lvim.builtin.which_key.mappings["F"] = { builtin.live_grep, "Text" }
   lvim.builtin.which_key.mappings["B"] = lvim.builtin.which_key.mappings["b"]
+  -- Close all but current buffer
+  lvim.builtin.which_key.mappings["Bo"] = { ':%bd!|e #|bd #|normal`"<CR>', "Close inactive buffers" }
   lvim.builtin.which_key.mappings["b"] = { builtin.buffers, "Buffers" }
 end
 lvim.builtin.which_key.mappings["sF"] = { "<Cmd>Telescope frecency<CR>", "Frecency" }
