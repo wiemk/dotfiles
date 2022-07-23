@@ -43,6 +43,7 @@ parse() {
 	declare -g flag_parallel=0
 	declare -g flag_jobs=16
 	declare -g flag_depth=2
+	declare -g flag_quiet=0
 
 	while :; do
 		case ${1-} in
@@ -50,6 +51,7 @@ parse() {
 		-v | --verbose) set -x ;;
 		--no-color) NO_COLOR=1 ;;
 		-p | --parallel) flag_parallel=1 ;;
+		-q | --quiet) flag_quiet=1 ;;
 		-j | --jobs)
 			flag_jobs=${2-}
 			shift
@@ -81,12 +83,16 @@ colors() {
 }
 
 update() {
+	# export variables because of invocation inside subshell
+	if ((flag_quiet == 1)); then
+		export GIT_QUIET=1
+	fi
 	export GIT_TERMINAL_PROMPT=0 GIT_CONFIG_GLOBAL=/dev/null
 	git_pull() {
 		if git -C "$1" config --get branch."$(git -C "$1" symbolic-ref --short HEAD)".remote &>/dev/null; then
 			# Redirection order is intentional: suppress git errors and redirect stdout to stderr
 			# shellcheck disable=SC2069
-			if ! git -C "$1" -c color.ui=always pull --rebase 2>&1 2>/dev/null; then
+			if ! git -C "$1" -c color.ui=always pull ${GIT_QUIET:+'-q'} --rebase 2>&1 2>/dev/null; then
 				printf "${RED}╚═[ERROR]: %s${NOFORMAT}\n" "${1##*/}" >&2
 			fi
 		else

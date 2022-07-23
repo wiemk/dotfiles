@@ -42,7 +42,7 @@ clip() {
 		esac
 	}
 
-	if [[ $TERM_PROGRAM = tmux ]]; then
+	if [[ $TERM_PROGRAM == tmux ]]; then
 		tmux load-buffer -w /dev/fd/0
 	elif [[ -v KITTY_INSTALLATION_DIR ]]; then
 		kitty +kitten clipboard
