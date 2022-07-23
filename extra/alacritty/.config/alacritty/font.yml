@@ -2,7 +2,6 @@
 
 font:
   normal:
-    # family: JetBrainsMono Nerd Font
     family: JuliaMono
     style: Regular
   size: 16.0
