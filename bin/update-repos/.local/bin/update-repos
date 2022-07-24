@@ -93,23 +93,23 @@ update() {
 			# Redirection order is intentional: suppress git errors and redirect stdout to stderr
 			# shellcheck disable=SC2069
 			if ! git -C "$1" -c color.ui=always pull ${GIT_QUIET:+'-q'} --rebase 2>&1 2>/dev/null; then
-				printf "${RED}╚═[ERROR]: %s${NOFORMAT}\n" "${1##*/}" >&2
+				printf "${RED}╠═[ERROR]: %s${NOFORMAT}\n" "${1##*/}" >&2
 			fi
 		else
-			printf "${BLUE}╚═[INFO]: No remote configured for %s${NOFORMAT}\n" "${1##*/}" >&2
+			printf "${BLUE}╠═[INFO]: No remote configured for %s${NOFORMAT}\n" "${1##*/}" >&2
 		fi
 	}
 	export -f git_pull
 
 	if ((flag_parallel == 0)); then
 		find "${argv[0]}" -maxdepth "${flag_depth}" -name '.git' -prune -type d -exec \
-			bash -c 'c=$(readlink -en "${1}/.."); printf "${PURPLE}[%s]${NOFORMAT}\n" "${c##*/}"; git_pull "$c"' shell {} \;
+			bash -c 'c=$(readlink -en "${1}/.."); printf "${PURPLE}╠%s${NOFORMAT}\n" "${c##*/}"; git_pull "$c"' shell {} \;
 	elif ((GNU_PARALLEL == 1)); then
 		find "${argv[0]}" -maxdepth "${flag_depth}" -name '.git' -prune -type d -printf '%h\0' |
-			parallel -0 -j "$flag_jobs" --keep-order "printf \"${PURPLE}[%s]${NOFORMAT}\n\" {}; git_pull {}"
+			parallel -0 -j "$flag_jobs" --keep-order "printf \"${PURPLE}╠%s${NOFORMAT}\n\" {}; git_pull {}"
 	else
 		find "${argv[0]}" -maxdepth "${flag_depth}" -name '.git' -prune -type d -printf '%h\0' |
-			xargs -0 -I{} -P "$flag_jobs" sh -c "printf \"${PURPLE}[%s]${NOFORMAT}\n\" {}; git_pull {}"
+			xargs -0 -I{} -P "$flag_jobs" sh -c "printf \"${PURPLE}╠%s${NOFORMAT}\n\" {}; git_pull {}"
 	fi
 }
 

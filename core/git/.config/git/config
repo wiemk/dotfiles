@@ -1,7 +1,7 @@
 # vi: set ft=gitconfig ts=2 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:
 
 [alias]
-	amend = commit --amend
+	amp = commit --patch --amend
 	b = branch -vv --sort=-committerdate
 	c = commit
 	ca = commit --amend --no-edit
