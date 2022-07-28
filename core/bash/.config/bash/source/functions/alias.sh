@@ -34,3 +34,11 @@ alias tma='tm'
 alias top='htop'
 alias unsha='socat -t 5 - tcp:unsha.re:10000'
 alias ydl='yt-dlp'
+
+if has batman; then
+	alias man='batman'
+fi
+
+if has bat; then
+	alias less='bat'
+fi

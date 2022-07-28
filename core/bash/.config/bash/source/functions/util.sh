@@ -17,6 +17,16 @@ lsmono() {
 		grep -E 'spacing=(100|90).*?outline=True.*?scalable=True' | cut -d':' -f1 | sort -u
 }
 
+fonttest() {
+	echo -e "\e[1mbold\e[0m"
+	echo -e "\e[3mitalic\e[0m"
+	echo -e "\e[3m\e[1mbold italic\e[0m"
+	echo -e "\e[4munderline\e[0m"
+	echo -e "\e[9mstrikethrough\e[0m"
+	echo -e "\e[31mHello World\e[0m"
+	echo -e "\x1B[31mHello World\e[0m"
+}
+
 bashquote() {
 	printf '%q\n' "$(</dev/stdin)"
 }
@@ -54,7 +64,6 @@ escape() {
 	printf "\\\x%s" $(printf '%s' "$*" | xxd -p -c1 -u)
 	printf '\n'
 }
-
 
 con() {
 	if has lsof; then

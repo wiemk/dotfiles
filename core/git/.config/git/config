@@ -158,8 +158,8 @@
 	rebase = true
 
 [rebase]
-	autosquash = false
-	autostash = false
+	autosquash = true
+	autoStash = true
 
 [receive]
 	denyCurrentBranch = refuse

@@ -9,7 +9,7 @@ base=$(dirname "$(readlink -f "${BASH_SOURCE[0]:-$0}")")
 prompt() {
 	msg() {
 		local text=$1
-		local div_width="120"
+		local div_width=120
 		printf "%${div_width}s\n" ' ' | tr ' ' -
 		printf "%s\n" "$text"
 	}
