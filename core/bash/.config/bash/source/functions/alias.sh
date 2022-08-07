@@ -15,6 +15,7 @@ alias info='info --vi-keys'
 alias l.='command ls -d .* --color=auto' 2>/dev/null
 alias ll='command ls -l --color=auto' 2>/dev/null
 alias ls='command ls --color=auto --show-control-chars --group-directories-first -AlhXF'
+alias sl='ls'
 
 alias cp='command cp -avi'
 alias ln='command ln -vi'
@@ -29,7 +30,7 @@ alias kc='koji-check'
 alias kdl='koji-arch'
 alias mm='neomutt'
 alias mutt='neomutt'
-alias srun='sc-run'
+alias srun='sc-run-bg'
 alias tma='tm'
 alias top='htop'
 alias unsha='socat -t 5 - tcp:unsha.re:10000'

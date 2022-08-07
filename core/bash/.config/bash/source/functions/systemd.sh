@@ -4,7 +4,19 @@
 init_debug
 
 sc-run() {
+	systemd-run --quiet --user --collect --pty "$@"
+}
+
+sc-run-idle() {
+	systemd-run --quiet --user --collect --pty --nice=19 --property=CPUSchedulingPolicy=idle --property=IOSchedulingClass=idle "$@"
+}
+
+sc-run-bg() {
 	systemd-run --quiet --user --collect "$@"
+}
+
+sc-run-idle-bg() {
+	systemd-run --quiet --user --collect --nice=19 --property=CPUSchedulingPolicy=idle --property=IOSchedulingClass=idle "$@"
 }
 
 sc-running() {

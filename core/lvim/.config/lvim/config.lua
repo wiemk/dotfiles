@@ -122,6 +122,7 @@ lvim.builtin.which_key.mappings["R"] = { "<Cmd>Telescope frecency<CR>", "Frecenc
 lvim.builtin.which_key.mappings["C"] = { "<Cmd>ProjectRoot<CR>", "Project Root" }
 lvim.builtin.which_key.mappings["u"] = {
   name = "Utilities",
+  c = { "<Cmd>lcd %:p:h|lua print('Window working directory changed to ' .. vim.fn.getcwd())<CR>", "lcd %:p:h" },
   S = {
     [[
       :%s/\(.\+\)\n/\1@/
@@ -322,7 +323,7 @@ lvim.plugins = {
     end,
   },
   {
-    "windwp/nvim-spectre",
+    "nvim-pack/nvim-spectre",
     -- event = "BufRead",
     module = 'spectre',
     config = function()
