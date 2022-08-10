@@ -1,10 +1,22 @@
-# vi: set ft=sh ts=4 sw=4 sts=-1 sr et si tw=0 fdm=manual:
+# vi: set ft=sh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
 # shellcheck shell=bash
 
 init_debug
 
 sc-run() {
+	systemd-run --quiet --user --collect --pty "$@"
+}
+
+sc-run-idle() {
+	systemd-run --quiet --user --collect --pty --nice=19 --property=CPUSchedulingPolicy=idle --property=IOSchedulingClass=idle "$@"
+}
+
+sc-run-bg() {
 	systemd-run --quiet --user --collect "$@"
+}
+
+sc-run-idle-bg() {
+	systemd-run --quiet --user --collect --nice=19 --property=CPUSchedulingPolicy=idle --property=IOSchedulingClass=idle "$@"
 }
 
 sc-running() {

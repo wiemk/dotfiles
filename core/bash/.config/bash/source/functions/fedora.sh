@@ -1,4 +1,4 @@
-# vi: set ft=sh ts=4 sw=4 sts=-1 sr et si tw=0 fdm=manual:
+# vi: set ft=sh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
 # shellcheck shell=bash
 
 init_debug
@@ -35,7 +35,7 @@ if has koji; then
 fi
 
 if has jq; then
-	current-kernels() {
+	kernel-releases() {
 		curl -Ls https://kernel.org/releases.json | jq -r '.releases[] | select(.moniker != "longterm") | .moniker + ":" + .version'
 	}
 fi

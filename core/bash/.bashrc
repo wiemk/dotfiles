@@ -106,15 +106,31 @@ contains() {
 
 trim() {
 	local var=$*
-	var="${var#"${var%%[![:space:]]*}"}"
-	var="${var%"${var##*[![:space:]]}"}"
+	var=${var#"${var%%[![:space:]]*}"}
+	var=${var%"${var##*[![:space:]]}"}
 	printf '%s' "$var"
 }
+
+if has systemd-detect-virt; then
+	is_container() {
+		local -r container=$(systemd-detect-virt --container)
+		if [[ -n $container && $container != "none" ]]; then
+			echo "$container"
+			return 0
+		fi
+		return 1
+	}
+
+	container=$(is_container)
+	if [[ -n $container ]]; then
+		export CONTAINER=$container
+	fi
+fi
 
 prompt() {
 	msg_bar() {
 		local text=$1
-		local div_width="80"
+		local div_width=80
 		printf "%${div_width}s\n" ' ' | tr ' ' -
 		printf '%s\n' "$text"
 	}
@@ -135,22 +151,6 @@ prompt() {
 		esac
 	done
 }
-
-if has systemd-detect-virt; then
-	container() {
-		local -r container=$(systemd-detect-virt --container)
-		if [[ -n $container && $container != "none" ]]; then
-			echo "$container"
-			return 0
-		fi
-		return 1
-	}
-
-	container=$(container)
-	if [[ -n $container ]]; then
-		export CONTAINER=$container
-	fi
-fi
 
 # note: files beginning with `99-' are not version controlled
 if [[ -d $RCDIR/source.d ]]; then

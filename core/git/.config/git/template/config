@@ -1,3 +1,3 @@
-# vi: set ft=gitconfig ts=2 sw=2 sts=0 sr et si tw=0 fdm=manual:
+# vi: set ft=gitconfig ts=2 sw=2 sts=0 sr noet si tw=0 fdm=manual:
 [commit]
 	gpgsign = true

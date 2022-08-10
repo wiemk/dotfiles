@@ -1,4 +1,4 @@
-# vi: set ft=sh ts=4 sw=4 sts=-1 sr et si tw=0 fdm=manual:
+# vi: set ft=sh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
 # shellcheck shell=bash
 
 init_debug
@@ -15,6 +15,7 @@ alias info='info --vi-keys'
 alias l.='command ls -d .* --color=auto' 2>/dev/null
 alias ll='command ls -l --color=auto' 2>/dev/null
 alias ls='command ls --color=auto --show-control-chars --group-directories-first -AlhXF'
+alias sl='ls'
 
 alias cp='command cp -avi'
 alias ln='command ln -vi'
@@ -29,8 +30,16 @@ alias kc='koji-check'
 alias kdl='koji-arch'
 alias mm='neomutt'
 alias mutt='neomutt'
-alias srun='sc-run'
+alias srun='sc-run-bg'
 alias tma='tm'
 alias top='htop'
 alias unsha='socat -t 5 - tcp:unsha.re:10000'
 alias ydl='yt-dlp'
+
+if has batman; then
+	alias man='batman'
+fi
+
+if has bat; then
+	alias less='bat'
+fi
