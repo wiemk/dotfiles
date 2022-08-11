@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+# shellcheck disable=2155,1090
+
+# burn in English subtitle track and transcode to constant quality 8bit h264 yuv420p, Japanese audio
+
+# shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
+source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
+
+declare workdir
+if (($# < 1)); then
+	workdir=$PWD
+elif [[ -d $1 ]]; then
+	workdir=$1
+else
+	die "Not a valid directory: ${1}"
+fi
+
+if ! has HandBrakeCLI; then
+	die "HandBrakeCLI mising."
+fi
+
+workdir=$(readlink -f "$workdir")
+
+numfiles() {
+	find "$1" -maxdepth 1 -type f \( -iname "*.mkv" ! -iname "*.new.mkv" \) -printf . | wc -c
+}
+
+assburn() {
+	# shellcheck disable=SC1004
+	find "$1" -maxdepth 1 -type f \( -iname "*.mkv" ! -iname "*.new.mkv" \) \
+		\( -exec sh -c 'i="$1"; \
+			systemd-run --quiet --user --collect --pty --nice=19 --property=CPUSchedulingPolicy=idle --property=IOSchedulingClass=idle \
+			taskset -c 2-$(($(nproc)-1)) \
+			HandBrakeCLI --input "$i" --encoder x264 --encoder-preset faster --encoder-tune animation \
+			--encoder-profile high --encoder-level 5.2 --quality 18 -vfr --turbo \
+			--audio-lang-list jpn --first-audio --aencoder copy --audio-copy-mask aac,ac3,eac3,truehd,dts,dtshd,mp3 \
+			--audio-fallback av_aac --ab 160 --mixdown stereo --normalize-mix --arate auto --native-language eng \
+			--subtitle=scan --subtitle-burned=native \
+			--output "$(dirname "$i")/$(basename "$i" .mkv).new.mkv"' \
+		shell {} \; -o -quit \)
+
+	command ls --color=auto --show-control-chars --group-directories-first -AlhXF "$1"
+	if has prename; then
+		if prompt "Want to replace the original files?"; then
+			prename -vf 's/\.new.mkv$/.mkv/' "$1"/*.new.mkv
+		fi
+	fi
+}
+
+if (($(numfiles "$workdir") < 1)); then
+	die "No files to process found."
+fi
+
+assburn "$workdir"
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

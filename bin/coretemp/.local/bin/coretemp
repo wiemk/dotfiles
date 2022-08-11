@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 
-has() {
-    if hash "$1" &>/dev/null; then
-        return 0
-    fi
-    return 1
-}
+# shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
+source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
 if has sensors && has jq; then
     coretemp() {

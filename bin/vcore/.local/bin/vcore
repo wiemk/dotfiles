@@ -4,16 +4,12 @@
 # shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
-if has nvim; then
-	nvim "$@"
-elif has vim; then
-	vim "$@"
-elif has nano; then
-	nano "$@"
-elif has emacs; then
-	emacs "$@"
-else
-	exit 1
+if has sensors && has jq; then
+	vcore() {
+		sensors -j | jq -r 'to_entries[] | select(.key=="nct6776-isa-0290").value | to_entries[] | select(.key=="Vcore").value.in0_input'
+	}
 fi
+
+vcore
 
 # vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

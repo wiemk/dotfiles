@@ -39,7 +39,3 @@ alias ydl='yt-dlp'
 if has batman; then
 	alias man='batman'
 fi
-
-if has bat; then
-	alias less='bat'
-fi
