@@ -36,6 +36,10 @@ up() {
 	alias ..='up'
 }
 
+nocomment() {
+	awk -F\# '$1!="" {print}' "$@"
+}
+
 ps() {
 	if (($# > 0)); then
 		command ps "$@"

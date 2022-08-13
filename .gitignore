@@ -10,6 +10,8 @@ core/git/.config/git/*.local
 **/systemd/user/**/override.conf
 # neovim
 core/[nl]vim/.config/[nl]vim/plugin/*
+# vifm
+core/vifm/.config/vifm/vifminfo.json
 # gnupg
 core/gnupg/.gnupg/*
 !core/gnupg/.gnupg/*.conf

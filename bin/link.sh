@@ -50,7 +50,7 @@ link_shared() {
 	local target=${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/lib
 	mkdir -p "$target"
 	local source
-	printf -v source '%s/../share/lib/.local/share/dotfiles/lib/lib.sh' "${base}"
+	printf -v source '%s/../share/lib/.local/share/dotfiles/lib/lib.sh' "$base"
 	source=$(readlink -fe "$source")
 	if [[ -n $source ]]; then
 		command ln -v --symbolic --relative --no-target-directory --force "$source" "${target}/lib.sh"

@@ -64,3 +64,9 @@ if has mediainfo; then
 					ChromaSub: .media.track[1].ChromaSubsampling})'
 	}
 fi
+
+if has navi; then
+	naviq() {
+		navi --query "$1"
+	}
+fi

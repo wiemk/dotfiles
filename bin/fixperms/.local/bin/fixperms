@@ -41,10 +41,10 @@ prompt() {
 }
 
 if prompt "Fix permissions of '${workdir}'?"; then
-	command chown --verbose --preserve-root --recursive "$(id -u):$(id -g)" "$workdir"
+	sudo chown --verbose --preserve-root --recursive "$(id -u):$(id -g)" "$workdir"
 	if has getenforce; then
 		if [[ $(getenforce 2>&1) =~ Enforcing|Permissive ]]; then
-			restorecon -vxFR "$workdir"
+			sudo restorecon -vxFR "$workdir"
 		fi
 	fi
 fi
