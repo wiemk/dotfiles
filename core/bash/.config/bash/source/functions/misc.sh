@@ -52,3 +52,21 @@ if has htop; then
 		command htop --drop-capabilities=strict 2>/dev/null || command htop
 	}
 fi
+
+if has mediainfo; then
+	minfo() {
+		mediainfo --inform_version=0 --Output=JSON "$@" |
+			jq --raw-output --slurp 'map({FPS: .media.track[0].FrameRate,
+					AudioTracks: .media.track[0].AudioCount,
+					Format: .media.track[1].Format,
+					Profile: .media.track[1].Format_Profile,
+					BitDepth: .media.track[1].BitDepth,
+					ChromaSub: .media.track[1].ChromaSubsampling})'
+	}
+fi
+
+if has navi; then
+	naviq() {
+		navi --query "$1"
+	}
+fi

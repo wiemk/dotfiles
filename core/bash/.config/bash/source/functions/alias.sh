@@ -30,6 +30,7 @@ alias kc='koji-check'
 alias kdl='koji-arch'
 alias mm='neomutt'
 alias mutt='neomutt'
+alias pe='command up'
 alias srun='sc-run-bg'
 alias tma='tm'
 alias top='htop'
@@ -38,8 +39,4 @@ alias ydl='yt-dlp'
 
 if has batman; then
 	alias man='batman'
-fi
-
-if has bat; then
-	alias less='bat'
 fi

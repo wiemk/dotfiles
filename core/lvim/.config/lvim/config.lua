@@ -47,8 +47,8 @@ vim.keymap.set({ 'i', 'n', 'v' }, '<C-a>', '<Home>', { noremap = true, silent = 
 vim.keymap.set({ 'i', 'n', 'v' }, '<C-e>', '<End>', { noremap = true, silent = true })
 
 -- Use the default vim behavior for H and L
-lvim.keys.normal_mode["<S-l>"] = false
-lvim.keys.normal_mode["<S-h>"] = false
+-- lvim.keys.normal_mode["<S-l>"] = false
+-- lvim.keys.normal_mode["<S-h>"] = false
 -- vim.keymap.del("n", "<S-l>")
 -- vim.keymap.del("n", "<S-h:")
 

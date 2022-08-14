@@ -60,3 +60,5 @@ vim.opt.copyindent = true
 vim.opt.cursorline = true
 vim.opt.termguicolors = true
 vim.cmd [[ colorscheme slate ]]
+
+vim.api.nvim_set_keymap("n", "<C-q>", ":qa!<CR>", {noremap = true})

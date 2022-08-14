@@ -46,12 +46,28 @@ build_list() {
 	done
 }
 
+link_shared() {
+	local target=${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/lib
+	mkdir -p "$target"
+	local source
+	printf -v source '%s/../share/lib/.local/share/dotfiles/lib/lib.sh' "$base"
+	source=$(readlink -fe "$source")
+	if [[ -n $source ]]; then
+		command ln -v --symbolic --relative --no-target-directory --force "$source" "${target}/lib.sh"
+	else
+		return 1
+	fi
+}
+
 build_list
 if prompt "Link?"; then
+	if ! link_shared; then
+		msg "Something went wrong with the shared library file path. Please link lib.sh to ~/.local/share/dotfiles/lib/lib.sh manually."
+	fi
+
 	mkdir -p ~/.local/bin
 	for source in "${!targets[@]}"; do
-		ln -v --symbolic --relative --no-target-directory --force "$source" "${targets[$source]}"
+		command ln -v --symbolic --relative --no-target-directory --force "$source" "${targets[$source]}"
 	done
 fi
-
-# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=0 fdm=manual:
