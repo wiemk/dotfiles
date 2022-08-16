@@ -77,7 +77,8 @@ update() {
 		if git -C "$1" config --get branch."$(git -C "$1" symbolic-ref --short HEAD)".remote &>/dev/null; then
 			# Redirection order is intentional: suppress git errors and redirect stdout to stderr
 			# shellcheck disable=SC2069
-			if ! git -C "$1" -c color.ui=always pull ${GIT_QUIET:+'-q'} --rebase 2>&1 2>/dev/null; then
+			if ! git -C "$1" -c color.ui=always -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=5 pull \
+				${GIT_QUIET:+'-q'} --rebase 2>&1 2>/dev/null; then
 				printf "${RED}╠═[ERROR]: %s${NOFORMAT}\n" "${1##*/}" >&2
 			fi
 		else

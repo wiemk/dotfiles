@@ -47,8 +47,8 @@ vim.keymap.set({ 'i', 'n', 'v' }, '<C-a>', '<Home>', { noremap = true, silent = 
 vim.keymap.set({ 'i', 'n', 'v' }, '<C-e>', '<End>', { noremap = true, silent = true })
 
 -- Use the default vim behavior for H and L
--- lvim.keys.normal_mode["<S-l>"] = false
--- lvim.keys.normal_mode["<S-h>"] = false
+lvim.keys.normal_mode["<S-l>"] = false
+lvim.keys.normal_mode["<S-h>"] = false
 -- vim.keymap.del("n", "<S-l>")
 -- vim.keymap.del("n", "<S-h:")
 
@@ -177,7 +177,7 @@ lvim.builtin.telescope.extensions = vim.tbl_deep_extend("force",
 lvim.builtin.autopairs.active = false
 
 -- alpha
-lvim.builtin.alpha.active = true
+lvim.builtin.alpha.active = false
 lvim.builtin.alpha.mode = "startify"
 
 -- notify
@@ -426,15 +426,21 @@ lvim.plugins = {
       require("rust-tools").setup({
         tools = {
           autoSetHints = true,
-          hover_with_actions = true,
           runnables = {
             use_telescope = true,
           },
         },
         server = {
           cmd_env = requested_server._default_options.cmd_env,
-          on_attach = require("lvim.lsp").common_on_attach,
           on_init = require("lvim.lsp").common_on_init,
+          on_attach = function(client, bufnr)
+            require("lvim.lsp").common_on_attach(client, bufnr)
+            local rt = require "rust-tools"
+            -- Hover actions
+            vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
+            -- Code action groups
+            vim.keymap.set("n", "<leader>lA", rt.code_action_group.code_action_group, { buffer = bufnr })
+          end,
         },
       })
     end,
