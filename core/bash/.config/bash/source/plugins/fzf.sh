@@ -102,15 +102,15 @@ _fzfyank() {
 
 # Alt+[df] - local dir/all selection
 if has fd; then
-	bind -m emacs -x '"\ef": _fzfyank "fd --hidden --unrestricted --exclude=.git/ --color=always"'
+	bind -m emacs -x '"\ej": _fzfyank "fd --hidden --unrestricted --exclude=.git/ --color=always"'
 	bind -m emacs -x '"\ed": _fzfyank "fd --hidden --unrestricted --exclude=.git/ --color=always --type=d --type=s"'
 
-	bind -m vi-command -x '"\ef": _fzfyank "fd --hidden --unrestricted --exclude=.git/ --color=always"'
+	bind -m vi-command -x '"\ej": _fzfyank "fd --hidden --unrestricted --exclude=.git/ --color=always"'
 	bind -m vi-command -x '"\ed": _fzfyank "fd --hidden --unrestricted --follow --exclude=.git/ --color=always --type=d --type=s"'
 else
-	bind -m emacs -x '"\ef": _fzfyank "find . -xdev -name .\?\* -prune -o -printf %P\\\0"'
+	bind -m emacs -x '"\ej": _fzfyank "find . -xdev -name .\?\* -prune -o -printf %P\\\0"'
 	bind -m emacs -x '"\ed": _fzfyank "find . -xdev -name .\?\* -prune -o -xtype d -printf %P\\\0"'
 
-	bind -m vi-command -x '"\ef": _fzfyank "find . -xdev -name .\?\* -prune -o -printf %P\\\0"'
+	bind -m vi-command -x '"\ej": _fzfyank "find . -xdev -name .\?\* -prune -o -printf %P\\\0"'
 	bind -m vi-command -x '"\ed": _fzfyank "find . -xdev -name .\?\* -prune -o -xtype d -printf %P\\\0"'
 fi
