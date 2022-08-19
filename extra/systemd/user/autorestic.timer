@@ -1,0 +1,10 @@
+[Unit]
+Description=autorestic
+
+[Timer]
+OnStartupSec=10m
+OnUnitActiveSec=15m
+AccuracySec=1m
+
+[Install]
+WantedBy=timers.target

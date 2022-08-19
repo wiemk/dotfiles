@@ -1,0 +1,12 @@
+[Unit]
+Description=mailsync
+Requires=gpg-agent.socket
+
+[Timer]
+OnStartupSec=10m
+OnUnitActiveSec=15m
+AccuracySec=1m
+
+[Install]
+WantedBy=timers.target
+Also=gpg-agent.socket

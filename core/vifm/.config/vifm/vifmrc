@@ -472,7 +472,8 @@ nnoremap <a-i> :sync<cr>
 nnoremap <a-o> :sync %c<cr>
 
 " Faster exit
-nnoremap <c-q> :wq!<cr>
+nnoremap q :wq!<cr>
+nnoremap <c-q> q
 nnoremap ; :
 
 

@@ -1,0 +1,13 @@
+[Unit]
+Description=Task Spooler service for %I parallel tasks
+
+[Service]
+Type=forking
+Restart=always
+Environment=TS_SOCKET=%t/tsp/socket-ts.%U
+Environment=TMPDIR=%t/tsp
+ExecStart=tsp -S %I
+ExecStop=tsp -K
+
+[Install]
+WantedBy=default.target

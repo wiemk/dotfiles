@@ -1,0 +1,7 @@
+[Unit]
+Description=mailsync
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/mailsync
+WorkingDirectory=/home/zeno/tmpfs

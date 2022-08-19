@@ -1,0 +1,13 @@
+[Unit]
+Description=xdg-open redirect via socat
+
+[Service]
+Type=simple
+WorkingDirectory=/tmp
+SyslogIdentifier=xdg-remote-open
+ExecStart=/usr/bin/socat -v TCP4-L:55112,fork,reuseaddr,bind=127.0.0.1 SYSTEM:"xdg-stdin"
+KillSignal=SIGKILL
+
+[Install]
+RequiredBy=default.target
+

@@ -51,7 +51,7 @@ link_shared() {
 	mkdir -p "$target"
 	local source
 	printf -v source '%s/../share/lib/.local/share/dotfiles/lib/lib.sh' "$base"
-	source=$(readlink -fe "$source")
+	source=$(readlink -e "$source")
 	if [[ -n $source ]]; then
 		command ln -v --symbolic --relative --no-target-directory --force "$source" "${target}/lib.sh"
 	else

@@ -75,6 +75,14 @@ has() {
 	return 1
 }
 
+has_all() {
+	for cmd in "$@"; do
+		if ! has "${cmd}"; then
+			return 1
+		fi
+	done
+}
+
 msg() {
 	echo >&2 -e "${1-}"
 }
