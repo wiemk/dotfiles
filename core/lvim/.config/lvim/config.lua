@@ -46,12 +46,6 @@ lvim.keys.normal_mode["<Right>"] = "<NOP>"
 vim.keymap.set({ 'i', 'n', 'v' }, '<C-a>', '<Home>', { noremap = true, silent = true })
 vim.keymap.set({ 'i', 'n', 'v' }, '<C-e>', '<End>', { noremap = true, silent = true })
 
--- Use the default vim behavior for H and L
-lvim.keys.normal_mode["<S-l>"] = false
-lvim.keys.normal_mode["<S-h>"] = false
--- vim.keymap.del("n", "<S-l>")
--- vim.keymap.del("n", "<S-h:")
-
 -- Don't yank on backspace or x
 lvim.keys.normal_mode["<Del>"] = '"_x'
 lvim.keys.normal_mode["x"] = '"_x'
@@ -243,8 +237,8 @@ lvim.builtin.treesitter.highlight.enabled = true
 lvim.builtin.treesitter.matchup.enable = true
 
 -- Generic LSP settings
-lvim.lsp.automatic_servers_installation = false
-vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "rust_analyzer" })
+lvim.lsp.installer.setup.automatic_installation = false
+vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "rust_analyzer", "bashls" })
 
 -- Custom linters
 if vim.fn.executable("shellcheck") == 1 then
@@ -421,9 +415,7 @@ lvim.plugins = {
   {
     "simrat39/rust-tools.nvim",
     config = function()
-      local lsp_installer_servers = require "nvim-lsp-installer.servers"
-      local _, requested_server = lsp_installer_servers.get_server "rust_analyzer"
-      require("rust-tools").setup({
+      require("rust-tools").setup {
         tools = {
           autoSetHints = true,
           runnables = {
@@ -431,7 +423,6 @@ lvim.plugins = {
           },
         },
         server = {
-          cmd_env = requested_server._default_options.cmd_env,
           on_init = require("lvim.lsp").common_on_init,
           on_attach = function(client, bufnr)
             require("lvim.lsp").common_on_attach(client, bufnr)
@@ -442,7 +433,7 @@ lvim.plugins = {
             vim.keymap.set("n", "<leader>lA", rt.code_action_group.code_action_group, { buffer = bufnr })
           end,
         },
-      })
+      }
     end,
     ft = { "rust", "rs" },
   },

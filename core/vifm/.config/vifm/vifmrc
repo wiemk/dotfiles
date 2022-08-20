@@ -313,6 +313,11 @@ filetype *.ftp
        \ {Mount with curlftpfs}
        \ FUSE_MOUNT2|curlftpfs -o ftp_port=-,,disable_eprt %PARAM %DESTINATION_DIR %FOREGROUND,
 
+" Suqashfs
+filetype *.sfs
+       \ {Mount with squashfuse}
+       \ FUSE_MOUNT|squashfuse %SOURCE_FILE %DESTINATION_DIR,
+
 " Fuse7z and 7z archives
 filetype {*.7z},<application/x-7z-compressed>
        \ {Mount with fuse-7z}
