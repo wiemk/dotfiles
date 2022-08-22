@@ -23,30 +23,23 @@ fi
 workdir=$(readlink -f "$workdir")
 
 numfiles() {
-	find "$1" -maxdepth 1 -type f \( -iname "*.mkv" ! -iname "*.new.mkv" \) -printf . | wc -c
+	find "$1" -maxdepth 1 -type f -iname "*.mkv" -printf . | wc -c
 }
 
 assburn() {
 	# shellcheck disable=SC1004
-	find "$1" -maxdepth 1 -type f \( -iname "*.mkv" ! -iname "*.new.mkv" \) \
-		\( -exec sh -c 'i="$1"; \
+	find "$1" -maxdepth 1 -type f -iname "*.mkv" \( -exec sh -c 'i="$1" base="$(dirname "$1")/$(basename "$1" .mkv)"; \
 			systemd-run --quiet --user --collect --pty --nice=19 --property=CPUSchedulingPolicy=idle --property=IOSchedulingClass=idle \
-			taskset -c 2-$(($(nproc)-1)) \
+			taskset -c 1-$(($(nproc)-1)):2 \
 			HandBrakeCLI --input "$i" --encoder x264 --encoder-preset faster --encoder-tune animation \
 			--encoder-profile high --encoder-level 5.2 --quality 18 -vfr --turbo \
 			--audio-lang-list jpn --first-audio --aencoder copy --audio-copy-mask aac,ac3,eac3,truehd,dts,dtshd,mp3 \
 			--audio-fallback av_aac --ab 160 --mixdown stereo --normalize-mix --arate auto --native-language eng \
 			--subtitle-lang-list eng,und --first-subtitle --subtitle-burned \
-			--output "$(dirname "$i")/$(basename "$i" .mkv).new.mkv"' \
+			--output "${base}.new.mp4" && echo mv -vuf "${base}.new.mp4" "${base}.mp4"' \
 		shell {} \; -o -quit \) || exit 1
 
 	command ls --color=auto --show-control-chars --group-directories-first -AlhXF "$1"
-
-	if has prename; then
-		if prompt "Want to replace the original files?"; then
-			prename -vf 's/\.new\.mkv$/.mkv/' "$1"/*.new.mkv
-		fi
-	fi
 }
 
 if (($(numfiles "$workdir") < 1)); then
@@ -55,4 +48,4 @@ fi
 
 assburn "$workdir"
 
-# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=0 fdm=manual:

@@ -8,6 +8,7 @@ set -eo pipefail
 
 declare -A FUNC=(
 	[alias]=50
+	[archive]=90
 	[editor]=51
 	[fedora]=50
 	[info]=90

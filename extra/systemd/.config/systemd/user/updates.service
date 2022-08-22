@@ -1,5 +1,0 @@
-[Unit]
-Description=Notify about available updates
-
-[Service]
-ExecStart=/home/zeno/.config/systemd/user/scripts/updates

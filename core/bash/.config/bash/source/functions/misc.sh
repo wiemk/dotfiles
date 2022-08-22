@@ -70,3 +70,32 @@ if has navi; then
 		navi --query "$1"
 	}
 fi
+
+if has mullvad; then
+	alias vpn='mullvad'
+	alias vpnf='vpn-latency'
+
+	vpn-latency() {
+		local -r status=$(mullvad status)
+		if [[ "$status" != 'Disconnected' ]]; then
+			mullvad disconnect
+			sleep 2s
+			if ip --brief link show wg-mullvad up type wireguard &>/dev/null; then
+				sudo ip link del wg-mullvad
+			fi
+		fi
+
+		local country
+		if (($# < 1)); then
+			country=de
+		else
+			country=$1
+		fi
+
+		local -r server=$(mullvad-best-server -country "$country" -provider=31173 -warmup)
+		printf -v host '%s-wireguard' "$server"
+
+		mullvad relay set hostname "$host"
+		mullvad connect
+	}
+fi

@@ -1,6 +1,0 @@
-[Unit]
-Description=urxvt Daemon
-
-[Service]
-ExecStart=/usr/bin/urxvtd
-Restart=on-failure
