@@ -19,6 +19,7 @@ declare -A FUNC=(
 )
 declare -A PLUGIN=(
 	[fzf]=10
+	[gnupg]=10
 	[prompt]=10
 	[vivid]=10
 	[zoxide]=10

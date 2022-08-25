@@ -4,7 +4,7 @@
 # shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
-if has sensors && has jq; then
+if has_all_emit sensors jq; then
     coretemp() {
         sensors -j | jq -r \
             'to_entries[]

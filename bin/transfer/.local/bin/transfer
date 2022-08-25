@@ -5,7 +5,7 @@
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
 urlencode() {
-	if hash jq 2>/dev/null; then
+	if has jq; then
 		printf '%s' "$(jq -sRr @uri < <(printf "%s" "$1"))"
 	else
 		local length=${#1}

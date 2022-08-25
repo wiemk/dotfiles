@@ -43,6 +43,7 @@ vim.opt.smartcase = true
 -- Tune redraw performance
 vim.opt.lazyredraw = true
 vim.opt.synmaxcol = 256
+vim.opt.wrap = false
 
 -- Window settings
 vim.opt.sidescroll = 10

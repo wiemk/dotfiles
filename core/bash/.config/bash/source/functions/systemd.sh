@@ -4,19 +4,38 @@
 init_debug
 
 sc-run() {
-	systemd-run --quiet --user --collect --pty "$@"
-}
+	local flag_fg=0 \
+		flag_idle=0
 
-sc-run-idle() {
-	systemd-run --quiet --user --collect --pty --nice=19 --property=CPUSchedulingPolicy=idle --property=IOSchedulingClass=idle "$@"
-}
+	while :; do
+		case ${1-} in
+		-h | --help)
+			cat <<-'HELP'
+				Flags:
+					-f|--fg   : launch into foreground
+					-i|--idle : idle priority
+			HELP
+			return 0
+			;;
+		-f | --fg) flag_fg=1 ;;
+		-i | --idle) flag_idle=1 ;;
+		*)
+			break
+			;;
+		esac
+		shift
+	done
 
-sc-run-bg() {
-	systemd-run --quiet --user --collect "$@"
-}
+	local -a cmd=(systemd-run --quiet --user --collect)
 
-sc-run-idle-bg() {
-	systemd-run --quiet --user --collect --nice=19 --property=CPUSchedulingPolicy=idle --property=IOSchedulingClass=idle "$@"
+	if ((flag_fg)); then
+		cmd+=(--pty)
+	fi
+	if ((flag_idle)); then
+		cmd+=(--nice=19 --property=CPUSchedulingPolicy=idle --property=IOSchedulingClass=idle)
+	fi
+
+	"${cmd[@]}" "$@"
 }
 
 sc-running() {

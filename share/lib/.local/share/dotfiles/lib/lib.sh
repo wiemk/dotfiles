@@ -4,10 +4,40 @@
 
 
 has() {
-	if hash "$1" &>/dev/null; then
-		return 0
-	fi
+	hash "$1" &>/dev/null
+}
+
+has_oneof() {
+	for cmd in "$@"; do
+		if has "${cmd}"; then
+			return 0
+		fi
+	done
 	return 1
+}
+
+
+has_emit() {
+	if ! has "$1"; then
+		msg "${1} not found in PATH"
+		return 1
+	fi
+}
+
+has_all() {
+	for cmd in "$@"; do
+		if ! has "${cmd}"; then
+			return 1
+		fi
+	done
+}
+
+has_all_emit() {
+	for cmd in "$@"; do
+		if ! has_emit "${cmd}"; then
+			return 1
+		fi
+	done
 }
 
 msg() {
