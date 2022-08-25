@@ -4,7 +4,7 @@
 
 set -eo pipefail
 
-base=$(dirname "$(readlink -f "${BASH_SOURCE[0]:-$0}")")
+base=$(dirname "$(readlink -f -- "${BASH_SOURCE[0]:-$0}")")
 
 prompt() {
 	msg() {
@@ -51,7 +51,7 @@ link_shared() {
 	mkdir -p "$target"
 	local source
 	printf -v source '%s/../share/lib/.local/share/dotfiles/lib/lib.sh' "$base"
-	source=$(readlink -e "$source")
+	source=$(readlink -e -- "$source")
 	if [[ -n $source ]]; then
 		command ln -v --symbolic --relative --no-target-directory --force "$source" "${target}/lib.sh"
 	else

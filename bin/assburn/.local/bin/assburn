@@ -16,11 +16,11 @@ else
 	die "Not a valid directory: ${1}"
 fi
 
-if ! has HandBrakeCLI; then
-	die "HandBrakeCLI mising."
+if ! has_emit HandBrakeCLIs; then
+	exit 1
 fi
 
-workdir=$(readlink -f "$workdir")
+workdir=$(readlink -f -- "$workdir")
 
 numfiles() {
 	find "$1" -maxdepth 1 -type f -iname "*.mkv" -printf . | wc -c
