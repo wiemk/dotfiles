@@ -67,7 +67,7 @@ export_user_paths() {
 		# shellcheck disable=SC2034
 		readarray -t -d ':' apath <<<"$PATH"
 		for ((i = 0; i < ${#PATH_EXPORTS[@]}; i++)); do
-			local realp=$(readlink -qms "${PATH_EXPORTS[$i]}")
+			local realp=$(readlink -qms -- "${PATH_EXPORTS[$i]}")
 			# check if already added,
 			if ! contains apath "$realp"; then
 				rpath+=("$realp")

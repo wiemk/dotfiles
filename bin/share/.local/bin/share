@@ -5,13 +5,12 @@
 # shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
-if ! has jq; then
-	echo 'Please make sure you have jq in your path.' >&2
+if ! has_emit jq; then
 	exit 1
 fi
 
-if ! type clip &>/dev/null; then
-	script=$(dirname "$(readlink -f "$0")")
+if ! has clip; then
+	script=$(dirname "$(readlink -f -- "$0")")
 	src=${script}/../../../clip/.local/bin/clip
 	if [[ -f $src ]]; then
 		source "$src"

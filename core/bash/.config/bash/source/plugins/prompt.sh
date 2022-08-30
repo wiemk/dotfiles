@@ -25,7 +25,10 @@ else
 		declare -a seq=(bold dim blink smul rmul rev smso rmso sgr0 tsl fsl)
 		declare -A osc
 		for i in "${seq[@]}"; do
-			osc[$i]="\[$(tput "$i")\]"
+			if val=$(tput "$i"); then
+				osc[$i]="\[$val\]"
+			fi
+			unset val
 		done
 
 		declare -A col
@@ -39,7 +42,12 @@ else
 			local -r norm=${osc[sgr0]}
 			local -r dim=${osc[dim]}
 			local -r bold=${osc[bold]}
-			local -r remp="${osc[tsl]}\u@\h: \w${osc[fsl]}"
+
+			# guard against kai shenanigans
+			local tsl=${osc[tsl]}
+			if [[ -n $tsl ]]; then
+				local -r remp="${tsl}\u@\h: \w${osc[fsl]}"
+			fi
 			if ((rval == 0)); then
 				unset rval
 			else

@@ -104,3 +104,22 @@ netns() {
 			setpriv --reuid "$UID" --regid "${GROUPS[0]}" --clear-groups --reset-env "$@"
 	fi
 }
+
+fsudo() {
+	local -r arg=$1
+	if [[ $(type -t "$arg") = 'function' ]]; then
+		shift && command sudo bash -c "$(declare -f "$arg");$arg $*"
+	elif [[ $(type -t "$arg") = 'alias' ]]; then
+		local -r bak=$(alias sudo 2>/dev/null)
+		alias sudo='\sudo '
+		eval "sudo $*"
+
+		if [[ -n $bak ]]; then
+			eval "$bak"
+		else
+			unalias sudo
+		fi
+	else
+		command sudo "$@"
+	fi
+}
