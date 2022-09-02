@@ -5,7 +5,8 @@ init_debug
 
 sc-run() {
 	local flag_fg=0 \
-		flag_idle=0
+		flag_idle=0 \
+		flag_root=0
 
 	while :; do
 		case ${1-} in
@@ -14,11 +15,13 @@ sc-run() {
 				Flags:
 					-f|--fg   : launch into foreground
 					-i|--idle : idle priority
+					-r|--root : launch as system service
 			HELP
 			return 0
 			;;
 		-f | --fg) flag_fg=1 ;;
 		-i | --idle) flag_idle=1 ;;
+		-r | --root) flag_root=1 ;;
 		*)
 			break
 			;;
@@ -26,8 +29,11 @@ sc-run() {
 		shift
 	done
 
-	local -a cmd=(systemd-run --quiet --user --collect)
+	local -a cmd=(systemd-run --quiet --collect)
 
+	if ((!flag_root)); then
+		cmd+=(--user)
+	fi
 	if ((flag_fg)); then
 		cmd+=(--pty)
 	fi

@@ -35,7 +35,7 @@ if has koji; then
 fi
 
 if has jq; then
-	kernel-releases() {
+	kernels() {
 		curl -Ls https://kernel.org/releases.json | jq -r '.releases[] | select(.moniker != "longterm") | .moniker + ":" + .version'
 	}
 fi

@@ -1,0 +1,17 @@
+diff --git a/lua/lvim/lsp/manager.lua b/lua/lvim/lsp/manager.lua
+index 1323ace..4a25385 100644
+--- a/lua/lvim/lsp/manager.lua
++++ b/lua/lvim/lsp/manager.lua
+@@ -125,8 +125,10 @@ function M.setup(server_name, user_config)
+     end
+   end
+ 
+-  local config = resolve_config(server_name, resolve_mason_config(server_name), user_config)
+-  launch_server(server_name, config)
++  if registry.is_installed(pkg_name) then
++    local config = resolve_config(server_name, resolve_mason_config(server_name), user_config)
++    launch_server(server_name, config)
++  end
+ end
+ 
+ return M

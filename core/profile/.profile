@@ -19,12 +19,16 @@ init_debug
 
 export PROFILE_SOURCED=1
 
-has() {
-	if hash "$1" &>/dev/null; then
-		return 0
-	fi
-	return 1
-}
+if hash &>/dev/null; then
+	has() {
+		hash "$1" &>/dev/null
+	}
+else
+	# hashing disabled (NixOS)
+	has() {
+		command -v "$1" &>/dev/null
+	}
+fi
 
 contains() {
 	local -n arr=$1
@@ -41,11 +45,12 @@ XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-${HOME}/.config}
 XDG_CACHE_HOME=${XDG_CACHE_HOME:-${HOME}/.cache}
 XDG_DATA_HOME=${XDG_DATA_HOME:-${HOME}/.local/share}
 XDG_STATE_HOME=${XDG_STATE_HOME:-${HOME}/.local/state}
+XDG_BIN_HOME=${XDG_BIN_HOME:-$(readlink -qf "${XDG_DATA_HOME}/../bin")}
 
-export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME
+export XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_HOME XDG_STATE_HOME XDG_BIN_HOME
 
 # define additional PATH folders here
-PATH_EXPORTS=("${XDG_DATA_HOME}/../bin")
+PATH_EXPORTS=("${XDG_BIN_HOME}")
 
 pathmunge() {
 	case ":${PATH}:" in
@@ -63,17 +68,15 @@ pathmunge() {
 
 export_user_paths() {
 	local -a rpath
-	if has readlink; then
-		# shellcheck disable=SC2034
-		readarray -t -d ':' apath <<<"$PATH"
-		for ((i = 0; i < ${#PATH_EXPORTS[@]}; i++)); do
-			local realp=$(readlink -qms -- "${PATH_EXPORTS[$i]}")
-			# check if already added,
-			if ! contains apath "$realp"; then
-				rpath+=("$realp")
-			fi
-		done
-	fi
+	# shellcheck disable=SC2034
+	readarray -t -d ':' apath <<<"$PATH"
+	for ((i = 0; i < ${#PATH_EXPORTS[@]}; i++)); do
+		local realp=$(readlink -qms -- "${PATH_EXPORTS[$i]}")
+		# check if already added,
+		if ! contains apath "$realp"; then
+			rpath+=("$realp")
+		fi
+	done
 	local path=("${rpath[@]}" "$PATH")
 	printf -v spath '%s:' "${path[@]%/}"
 	PATH=${spath:0:-1}
@@ -181,9 +184,14 @@ write_pamd_exports() {
 
 write_envd_exports() {
 	render_exp=$(create_envd_export)
-	if ! is_equal "${XDG_CONFIG_HOME}/environment.d/50-profile.conf" "$render_exp"; then
-		printf '%s\n' "${XDG_CONFIG_HOME}/environment.d/50-profile.conf updated!" >&2
-		printf '%s\n' "$render_exp" >"${XDG_CONFIG_HOME}/environment.d/50-profile.conf"
+	local -r env=${XDG_CONFIG_HOME}/environment.d
+	if [[ ! -r ${env}/50-profile.conf ]]; then
+		mkdir -p "$env"
+		touch "${env}/50-profile.conf"
+	fi
+	if ! is_equal "${env}/50-profile.conf" "$render_exp"; then
+		printf '%s\n' "${env}/50-profile.conf updated!" >&2
+		printf '%s\n' "$render_exp" >"${env}/50-profile.conf"
 	fi
 }
 

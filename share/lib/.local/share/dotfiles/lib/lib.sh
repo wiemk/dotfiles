@@ -3,9 +3,16 @@
 # shellcheck disable=2155,1090
 
 
-has() {
-	hash "$1" &>/dev/null
-}
+if hash &>/dev/null; then
+	has() {
+		hash "$1" &>/dev/null
+	}
+else
+	# hashing disabled (NixOS)
+	has() {
+		command -v "$1" &>/dev/null
+	}
+fi
 
 has_oneof() {
 	for cmd in "$@"; do
