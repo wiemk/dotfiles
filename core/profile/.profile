@@ -1,9 +1,7 @@
 # vim: ft=sh ts=4 sw=4 noet
 # shellcheck shell=bash
-# shellcheck disable=2155,1090
+# shellcheck disable=1090,1091,2155
 #
-# Override exported variables in host specific profiles
-# in ${XDG_CONFIG_HOME}/profile/${HOSTNAME}.conf
 
 # DEBUG
 if [[ -e ${XDG_CONFIG_HOME}/bash/_debug ]]; then
@@ -121,8 +119,13 @@ ENV_EXPORTS=("${PAM_EXPORTS[@]}")
 source_machine_profile() {
 	local machine=$(</etc/machine-id)
 	if [[ -n $machine ]]; then
-		if [[ -r ${XDG_CONFIG_HOME}/profile/${machine}.conf ]]; then
-			source "${XDG_CONFIG_HOME}/profile/${machine}.conf"
+		local -r ppath=${XDG_CONFIG_HOME}/profile/machine.d/${machine}
+		if [[ -d $ppath ]]; then
+			for frag in "${ppath}"/*.conf; do
+				if [[ -f $frag ]]; then
+					source "$frag"
+				fi
+			done
 		elif [[ -r ${HOME}/.profile-${machine}.conf ]]; then
 			source "${HOME}/.profile-${machine}.conf"
 		fi
@@ -133,11 +136,74 @@ source_host_profile() {
 	local host=${HOSTNAME:-$(</proc/sys/kernel/hostname)}
 	host=${host,,}
 	if [[ -n $host ]]; then
-		if [[ -r ${XDG_CONFIG_HOME}/profile/${host}.conf ]]; then
-			source "${XDG_CONFIG_HOME}/profile/${host}.conf"
+		local -r ppath=${XDG_CONFIG_HOME}/profile/host.d/${host}
+		if [[ -d $ppath ]]; then
+			for frag in "${ppath}"/*.conf; do
+				if [[ -f $frag ]]; then
+					source "$frag"
+				fi
+			done
 		elif [[ -r ${HOME}/.profile-${host}.conf ]]; then
 			source "${HOME}/.profile-${host}.conf"
 		fi
+	fi
+}
+
+source_user_profile() {
+	local -r ppath=${XDG_CONFIG_HOME}/profile/user.d/${LOGNAME}
+	if [[ -d ${ppath} ]]; then
+		for frag in "${ppath}"/*.conf; do
+			if [[ -f $frag ]]; then
+				source "$frag"
+			fi
+		done
+	elif [[ -r ${HOME}/.profile-${LOGNAME}.conf ]]; then
+		source "${HOME}/.profile-${LOGNAME}.conf"
+	fi
+}
+
+# we assume bash, so UID should be available without fork
+source_uid_profile() {
+	local -r ppath=${XDG_CONFIG_HOME}/profile/uid.d/${UID}
+	if [[ -d ${ppath} ]]; then
+		for frag in "${ppath}"/*.conf; do
+			if [[ -f $frag ]]; then
+				source "$frag"
+			fi
+		done
+	elif [[ -r ${HOME}/.profile-${UID}.conf ]]; then
+		source "${HOME}/.profile-${UID}.conf"
+	fi
+}
+
+source_userhost_profile() {
+	local host=${HOSTNAME:-$(</proc/sys/kernel/hostname)}
+	host=${host,,}
+	if [[ -n $host ]]; then
+		local -r ppath=${XDG_CONFIG_HOME}/profile/user@host.d/${LOGNAME}@${host}
+		if [[ -d $ppath ]]; then
+			for frag in "${ppath}"/*.conf; do
+				if [[ -f $frag ]]; then
+					source "$frag"
+				fi
+			done
+		elif [[ -r ${HOME}/.profile-${LOGNAME}@${host}.conf ]]; then
+			source "${HOME}/.profile-${LOGNAME}@${host}.conf"
+		fi
+	fi
+}
+
+
+source_local_profile() {
+	local -r ppath=${XDG_CONFIG_HOME}/profile/local
+	if [[ -d ${ppath} ]]; then
+		for frag in "${ppath}"/*.conf; do
+			if [[ -f $frag ]]; then
+				source "$frag"
+			fi
+		done
+	elif [[ -r ${HOME}/.profile-local.conf ]]; then
+		source "${HOME}/.profile-local.conf"
 	fi
 }
 
@@ -200,19 +266,24 @@ export_envd() {
 	shopt -s nullglob
 	local -r envd=${XDG_CONFIG_HOME}/environment.d
 	set -a
-	if [[ -d $fragment ]]; then
+	if [[ -d $envd ]]; then
 		for fragment in "${envd}"/*.conf; do
-			source "$fragment"
+			if [[ -f $fragment ]]; then
+				source "$fragment"
+			fi
 		done
 	fi
 	set +a
 }
 
-# load machine specific profile
-source_machine_profile
-
-# load host specific profile
+# priority higher -> lower, decreasing specificity
+# local > user@host > uid > user > machine > host
 source_host_profile
+source_machine_profile
+source_user_profile
+source_uid_profile
+source_userhost_profile
+source_local_profile
 
 # export canonicalized 'PATH_EXPORTS' entries after sourcing host specific profile
 export_user_paths

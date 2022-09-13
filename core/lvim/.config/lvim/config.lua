@@ -203,9 +203,6 @@ lvim.builtin.lualine.sections.lualine_y = {
   components.location
 }
 
--- bufferline
--- lvim.builtin.bufferline.options.mode = "tabs"
-
 -- tree-sitter
 lvim.builtin.treesitter.ensure_installed = {
   "bash",
@@ -223,6 +220,7 @@ lvim.builtin.treesitter.ensure_installed = {
   "lua",
   "make",
   "markdown",
+  "nix",
   "python",
   "regex",
   "rust",
@@ -432,6 +430,13 @@ lvim.plugins = {
             -- Code action groups
             vim.keymap.set("n", "<leader>lA", rt.code_action_group.code_action_group, { buffer = bufnr })
           end,
+          settings = {
+            ["rust-analyzer"] = {
+              checkOnSave = {
+                command = "clippy"
+              }
+            }
+          }
         },
       }
     end,

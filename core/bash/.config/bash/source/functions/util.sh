@@ -13,7 +13,7 @@ lsansi() {
 }
 
 lsmono() {
-	fc-list : family spacing outline scalable | \
+	fc-list : family spacing outline scalable |
 		grep -E 'spacing=(100|90).*?outline=True.*?scalable=True' | cut -d':' -f1 | sort -u
 }
 
@@ -122,4 +122,30 @@ fsudo() {
 	else
 		command sudo "$@"
 	fi
+}
+
+listsans() {
+	if [[ ! -r $1 ]]; then
+		msg 'Could not open file.'
+		return 1
+	fi
+
+	local -r sans=$(openssl x509 -in "$1" -noout -text | grep -A1 'Subject Alternative Name' | tail -n1 | tr -d ',')
+	for san in $sans; do
+		echo "$san" | cut -f2 -d:
+	done
+}
+
+#shellcheck disable=2086
+oomscore() {
+	msg 'PID\tOOM Score\tOOM Adj\tCommand'
+	while read -r pid comm; do
+		if [[ -f /proc/$pid/oom_score ]]; then
+			local score=$(</proc/${pid}/oom_score)
+			local adj=$(</proc/${pid}/oom_score_adj)
+			if ((score != 0)); then
+				printf '%d\t%d\t\t%d\t%s\n' "$pid" "$score" "$adj" "$comm"
+			fi
+		fi
+	done < <(ps -e -o pid= -o comm=) | sort -k 2nr
 }

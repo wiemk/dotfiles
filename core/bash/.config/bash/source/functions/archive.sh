@@ -10,9 +10,9 @@ fi
 
 invoke-cmd() {
 	if ((SHOW_CMD)); then
-		echo -ne "command $*" >&2
+		echo -ne "$*" >&2
 	else
-		eval "command $*"
+		eval "$*"
 	fi
 }
 
@@ -227,18 +227,18 @@ arc() {
 			export SHOW_CMD=1
 			if ((!flag_bare)); then
 				if ((flag_meta)); then
-					mirror-stream "$src"
+					mirror-stream "'$src'"
 				else
-					archive-stream "$src"
+					archive-stream "'$src'"
 				fi
 				printf ' | \\\n' >&2
 			fi
 			compress-stream "${flag_store:-}"
-			printf ' | \\\n' >&2
 
 			if ((flag_enc)); then
+				printf ' | \\\n' >&2
 				if ((flag_age)); then
-					encrypt-stream-age >"$out"
+					encrypt-stream-age >"'$out'"
 				else
 					if ((flag_pass)); then
 						encrypt-stream-pass
@@ -247,11 +247,11 @@ arc() {
 					fi
 				fi
 			fi
-			printf ' >%s' "$out" >&2
+			printf ' >%s' "'$out'" >&2
 
 			if ((flag_fec)); then
 				printf ' && \\\n' >&2
-				create-fec "$out"
+				create-fec "'$out'"
 			fi
 		} 2>&1
 	)
@@ -333,16 +333,16 @@ if has mksquashfs; then
 				#shellcheck disable=SC2030,SC2031
 				export SHOW_CMD=1
 				if has getfacl; then
-					invoke-cmd getfacl -Rs "$src"
-					printf '>%s' "${dst}/acl.log"
+					invoke-cmd getfacl -Rs "'$src'"
+					printf '>%s' "'${dst}/acl.log'"
 					printf ' &&\n' >&2
 				fi
-				invoke-cmd mksquashfs "$src" "${dst}/acl.log" "$out" -not-reproducible -noappend -xattrs -comp "${opt_fast:-zstd}" -keep-as-directory -progress -wildcards "${@:-}"
+				invoke-cmd mksquashfs "'$src'" "'${dst}/acl.log'" "'$out'" -not-reproducible -noappend -xattrs -comp "${opt_fast:-zstd}" -keep-as-directory -progress -wildcards "${@:-}"
 			} 2>&1
 		)
 
 		if ((flag_root)); then
-			printf -v cmd "command sudo -- bash -c '%s &&\nchown --quiet --preserve-root %u:%u %s'" "$cmd" "$(id -u)" "$(id -g)" "$out"
+			printf -v cmd "command sudo -- bash -c '%s &&\nchown --quiet --preserve-root %u:%u %s'" "$cmd" "$(id -u)" "$(id -g)" "'$out'"
 		fi
 
 		if ((flag_dry)); then

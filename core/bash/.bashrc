@@ -190,16 +190,16 @@ prompt() {
 
 # note: files beginning with `99-' are not version controlled
 if [[ -d $RCDIR/source.d ]]; then
-	shopt -s nullglob
 	# Plugins are allowed to modify the environment via export
 	# but are self-contained and loading order shall not matter.
 	# Functions should be pure/side-effect free but may depend
 	# on each other.
 	for src in "$RCDIR"/source.d/*.sh; do
-		source "$src"
+		if [[ -f $src ]]; then
+			source "$src"
+		fi
 	done
 fi
-shopt -u nullglob
 
 if [[ -f $RCDIR/rc.post ]]; then
 	source "${RCDIR}/rc.post"

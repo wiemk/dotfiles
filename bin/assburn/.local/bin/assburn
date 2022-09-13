@@ -44,7 +44,7 @@ assburn() {
 			--audio-fallback av_aac --ab 192 --normalize-mix --arate auto --native-language eng \
 			--subtitle-lang-list eng,und --first-subtitle --subtitle-burned \
 			"${args[@]}" \
-			--output "${base}.new.mp4" && echo mv -vuf "${base}.new.mp4" "${base}.mp4"' \
+			--output "${base}.new.mp4" && command mv -vuf "${base}.new.mp4" "${base}.mp4"' \
 		shell {} "$@" \; -o -quit \) || exit 1
 
 	command ls --color=auto --show-control-chars --group-directories-first -AlhXF "$dir"
