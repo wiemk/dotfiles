@@ -2,7 +2,7 @@
 
 #### Dependencies
 
-Some scripts in **[bin](bin/)** require `dash` to be installed.
+Some scripts in **[bin](bin/)** may require `dash` to be installed.
 
 #### Linking
 
@@ -26,3 +26,6 @@ stow -d "$PWD/dotfiles/core" -t "$HOME" -S tmux
 1. `~/.tmux.conf` 🡒 `$PWD/zeno-dotfiles/core/tmux/.tmux.conf`
 2. `~/.config/tmux` 🡒 `$PWD/zeno-dotfiles/core/tmux/.config/tmux`
 
+#### Notes
+
+Directories in **[staging](staging/)** may be disappeared at any time.

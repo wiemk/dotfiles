@@ -1,7 +1,7 @@
 *.bak
 # profile
-core/profile/.config/profile/profile.d/*
-core/profile/.config/profile/local/*.sh
+core/profile/.config/profile/local/*
+core/profile/.config/profile/conf.d/*
 # bash
 core/bash/.config/bash/rc.pre
 core/bash/.config/bash/rc.post

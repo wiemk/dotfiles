@@ -163,6 +163,21 @@ if has systemd-detect-virt; then
 	fi
 fi
 
+# prepend or append first argument directly to PATH variable
+pathmunge() {
+	case ":${PATH}:" in
+	*:"$1":*) ;;
+
+	*)
+		if [[ $2 = 'append' ]]; then
+			PATH=$PATH:$1
+		else
+			PATH=$1:$PATH
+		fi
+		;;
+	esac
+}
+
 prompt() {
 	msg_bar() {
 		local text=$1
