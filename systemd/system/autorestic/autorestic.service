@@ -1,0 +1,19 @@
+# vi: set ft=systemd ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+[Unit]
+Description=autorestic
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/autorestic --config /root/.config/autorestic/.autorestic.yml --restic-bin /usr/local/bin/restic cron --lean
+WorkingDirectory=/tmp
+PrivateTmp=true
+
+[Unit]
+ConditionPathExists=/root/.config/autorestic/.autorestic.yml
+
+[Service]
+Nice=19
+CPUSchedulingPolicy=idle
+IOSchedulingClass=idle
+IOSchedulingPriority=7

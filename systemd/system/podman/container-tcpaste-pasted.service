@@ -1,0 +1,54 @@
+# vi: set ft=systemd ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+[Unit]
+Description=Podman container-tcpaste-pasted.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=%t/containers
+
+Wants=container-tcpaste-http.service container-tcpaste-erased.service
+PartOf=container-tcpaste-erased.service container-tcpaste-http.service
+
+[Service]
+Delegate=yes
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=on-failure
+TimeoutStopSec=70
+Type=notify
+NotifyAccess=all
+SyslogIdentifier=tcp-pasted
+
+ExecStartPre=/bin/rm -f %t/%n.ctr-id
+ExecStart=/usr/local/bin/podman run \
+		  --cap-add=chown,kill,setuid,setgid,sys_chroot \
+		  --cap-drop=all \
+		  --cgroups=split \
+		  --cidfile=%t/%n.ctr-id \
+		  --detach=true \
+		  --env=DEST_DIR=/var/lib/pasted \
+		  --env=RUST_LOG=debug \
+		  --hostname=pasted \
+		  --init \
+		  --label=io.containers.autoupdate.authfile=/etc/podman/betaco.json \
+		  --label=io.containers.autoupdate=registry \
+		  --log-driver=passthrough \
+		  --mount=type=volume,source=pasted,destination=/var/lib/pasted,U=true \
+		  --name=tcpaste-pasted \
+		  --network=tcpaste \
+		  --publish=9999:9999 \
+		  --pull=missing \
+		  --replace \
+		  --rm \
+		  --sdnotify=conmon \
+		  --security-opt=seccomp=/etc/podman/seccomp.json \
+		  --security-opt=no-new-privileges \
+		  --subgidname=containers \
+		  --subuidname=containers \
+		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \
+		  betaco.de/strom/rust-tcpaste-pasted:latest /usr/local/bin/tcp-pasted
+ExecStop=/usr/local/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/local/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+
+[Install]
+WantedBy=default.target

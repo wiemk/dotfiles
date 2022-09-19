@@ -1,0 +1,12 @@
+# vi: set ft=systemd ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+[Unit]
+Description=Run acme.sh twice daily
+
+[Timer]
+OnCalendar=*-*-* 00,12:00:00
+RandomizedDelaySec=43200
+Persistent=true
+
+[Install]
+WantedBy=timers.target

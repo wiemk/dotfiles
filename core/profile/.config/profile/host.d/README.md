@@ -1,1 +1,1 @@
-`*.conf` files inside `./polaris/` are automatically sourced.
+`*.conf` files inside `./$(hostname)/` are automatically sourced.

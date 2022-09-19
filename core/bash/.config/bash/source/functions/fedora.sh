@@ -112,6 +112,6 @@ dnf-info() {
 	rpm -qi "$pkg"
 }
 
-seerror() {
+getseerror() {
 	sudo ausearch -m AVC,USER_AVC,SELINUX_ERR,USER_SELINUX_ERR -ts recent
 }
