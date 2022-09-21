@@ -26,7 +26,7 @@ has_oneof() {
 
 has_emit() {
 	if ! has "$1"; then
-		msg "${1} not found in PATH"
+		msg "$1" 'not found in PATH'
 		return 1
 	fi
 }
@@ -48,7 +48,7 @@ has_all_emit() {
 }
 
 msg() {
-	echo >&2 -e "${1-}"
+	printf '%b' "$*" '\n' >&2
 }
 
 die() {

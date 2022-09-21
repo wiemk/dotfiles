@@ -1,7 +1,7 @@
 # vi: set ft=systemd ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
 
 [Unit]
-Description=Podman container-mariadb.service
+Description=Podman container-playwright.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
 After=network-online.target
@@ -14,36 +14,47 @@ Restart=on-failure
 TimeoutStopSec=70
 Type=notify
 NotifyAccess=all
-SyslogIdentifier=mariadb
+SyslogIdentifier=playwright
 
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
 ExecStart=/usr/local/bin/podman run \
+		  --cap-add=chown,kill,setuid,setgid,sys_chroot \
 		  --cap-drop=all \
-		  --cap-add=chown,dac_override,kill,setuid,setgid,sys_chroot \
 		  --cgroups=split \
 		  --cidfile=%t/%n.ctr-id \
+		  --cpu-shares=512 \
 		  --detach \
-		  --env=TZ=Europe/Berlin \
-		  --hostname=mariadb \
+#		  --env="DEBUG=-*" \
+		  --env="SCREEN_WIDTH=1920" \
+		  --env="SCREEN_HEIGHT=1080" \
+		  --env="SCREEN_DEPTH=16" \
+		  --env="ENABLE_DEBUGGER=false" \
+		  --env="PREBOOT_CHROME=true" \
+		  --env="KEEP_ALIVE=true" \
+		  --env="CHROME_REFRESH_TIME=3600000" \
+		  --env="CONNECTION_TIMEOUT=30000" \
+		  --env="MAX_CONCURRENT_SESSIONS=2" \
+		  --env="DEFAULT_BLOCK_ADS=true" \
+		  --env="DEFAULT_STEALTH=true" \
+		  --env="EXIT_ON_HEALTH_FAILURE=true" \
+		  --hostname=playwright \
 		  --init \
 		  --label=io.containers.autoupdate.authfile=/etc/podman/dockerio.json \
 		  --label=io.containers.autoupdate=registry \
 		  --log-driver=passthrough \
-		  --mount=type=bind,src=/etc/podman/mariadb,dst=/etc/mysql/conf.d,ro=true,U=false \
-		  --mount=type=volume,source=mariadb,destination=/var/lib/mysql,U=false \
-		  --name=mariadb \
-		  --network=betaco \
-		  --publish="127.0.0.1:3306:3306" \
+		  --memory=3g \
+		  --name=playwright \
+		  --network=change \
+		  --oom-score-adj=999 \
 		  --pull=missing \
 		  --replace \
 		  --rm \
 		  --sdnotify=conmon \
 		  --security-opt=no-new-privileges \
-		  --security-opt=seccomp=/etc/podman/seccomp.json \
 		  --subgidname=containers \
 		  --subuidname=containers \
-		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \
-		  docker.io/library/mariadb:10.9.2
+		  --tmpfs=/tmp:exec,rw \
+		  docker.io/browserless/chrome:1.53-chrome-stable
 ExecStop=/usr/local/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/local/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 

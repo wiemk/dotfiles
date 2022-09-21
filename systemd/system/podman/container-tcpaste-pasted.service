@@ -36,13 +36,13 @@ ExecStart=/usr/local/bin/podman run \
 		  --mount=type=volume,source=pasted,destination=/var/lib/pasted,U=true \
 		  --name=tcpaste-pasted \
 		  --network=tcpaste \
-		  --publish=9999:9999 \
+		  --publish="9999:9999" \
 		  --pull=missing \
 		  --replace \
 		  --rm \
 		  --sdnotify=conmon \
-		  --security-opt=seccomp=/etc/podman/seccomp.json \
 		  --security-opt=no-new-privileges \
+		  --security-opt=seccomp=/etc/podman/seccomp.json \
 		  --subgidname=containers \
 		  --subuidname=containers \
 		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \

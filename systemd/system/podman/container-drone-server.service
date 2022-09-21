@@ -33,7 +33,7 @@ ExecStart=/usr/local/bin/podman run \
 		  --mount=type=volume,source=drone,destination=/data,U=true \
 		  --name=drone-server \
 		  --network=betaco \
-		  --publish=127.0.0.1:53666:53666 \
+		  --publish="127.0.0.1:53666:53666" \
 		  --pull=missing \
 		  --replace \
 		  --rm \

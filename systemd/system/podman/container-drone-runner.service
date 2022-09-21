@@ -32,7 +32,7 @@ ExecStart=/usr/local/bin/podman run \
 		  --log-driver=passthrough \
 		  --name=drone-runner \
 		  --network=betaco \
-		  --publish=127.0.0.1:3001:3001 \
+		  --publish="127.0.0.1:3001:3001" \
 		  --pull=missing \
 		  --replace \
 		  --rm \

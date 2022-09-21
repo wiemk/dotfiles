@@ -186,9 +186,9 @@ arc() {
 		shift
 	done
 
-	local -r src=$1
+	local -r src=$(readlink -qnm "$1")
 	if [[ ! -r $1 ]]; then
-		msg 'Cannot read input.'
+		msg 'Cannot read source:' "$src"
 		return 1
 	fi
 
@@ -196,7 +196,7 @@ arc() {
 	if (($# == 2)); then
 		local -r dest=$(readlink -qne -- "$2")
 		if [[ -z $dest ]]; then
-			msg 'Target directory must exist.'
+			msg 'Target directory does not exist.' "$dest"
 			return 1
 		fi
 	fi
@@ -313,12 +313,12 @@ if has mksquashfs; then
 		local san=$(printf '%s' "$src" | tr -d '\n' | sed -E 's/\//-/g;s/^-|-$//g;s/\./dot-/g;s/\s/_/g')
 
 		if [[ -z $src ]]; then
-			msg 'Source directory must exist.'
+			msg 'Source directory does not exist:' "$src"
 			return 1
 		fi
 
 		if [[ -z $dst ]]; then
-			msg 'Target directory must exist.'
+			msg 'Target directory does not exist:' "$dst"
 			return 1
 		fi
 

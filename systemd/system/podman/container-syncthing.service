@@ -34,9 +34,9 @@ ExecStart=/usr/local/bin/podman run \
 		  --name=syncthing \
 		  --network=syncthing \
 		  --no-healthcheck \
-		  --publish=0.0.0.0:22000:22000/tcp \
-		  --publish=0.0.0.0:22000:22000/udp \
-		  --publish=127.0.0.1:8384:8384/tcp \
+		  --publish="0.0.0.0:22000:22000/tcp" \
+		  --publish="0.0.0.0:22000:22000/udp" \
+		  --publish="127.0.0.1:8384:8384/tcp" \
 		  --pull=missing \
 		  --replace \
 		  --rm \

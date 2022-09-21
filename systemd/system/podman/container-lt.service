@@ -24,16 +24,20 @@ ExecStart=/usr/local/bin/podman run \
 		  --cidfile=%t/%n.ctr-id \
 		  --cpu-shares=512 \
 		  --detach \
+		  --env="Java_Xms=512m" \
+		  --env="Java_Xmx=2g" \
+		  --env="langtool_lananguageModel=/ngrams" \
 		  --init \
 		  --label=io.containers.autoupdate.authfile=/etc/podman/dockerio.json \
 		  --label=io.containers.autoupdate=registry \
 		  --log-driver=passthrough \
 		  --memory=3g \
 		  --mount=type=volume,source=ngrams,destination=/ngrams,U=true,ro=true \
-		  --name lt \
-		  --network lt \
+		  --name=lt \
+		  --network=lt \
 		  --no-healthcheck \
 		  --oom-score-adj=999 \
+		  --publish="127.0.0.1:8010:8010" \
 		  --pull=missing \
 		  --replace \
 		  --rm \
@@ -41,11 +45,7 @@ ExecStart=/usr/local/bin/podman run \
 		  --security-opt=no-new-privileges \
 		  --subgidname=containers \
 		  --subuidname=containers \
-		  --tmpfs /tmp:exec,rw \
-		  -e Java_Xms=512m \
-		  -e Java_Xmx=2g \
-		  -e langtool_lananguageModel=/ngrams \
-		  -p 127.0.0.1:8010:8010 \
+		  --tmpfs=/tmp:exec,rw \
 		  docker.io/erikvl87/languagetool:latest
 ExecStop=/usr/local/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/local/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id

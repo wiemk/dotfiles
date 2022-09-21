@@ -21,12 +21,12 @@ qmk() {
 	sudo -- podman run --uidmap 0:"$(id -u)":65536 --gidmap=0:"$(id -g)":65536 --rm -it \
 		--hostname qmk --tmpfs /tmp:exec,rw -v ~/dev/projects/qmk_firmware:/qmk:rw \
 		--security-opt label=disable --workdir /qmk --env 'OPT=2' qmkfm/qmk_cli \
-		sh -c 'qmk setup -y; qmk compile -kb keychron/q1/rev_0106 -km norgb' || {
+		sh -c 'qmk setup -y; qmk compile -kb keychron/q1/q1_ansi_stm32l432 -km norgb' || {
 		ifclean
 		return 1
 	} && ifclean
 
-	local fw=keychron_q1_rev_0106_norgb.bin
+	local fw=keychron_q1_q1_ansi_stm32l432_norgb.bin
 	if [[ -e "${fw}.orig" ]]; then
 		if cmp -s "${fw}" "${fw}.orig"; then
 			printf "\nOutput is identical the the previous firmware.\n"

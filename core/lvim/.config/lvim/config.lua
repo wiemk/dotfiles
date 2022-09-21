@@ -4,7 +4,7 @@ lvim = global options object
 
 -- General
 lvim.log.level = "error"
-lvim.format_on_save = false
+-- lvim.format_on_save = true
 lvim.builtin.theme.options.style = "moon"
 lvim.colorscheme = "tokyonight-moon"
 lvim.use_icons = true
@@ -160,7 +160,13 @@ lvim.builtin.telescope.pickers = vim.tbl_extend("force", lvim.builtin.telescope.
   },
   current_buffer_fuzzy_find = {
     theme = "dropdown",
-  }
+  },
+  find_files = {
+    theme = "ivy",
+  },
+  git_files = {
+    theme = "ivy",
+  },
 })
 -- extensions
 lvim.builtin.telescope.extensions = vim.tbl_deep_extend("force",
@@ -196,13 +202,7 @@ lvim.builtin.project.manual_mode = false
 lvim.builtin.dap.active = false
 
 -- lualine
-local components = require("lvim.core.lualine.components")
-
 lvim.builtin.lualine.sections.lualine_a = { "mode" }
-lvim.builtin.lualine.sections.lualine_y = {
-  components.spaces,
-  components.location
-}
 
 -- tree-sitter
 lvim.builtin.treesitter.ensure_installed = {
@@ -373,18 +373,6 @@ lvim.plugins = {
     requires = { "tami5/sqlite.lua" }
   },
   {
-    "lukas-reineke/indent-blankline.nvim",
-    event = "BufRead",
-    setup = function()
-      vim.g.indentLine_enabled = 1
-      vim.g.indent_blankline_char = "▏"
-      vim.g.indent_blankline_filetype_exclude = { "help", "terminal", "dashboard", "alpha" }
-      vim.g.indent_blankline_buftype_exclude = { "terminal", "nofile" }
-      vim.g.indent_blankline_show_trailing_blankline_indent = false
-      vim.g.indent_blankline_show_first_indent_level = false
-    end
-  },
-  {
     "tpope/vim-fugitive",
     cmd = {
       "G",
@@ -434,6 +422,16 @@ lvim.plugins = {
             highlight = "Comment",
           },
           hover_actions = {
+            border = {
+              { "╭", "FloatBorder" },
+              { "─", "FloatBorder" },
+              { "╮", "FloatBorder" },
+              { "│", "FloatBorder" },
+              { "╯", "FloatBorder" },
+              { "─", "FloatBorder" },
+              { "╰", "FloatBorder" },
+              { "│", "FloatBorder" },
+            };
             auto_focus = true,
           },
         },

@@ -34,7 +34,7 @@ ExecStart=/usr/local/bin/podman run \
 		  --mount=type=volume,source=pasted,destination=/var/lib/pasted,U=false \
 		  --name=tcpaste-http \
 		  --network=tcpaste \
-		  --publish=127.0.0.1:8080:8080 \
+		  --publish="127.0.0.1:8080:8080" \
 		  --pull=missing \
 		  --replace \
 		  --rm \

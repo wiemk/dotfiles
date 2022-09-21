@@ -21,7 +21,7 @@ SyslogIdentifier=gitea
 
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
 ExecStart=/usr/local/bin/podman run \
-		  --cap-add=chown,kill,setuid,setgid,sys_chroot \
+		  --cap-add=chown,sys_chroot,setgid,setuid,kill \
 		  --cap-drop=all \
 		  --cgroups=split \
 		  --cidfile=%t/%n.ctr-id \
@@ -36,15 +36,16 @@ ExecStart=/usr/local/bin/podman run \
 		  --mount=type=volume,source=gitea,destination=/data,U=true \
 		  --name=gitea \
 		  --network=betaco \
-		  --publish=127.0.0.1:3000:3000 \
-		  --publish=22:22 \
+		  --publish="127.0.0.1:3000:3000" \
+		  --publish="22:22" \
 		  --pull=missing \
 		  --replace \
 		  --rm \
 		  --sdnotify=conmon \
-		  --security-opt=no-new-privileges \
 		  --subgidname=containers \
 		  --subuidname=containers \
+		  --sysctl=net.ipv4.ip_unprivileged_port_start=22 \
+  		  --security-opt=no-new-privileges \
 		  docker.io/gitea/gitea:dev
 ExecStop=/usr/local/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/local/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id

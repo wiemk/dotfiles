@@ -36,7 +36,7 @@ ExecStart=/usr/local/bin/podman run \
 		  --mount=type=volume,source=pasted,destination=/var/lib/pasted,U=true \
 		  --name=tcpaste-erased \
 		  --network=tcpaste \
-		  --publish=10000:10000 \
+		  --publish="10000:10000" \
 		  --pull=missing \
 		  --replace \
 		  --rm \
