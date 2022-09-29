@@ -37,7 +37,7 @@ assburn() {
 	find "$dir" -maxdepth 1 -type f -iname "*.mkv" \( -exec bash -c ' \
 			src="$1"; shift; args=("$@"); base="$(dirname "$src")/$(basename "$src" .mkv)"
 			systemd-run --quiet --user --collect --pty --nice=19 --property=CPUSchedulingPolicy=idle --property=IOSchedulingClass=idle \
-			taskset -c 1-$(($(nproc)-1)):2 \
+			taskset -c 1-$(($(nproc)-1)) \
 			HandBrakeCLI --input "$src" --encoder x264 --encoder-preset faster --encoder-tune animation \
 			--encoder-profile high --encoder-level 5.2 --quality 18 -vfr --turbo --optimize \
 			--audio-lang-list jpn --first-audio --aencoder copy --audio-copy-mask aac,ac3,eac3,truehd,dts,dtshd,mp3 \

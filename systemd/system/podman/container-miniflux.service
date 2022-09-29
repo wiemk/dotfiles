@@ -1,11 +1,14 @@
 # vi: set ft=systemd ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
 
 [Unit]
-Description=Podman container-lt.service
+Description=Podman container-miniflux.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
 After=network-online.target
 RequiresMountsFor=%t/containers
+
+BindsTo=container-postgres.service
+After=container-postgres.service
 
 [Service]
 Delegate=yes
@@ -14,30 +17,22 @@ Restart=on-failure
 TimeoutStopSec=70
 Type=notify
 NotifyAccess=all
-SyslogIdentifier=lt
+SyslogIdentifier=miniflux
 
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
 ExecStart=/usr/bin/podman run \
-		  --cap-add=chown,kill,setuid,setgid,sys_chroot \
 		  --cap-drop=all \
+		  --cap-add=chown,dac_override,kill,setuid,setgid,sys_chroot \
 		  --cgroups=split \
 		  --cidfile=%t/%n.ctr-id \
-		  --cpu-shares=512 \
 		  --detach \
-		  --env="Java_Xms=512m" \
-		  --env="Java_Xmx=2g" \
-		  --env="langtool_lananguageModel=/ngrams" \
-		  --init \
-		  --label=io.containers.autoupdate.authfile=/etc/podman/dockerio.json \
+		  --env-file=/etc/podman/miniflux/miniflux.env \
+		  --hostname=miniflux \
 		  --label=io.containers.autoupdate=registry \
 		  --log-driver=passthrough \
-		  --memory=3g \
-		  --mount=type=volume,source=ngrams,destination=/ngrams,U=true,ro=true \
-		  --name=lt \
-		  --network=lt \
-		  --no-healthcheck \
-		  --oom-score-adj=999 \
-		  --publish="127.0.0.1:8010:8010" \
+		  --name=miniflux \
+		  --network=postgres \
+		  --publish="127.0.0.1:55850:8080" \
 		  --pull=missing \
 		  --replace \
 		  --rm \
@@ -45,8 +40,8 @@ ExecStart=/usr/bin/podman run \
 		  --security-opt=no-new-privileges \
 		  --subgidname=containers \
 		  --subuidname=containers \
-		  --tmpfs=/tmp:exec,rw \
-		  docker.io/erikvl87/languagetool:latest
+		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \
+		  ghcr.io/miniflux/miniflux:latest
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 

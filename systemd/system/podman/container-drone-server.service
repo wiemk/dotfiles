@@ -7,8 +7,8 @@ Wants=network-online.target
 After=network-online.target
 RequiresMountsFor=%t/containers
 
-BindsTo=container-mariadb.service container-drone-runner.service container-drone-gc.service
-After=container-mariadb.service
+BindsTo=container-postgres.service container-drone-runner.service container-drone-gc.service
+After=container-postgres.service
 
 [Service]
 Delegate=yes
@@ -20,7 +20,7 @@ NotifyAccess=all
 SyslogIdentifier=drone-server
 
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
-ExecStart=/usr/local/bin/podman run \
+ExecStart=/usr/bin/podman run \
 		  --cgroups=split \
 		  --cidfile=%t/%n.ctr-id \
 		  --detach=true \
@@ -32,7 +32,7 @@ ExecStart=/usr/local/bin/podman run \
 		  --log-driver=passthrough \
 		  --mount=type=volume,source=drone,destination=/data,U=true \
 		  --name=drone-server \
-		  --network=betaco \
+		  --network=postgres \
 		  --publish="127.0.0.1:53666:53666" \
 		  --pull=missing \
 		  --replace \
@@ -42,8 +42,8 @@ ExecStart=/usr/local/bin/podman run \
 		  --subuidname=containers \
 		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \
 		  betaco.de/strom/drone-server:latest
-ExecStop=/usr/local/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
-ExecStopPost=/usr/local/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 
 [Install]
 WantedBy=default.target

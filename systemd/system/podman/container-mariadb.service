@@ -17,7 +17,7 @@ NotifyAccess=all
 SyslogIdentifier=mariadb
 
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
-ExecStart=/usr/local/bin/podman run \
+ExecStart=/usr/bin/podman run \
 		  --cap-drop=all \
 		  --cap-add=chown,dac_override,kill,setuid,setgid,sys_chroot \
 		  --cgroups=split \
@@ -44,8 +44,8 @@ ExecStart=/usr/local/bin/podman run \
 		  --subuidname=containers \
 		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \
 		  docker.io/library/mariadb:10.9.2
-ExecStop=/usr/local/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
-ExecStopPost=/usr/local/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 
 [Install]
 WantedBy=default.target

@@ -7,9 +7,10 @@ Description=Expire old tcpaste pastes
 Type=oneshot
 SyslogIdentifier=tcp-expire
 
-ExecStart=/usr/local/bin/podman run \
+ExecStart=/usr/bin/podman run \
 		  --env=DEST_DIR=/var/lib/pasted \
 		  --env=RUST_LOG=debug \
+		  --env=RUST_LOG_STYLE=SYSTEMD \
 		  --hostname=expire \
 		  --init \
 		  --log-driver=passthrough \

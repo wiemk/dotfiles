@@ -12,9 +12,10 @@ Environment=PODMAN_SYSTEMD_UNIT=%n
 Type=oneshot
 SyslogIdentifier=nft-blackhole
 RemainAfterExit=yes
+RestartSec=5m
 
-ExecStart=/usr/local/bin/podman run \
-		  --detach \
+ExecStartPre=/usr/bin/sleep 300s
+ExecStart=/usr/bin/podman run \
 		  --hostname=nft \
 		  --label=io.containers.autoupdate.authfile=/etc/podman/betaco.json \
 		  --label=io.containers.autoupdate=registry \
@@ -25,9 +26,8 @@ ExecStart=/usr/local/bin/podman run \
 		  --rm \
 		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \
 		  betaco.de/strom/nft-blackhole:latest start
-ExecStop=/usr/local/bin/podman run \
+ExecStop=/usr/bin/podman run \
 		  --cap-add=net_admin \
-		  --detach \
 		  --hostname=nft \
 		  --log-driver=passthrough \
 		  --network=host \
@@ -36,9 +36,8 @@ ExecStop=/usr/local/bin/podman run \
 		  --rm \
 		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \
 		  betaco.de/strom/nft-blackhole:latest stop
-ExecReload=/usr/local/bin/podman run \
+ExecReload=/usr/bin/podman run \
 		  --cap-add=net_admin \
-		  --detach \
 		  --hostname=nft \
 		  --log-driver=passthrough \
 		  --network=host \

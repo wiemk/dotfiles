@@ -19,7 +19,7 @@ NotifyAccess=all
 SyslogIdentifier=change
 
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
-ExecStart=/usr/local/bin/podman run \
+ExecStart=/usr/bin/podman run \
 		  --cap-add=chown,kill,setuid,setgid,sys_chroot \
 		  --cap-drop=all \
 		  --cgroups=split \
@@ -45,8 +45,8 @@ ExecStart=/usr/local/bin/podman run \
 		  --tmpfs=/tmp:exec,rw \
 		  --publish="127.0.0.1:8050:5000" \
 		  docker.io/dgtlmoon/changedetection.io:latest
-ExecStop=/usr/local/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
-ExecStopPost=/usr/local/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 
 [Install]
 WantedBy=default.target

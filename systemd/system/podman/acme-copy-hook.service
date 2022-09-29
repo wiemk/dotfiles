@@ -1,0 +1,10 @@
+[Unit]
+Description=Reloads nginx container on cert change
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/bin/sleep 120s
+ExecStart=/usr/bin/podman exec nginx nginx -s reload
+
+[Install]
+WantedBy=multi-user.target
