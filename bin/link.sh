@@ -4,6 +4,8 @@
 
 set -eo pipefail
 
+shopt -s nullglob extglob
+
 base=$(dirname "$(readlink -f -- "${BASH_SOURCE[0]:-$0}")")
 
 prompt() {
@@ -34,8 +36,7 @@ prompt() {
 declare -A targets
 
 build_list() {
-	shopt -s nullglob
-	for i in "${base}"/*; do
+	for i in "${base}"/!(lib); do
 		if [[ -d "$i" ]]; then
 			local source target
 			printf -v source '%s/.local/bin/%s' "$i" "${i##*/}"
@@ -50,7 +51,7 @@ link_shared() {
 	local target=${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles/lib
 	mkdir -p "$target"
 	local source
-	printf -v source '%s/../share/lib/.local/share/dotfiles/lib/lib.sh' "$base"
+	printf -v source '%s/lib/.local/share/dotfiles/lib/lib.sh' "$base"
 	source=$(readlink -e -- "$source")
 	if [[ -n $source ]]; then
 		command ln -v --symbolic --relative --no-target-directory --force "$source" "${target}/lib.sh"

@@ -1,0 +1,55 @@
+# vi: set ft=systemd ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+[Unit]
+Description=Podman container-nginx.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=%t/containers
+
+[Service]
+Delegate=yes
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=no
+TimeoutStopSec=70
+Type=notify
+NotifyAccess=all
+SyslogIdentifier=nginx
+
+ExecStartPre=/bin/rm -f %t/%n.ctr-id
+ExecStart=/usr/bin/podman run \
+		  --cap-drop=all \
+		  --cap-add=chown,kill,setuid,setgid,sys_chroot,net_bind_service \
+		  --cgroups=split \
+		  --cidfile=%t/%n.ctr-id \
+		  --detach \
+		  --env=TZ=Europe/Berlin \
+		  --init \
+		  --log-driver=passthrough \
+		  --mount=type=volume,source=nginx,destination=/etc/nginx,U=true \
+		  --mount=type=volume,source=acme,destination=/etc/nginx/acme,U=true \
+		  --mount=type=volume,src=nginx_cache,dst=/var/cache/nginx,U=true \
+		  --mount=type=volume,src=nginx_srv,dst=/srv/http/virtual,U=true \
+		  --mount=type=volume,src=docroot_arc,dst=/srv/http/virtual/arc.tf,U=true \
+		  --mount=type=volume,src=docroot_bafh,dst=/srv/http/virtual/bafh.org,U=true \
+		  --mount=type=volume,src=docroot_betaco,dst=/srv/http/virtual/betaco.de,U=true \
+		  --mount=type=volume,src=docroot_bzero,dst=/srv/http/virtual/bzero.de,U=true \
+		  --mount=type=volume,src=docroot_uncore,dst=/srv/http/virtual/uncore.de,U=true \
+		  --mount=type=volume,src=docroot_unsha,dst=/srv/http/virtual/unsha.re,U=true \
+		  --mount=type=volume,src=docroot_zerofill,dst=/srv/http/virtual/zerofill.de,U=true \
+		  --name=nginx \
+		  --network=host \
+		  --pull=never \
+		  --replace \
+		  --rm \
+		  --sdnotify=conmon \
+		  --security-opt=no-new-privileges \
+		  --subuidname=containers \
+		  --subgidname=containers \
+		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \
+		  betaco.de/strom/nginx:latest
+ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+
+[Install]
+WantedBy=default.target

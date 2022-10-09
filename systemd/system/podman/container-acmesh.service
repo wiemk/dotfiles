@@ -1,0 +1,30 @@
+# vi: set ft=systemd ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+[Unit]
+Description=acme.sh
+Documentation=https://github.com/acmesh-official/acme.sh
+
+[Service]
+Type=oneshot
+SyslogIdentifier=acme
+
+ExecStart=/usr/bin/podman run \
+		  --env=NO_TIMESTAMP=1 \
+		  --init \
+		  --label=io.containers.autoupdate.authfile=/etc/podman/dockerio.json \
+		  --label=io.containers.autoupdate=registry \
+		  --log-driver=passthrough \
+		  --network=host \
+		  --pull=missing \
+		  --rm \
+		  --security-opt=label=disable \
+		  --uidmap=0:2147484647:65536 \
+		  --gidmap=0:2147484647:65536 \
+		  --mount=type=volume,src=acme,dst=/acme.sh \
+		  docker.io/neilpang/acme.sh --cron --auto-upgrade 0
+
+# The uidmap/gidmap is a workaround mapping subuidname=containers
+# (2147483647) + 1000 as root inside the container so the nginx container can access
+# the certificates with UID=1000 (2147483647 + 1000) when subuidname=containers is mapped
+# This allows acme.sh to run as UID=0 inside the container and still produce correct
+# file permissions.

@@ -1,0 +1,52 @@
+# vi: set ft=systemd ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+[Unit]
+Description=Podman container-change.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=%t/containers
+
+Wants=container-playwright.service
+
+[Service]
+Delegate=yes
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=on-failure
+TimeoutStopSec=70
+Type=notify
+NotifyAccess=all
+SyslogIdentifier=change
+
+ExecStartPre=/bin/rm -f %t/%n.ctr-id
+ExecStart=/usr/bin/podman run \
+		  --cap-add=chown,kill,setuid,setgid,sys_chroot \
+		  --cap-drop=all \
+		  --cgroups=split \
+		  --cidfile=%t/%n.ctr-id \
+		  --detach \
+		  --env="BASE_URL=https://change.zerofill.de" \
+		  --env="PLAYWRIGHT_DRIVER_URL=ws://playwright:3000/?stealth=1&--disable-web-security=true" \
+		  --init \
+		  --label=io.containers.autoupdate.authfile=/etc/podman/dockerio.json \
+		  --label=io.containers.autoupdate=registry \
+		  --log-driver=passthrough \
+		  --mount=type=volume,source=change,destination=/datastore,U=false \
+		  --name=change \
+		  --network=change \
+		  --oom-score-adj=999 \
+		  --pull=missing \
+		  --replace \
+		  --rm \
+		  --sdnotify=conmon \
+		  --security-opt=no-new-privileges \
+		  --subgidname=containers \
+		  --subuidname=containers \
+		  --tmpfs=/tmp:exec,rw \
+		  --publish="127.0.0.1:8050:5000" \
+		  docker.io/dgtlmoon/changedetection.io:latest
+ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+
+[Install]
+WantedBy=default.target

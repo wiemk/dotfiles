@@ -1,0 +1,26 @@
+# vi: set ft=systemd ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+[Unit]
+Description=Expire old tcpaste pastes
+
+[Service]
+Type=oneshot
+SyslogIdentifier=tcp-expire
+
+ExecStart=/usr/bin/podman run \
+		  --env=DEST_DIR=/var/lib/pasted \
+		  --env=RUST_LOG=debug \
+		  --env=RUST_LOG_STYLE=SYSTEMD \
+		  --hostname=expire \
+		  --init \
+		  --log-driver=passthrough \
+		  --mount=type=volume,source=pasted,destination=/var/lib/pasted,U=false \
+		  --name=tcpaste-expire \
+		  --network=none \
+		  --pull=missing \
+		  --rm \
+		  --security-opt=label=disable \
+		  --subgidname=containers \
+		  --subuidname=containers \
+		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \
+		  betaco.de/strom/rust-tcpaste-pasted:latest /usr/local/bin/tcp-expire

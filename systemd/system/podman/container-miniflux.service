@@ -1,0 +1,49 @@
+# vi: set ft=systemd ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+[Unit]
+Description=Podman container-miniflux.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=%t/containers
+
+BindsTo=container-postgres.service
+After=container-postgres.service
+
+[Service]
+Delegate=yes
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=on-failure
+TimeoutStopSec=70
+Type=notify
+NotifyAccess=all
+SyslogIdentifier=miniflux
+
+ExecStartPre=/bin/rm -f %t/%n.ctr-id
+ExecStart=/usr/bin/podman run \
+		  --cap-drop=all \
+		  --cap-add=chown,dac_override,kill,setuid,setgid,sys_chroot \
+		  --cgroups=split \
+		  --cidfile=%t/%n.ctr-id \
+		  --detach \
+		  --env-file=/etc/podman/miniflux/miniflux.env \
+		  --hostname=miniflux \
+		  --label=io.containers.autoupdate=registry \
+		  --log-driver=passthrough \
+		  --name=miniflux \
+		  --network=postgres \
+		  --publish="127.0.0.1:55850:8080" \
+		  --pull=missing \
+		  --replace \
+		  --rm \
+		  --sdnotify=conmon \
+		  --security-opt=no-new-privileges \
+		  --subgidname=containers \
+		  --subuidname=containers \
+		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \
+		  ghcr.io/miniflux/miniflux:latest
+ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+
+[Install]
+WantedBy=default.target

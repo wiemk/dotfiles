@@ -1,0 +1,1 @@
+Assorted configuration fragments intended to be consumed manually, i.e. not with GNU stow.

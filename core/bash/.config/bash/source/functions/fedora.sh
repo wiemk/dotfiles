@@ -35,7 +35,7 @@ if has koji; then
 fi
 
 if has jq; then
-	kernel-releases() {
+	kernels() {
 		curl -Ls https://kernel.org/releases.json | jq -r '.releases[] | select(.moniker != "longterm") | .moniker + ":" + .version'
 	}
 fi
@@ -112,6 +112,6 @@ dnf-info() {
 	rpm -qi "$pkg"
 }
 
-seerror() {
+getseerror() {
 	sudo ausearch -m AVC,USER_AVC,SELINUX_ERR,USER_SELINUX_ERR -ts recent
 }

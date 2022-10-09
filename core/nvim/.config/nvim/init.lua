@@ -43,6 +43,7 @@ vim.opt.smartcase = true
 -- Tune redraw performance
 vim.opt.lazyredraw = true
 vim.opt.synmaxcol = 256
+vim.opt.wrap = false
 
 -- Window settings
 vim.opt.sidescroll = 10
@@ -53,12 +54,12 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = false
 vim.opt.softtabstop = -1
---vim.opt.textwidth = 78
+vim.opt.textwidth = 0
 vim.opt.copyindent = true
 
 -- Colors
 vim.opt.cursorline = true
 vim.opt.termguicolors = true
-vim.cmd [[ colorscheme slate ]]
+vim.cmd [[ colorscheme default ]]
 
 vim.api.nvim_set_keymap("n", "<C-q>", ":qa!<CR>", {noremap = true})

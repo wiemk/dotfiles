@@ -24,6 +24,7 @@ alias mv='command mv -vi'
 alias rm='command rm -vI'
 
 alias dnf='sudo dnf'
+alias dnfw='sudo dnf --setopt=install_weak_deps=False'
 alias dust='dust -rx'
 alias grep='grep --color=auto'
 alias kc='koji-check'

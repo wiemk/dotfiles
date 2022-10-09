@@ -33,4 +33,6 @@ $if mode=vi
 	"\C-w": backward-kill-word
 	"\C-a": beginning-of-line
 	"\C-e": end-of-line
+$else
+	"\C-H": shell-backward-kill-word
 $endif

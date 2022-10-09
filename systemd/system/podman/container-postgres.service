@@ -1,0 +1,51 @@
+# vi: set ft=systemd ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+[Unit]
+Description=Podman container-postgres.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=%t/containers
+
+[Service]
+Delegate=yes
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=on-failure
+TimeoutStopSec=70
+Type=notify
+NotifyAccess=all
+SyslogIdentifier=postgres
+
+ExecStartPre=/bin/rm -f %t/%n.ctr-id
+ExecStart=/usr/bin/podman run \
+		  --cap-drop=all \
+		  --cap-add=chown,dac_override,kill,setuid,setgid,sys_chroot \
+		  --cgroups=split \
+		  --cidfile=%t/%n.ctr-id \
+		  --detach \
+		  --env=TZ=Europe/Berlin \
+		  --hostname=postgres \
+		  --init \
+		  --label=io.containers.autoupdate.authfile=/etc/podman/dockerio.json \
+		  --label=io.containers.autoupdate=registry \
+		  --log-driver=passthrough \
+		  --mount=type=volume,source=postgres,destination=/var/lib/postgresql/data,U=true \
+		  --name=postgres \
+		  --network=postgres \
+		  --pull=missing \
+		  --publish="127.0.0.1:5432:5432" \
+		  --replace \
+		  --rm \
+		  --sdnotify=conmon \
+		  --security-opt=no-new-privileges \
+		  --security-opt=seccomp=/etc/podman/seccomp.json \
+		  --shm-size=256MB \
+		  --subgidname=containers \
+		  --subuidname=containers \
+		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \
+		  docker.io/library/postgres:14.5
+ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+
+[Install]
+WantedBy=default.target

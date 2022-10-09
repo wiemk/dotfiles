@@ -69,12 +69,19 @@ unset BSTATE
 history -a
 
 msg() {
-	echo >&2 -e "${1-}"
+	printf '%b' "$*" '\n' >&2
 }
 
-has() {
-	hash "$1" &>/dev/null
-}
+if hash &>/dev/null; then
+	has() {
+		hash "$1" &>/dev/null
+	}
+else
+	# hashing disabled (NixOS)
+	has() {
+		command -v "$1" &>/dev/null
+	}
+fi
 
 has_oneof() {
 	for cmd in "$@"; do
@@ -87,7 +94,7 @@ has_oneof() {
 
 has_emit() {
 	if ! has "$1"; then
-		msg "${1} not found in PATH"
+		msg "$1" 'not found in PATH'
 		return 1
 	fi
 }
@@ -156,6 +163,21 @@ if has systemd-detect-virt; then
 	fi
 fi
 
+# prepend or append first argument directly to PATH variable
+pathmunge() {
+	case ":${PATH}:" in
+	*:"$1":*) ;;
+
+	*)
+		if [[ $2 = 'append' ]]; then
+			PATH=$PATH:$1
+		else
+			PATH=$1:$PATH
+		fi
+		;;
+	esac
+}
+
 prompt() {
 	msg_bar() {
 		local text=$1
@@ -183,16 +205,16 @@ prompt() {
 
 # note: files beginning with `99-' are not version controlled
 if [[ -d $RCDIR/source.d ]]; then
-	shopt -s nullglob
 	# Plugins are allowed to modify the environment via export
 	# but are self-contained and loading order shall not matter.
 	# Functions should be pure/side-effect free but may depend
 	# on each other.
 	for src in "$RCDIR"/source.d/*.sh; do
-		source "$src"
+		if [[ -f $src ]]; then
+			source "$src"
+		fi
 	done
 fi
-shopt -u nullglob
 
 if [[ -f $RCDIR/rc.post ]]; then
 	source "${RCDIR}/rc.post"

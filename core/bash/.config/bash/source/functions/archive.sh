@@ -9,10 +9,10 @@ if ! has_all tar zstd; then
 fi
 
 invoke-cmd() {
-	if ((SHOW_CMD == 1)); then
-		echo -ne "command $*" >&2
+	if ((SHOW_CMD)); then
+		echo -ne "$*" >&2
 	else
-		eval "command $*"
+		eval "$*"
 	fi
 }
 
@@ -186,9 +186,9 @@ arc() {
 		shift
 	done
 
-	local -r src=$1
+	local -r src=$(readlink -qnm "$1")
 	if [[ ! -r $1 ]]; then
-		msg 'Cannot read input.'
+		msg 'Cannot read source:' "$src"
 		return 1
 	fi
 
@@ -196,7 +196,7 @@ arc() {
 	if (($# == 2)); then
 		local -r dest=$(readlink -qne -- "$2")
 		if [[ -z $dest ]]; then
-			msg 'Target directory must exist.'
+			msg 'Target directory does not exist.' "$dest"
 			return 1
 		fi
 	fi
@@ -204,17 +204,17 @@ arc() {
 	local -r base=$(basename "$1")
 	local out
 
-	if ((flag_bare == 1)) && [[ ! -d "$src" ]]; then
+	if ((flag_bare)) && [[ ! -d "$src" ]]; then
 		printf -v out '%s%s.zst' "${dest:+$dest/}" "$base"
 	else
 		printf -v out '%s%s.tar.zst' "${dest:+$dest/}" "$base"
 	fi
 
-	if ((flag_enc == 1)); then
+	if ((flag_enc)); then
 		if ! has_emit gpg; then
 			return 1
 		fi
-		if ((flag_age == 1)); then
+		if ((flag_age)); then
 			printf -v out '%s.age' "$out"
 		else
 			printf -v out '%s.gpg' "$out"
@@ -225,43 +225,43 @@ arc() {
 		{
 			#shellcheck disable=SC2030,SC2031
 			export SHOW_CMD=1
-			if ((flag_bare == 0)); then
-				if ((flag_meta == 1)); then
-					mirror-stream "$src"
+			if ((!flag_bare)); then
+				if ((flag_meta)); then
+					mirror-stream "'$src'"
 				else
-					archive-stream "$src"
+					archive-stream "'$src'"
 				fi
 				printf ' | \\\n' >&2
 			fi
 			compress-stream "${flag_store:-}"
-			printf ' | \\\n' >&2
 
-			if ((flag_enc == 1)); then
-				if ((flag_age == 1)); then
-					encrypt-stream-age >"$out"
+			if ((flag_enc)); then
+				printf ' | \\\n' >&2
+				if ((flag_age)); then
+					encrypt-stream-age >"'$out'"
 				else
-					if ((flag_pass == 1)); then
+					if ((flag_pass)); then
 						encrypt-stream-pass
 					else
 						encrypt-stream-gpg
 					fi
 				fi
 			fi
-			printf ' >%s' "$out" >&2
+			printf ' >%s' "'$out'" >&2
 
-			if ((flag_fec == 1)); then
+			if ((flag_fec)); then
 				printf ' && \\\n' >&2
-				create-fec "$out"
+				create-fec "'$out'"
 			fi
 		} 2>&1
 	)
 
-	if ((flag_root == 1)); then
+	if ((flag_root)); then
 		# prepend tar with sudo for read permissions
 		printf -v cmd 'command sudo -- %s' "$cmd"
 	fi
 
-	if ((flag_dry == 1)); then
+	if ((flag_dry)); then
 		msg "$cmd"
 	else
 		invoke-cmd "$cmd"
@@ -313,12 +313,12 @@ if has mksquashfs; then
 		local san=$(printf '%s' "$src" | tr -d '\n' | sed -E 's/\//-/g;s/^-|-$//g;s/\./dot-/g;s/\s/_/g')
 
 		if [[ -z $src ]]; then
-			msg 'Source directory must exist.'
+			msg 'Source directory does not exist:' "$src"
 			return 1
 		fi
 
 		if [[ -z $dst ]]; then
-			msg 'Target directory must exist.'
+			msg 'Target directory does not exist:' "$dst"
 			return 1
 		fi
 
@@ -333,19 +333,19 @@ if has mksquashfs; then
 				#shellcheck disable=SC2030,SC2031
 				export SHOW_CMD=1
 				if has getfacl; then
-					invoke-cmd getfacl -Rs "$src"
-					printf '>%s' "${dst}/acl.log"
+					invoke-cmd getfacl -Rs "'$src'"
+					printf '>%s' "'${dst}/acl.log'"
 					printf ' &&\n' >&2
 				fi
-				invoke-cmd mksquashfs "$src" "${dst}/acl.log" "$out" -not-reproducible -noappend -xattrs -comp "${opt_fast:-zstd}" -keep-as-directory -progress -wildcards "${@:-}"
+				invoke-cmd mksquashfs "'$src'" "'${dst}/acl.log'" "'$out'" -not-reproducible -noappend -xattrs -comp "${opt_fast:-zstd}" -keep-as-directory -progress -wildcards "${@:-}"
 			} 2>&1
 		)
 
-		if ((flag_root == 1)); then
-			printf -v cmd "command sudo -- bash -c '%s &&\nchown --quiet --preserve-root %u:%u %s'" "$cmd" "$(id -u)" "$(id -g)" "$out"
+		if ((flag_root)); then
+			printf -v cmd "command sudo -- bash -c '%s &&\nchown --quiet --preserve-root %u:%u %s'" "$cmd" "$(id -u)" "$(id -g)" "'$out'"
 		fi
 
-		if ((flag_dry == 1)); then
+		if ((flag_dry)); then
 			msg "$cmd"
 		else
 			invoke-cmd "$cmd"

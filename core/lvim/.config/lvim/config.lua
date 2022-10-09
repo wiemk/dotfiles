@@ -3,9 +3,10 @@ lvim = global options object
 ]]
 
 -- General
-lvim.log.level = "warn"
-lvim.format_on_save = false
-lvim.colorscheme = "tokyonight"
+lvim.log.level = "error"
+-- lvim.format_on_save = true
+lvim.builtin.theme.options.style = "moon"
+lvim.colorscheme = "tokyonight-moon"
 lvim.use_icons = true
 
 -- Don't redraw during macro execution
@@ -15,7 +16,6 @@ vim.opt.synmaxcol = 256
 -- Override default options
 (function()
   local opts = {
-    cmdheight = 1,
     colorcolumn = "100",
     list = true,
     listchars = "tab:→ ,eol:↲,nbsp:␣,trail:•,extends:⟩,precedes:⟨",
@@ -23,6 +23,7 @@ vim.opt.synmaxcol = 256
     showbreak = "↪ ",
     spelllang = "en",
     timeoutlen = 250,
+    updatetime = 100,
   }
 
   for k, v in pairs(opts) do
@@ -159,7 +160,13 @@ lvim.builtin.telescope.pickers = vim.tbl_extend("force", lvim.builtin.telescope.
   },
   current_buffer_fuzzy_find = {
     theme = "dropdown",
-  }
+  },
+  find_files = {
+    theme = "ivy",
+  },
+  git_files = {
+    theme = "ivy",
+  },
 })
 -- extensions
 lvim.builtin.telescope.extensions = vim.tbl_deep_extend("force",
@@ -195,16 +202,7 @@ lvim.builtin.project.manual_mode = false
 lvim.builtin.dap.active = false
 
 -- lualine
-local components = require("lvim.core.lualine.components")
-
 lvim.builtin.lualine.sections.lualine_a = { "mode" }
-lvim.builtin.lualine.sections.lualine_y = {
-  components.spaces,
-  components.location
-}
-
--- bufferline
--- lvim.builtin.bufferline.options.mode = "tabs"
 
 -- tree-sitter
 lvim.builtin.treesitter.ensure_installed = {
@@ -223,6 +221,7 @@ lvim.builtin.treesitter.ensure_installed = {
   "lua",
   "make",
   "markdown",
+  "nix",
   "python",
   "regex",
   "rust",
@@ -253,7 +252,6 @@ end
 lvim.plugins = {
   { "p00f/nvim-ts-rainbow" },
   { "machakann/vim-sandwich" },
-  { "folke/tokyonight.nvim" },
   { "gpanders/editorconfig.nvim" },
   {
     "https://betaco.de/zeno/modeline.nvim",
@@ -375,18 +373,6 @@ lvim.plugins = {
     requires = { "tami5/sqlite.lua" }
   },
   {
-    "lukas-reineke/indent-blankline.nvim",
-    event = "BufRead",
-    setup = function()
-      vim.g.indentLine_enabled = 1
-      vim.g.indent_blankline_char = "▏"
-      vim.g.indent_blankline_filetype_exclude = { "help", "terminal", "dashboard", "alpha" }
-      vim.g.indent_blankline_buftype_exclude = { "terminal", "nofile" }
-      vim.g.indent_blankline_show_trailing_blankline_indent = false
-      vim.g.indent_blankline_show_first_indent_level = false
-    end
-  },
-  {
     "tpope/vim-fugitive",
     cmd = {
       "G",
@@ -415,25 +401,53 @@ lvim.plugins = {
   {
     "simrat39/rust-tools.nvim",
     config = function()
-      require("rust-tools").setup {
+      local status_ok, rust_tools = pcall(require, "rust-tools")
+      if not status_ok then
+        return
+      end
+      local opts = {
         tools = {
-          autoSetHints = true,
-          runnables = {
-            use_telescope = true,
+          executor = require("rust-tools/executors").termopen,
+          reload_workspace_from_cargo_toml = true,
+          inlay_hints = {
+            auto = true,
+            only_current_line = false,
+            show_parameter_hints = true,
+            parameter_hints_prefix = "<-",
+            other_hints_prefix = "=>",
+            max_len_align = false,
+            max_len_align_padding = 1,
+            right_align = false,
+            right_align_padding = 7,
+            highlight = "Comment",
+          },
+          hover_actions = {
+            border = {
+              { "╭", "FloatBorder" },
+              { "─", "FloatBorder" },
+              { "╮", "FloatBorder" },
+              { "│", "FloatBorder" },
+              { "╯", "FloatBorder" },
+              { "─", "FloatBorder" },
+              { "╰", "FloatBorder" },
+              { "│", "FloatBorder" },
+            };
+            auto_focus = true,
           },
         },
         server = {
+          on_attach = require("lvim.lsp").common_on_attach,
           on_init = require("lvim.lsp").common_on_init,
-          on_attach = function(client, bufnr)
-            require("lvim.lsp").common_on_attach(client, bufnr)
-            local rt = require "rust-tools"
-            -- Hover actions
-            vim.keymap.set("n", "<C-space>", rt.hover_actions.hover_actions, { buffer = bufnr })
-            -- Code action groups
-            vim.keymap.set("n", "<leader>lA", rt.code_action_group.code_action_group, { buffer = bufnr })
-          end,
+          settings = {
+            ["rust-analyzer"] = {
+              checkOnSave = {
+                command = "clippy"
+              }
+            }
+          }
         },
       }
+      rust_tools.setup(opts)
     end,
     ft = { "rust", "rs" },
   },

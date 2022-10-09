@@ -14,11 +14,14 @@ line:fg:magenta
 column:fg:magenta
 
 # flags
+--engine
+--mmap
 --hidden
+--follow
 --column
 --smart-case
 --trim
---max-columns=256
+--max-columns=120
 --glob
 !.git/**
 --glob

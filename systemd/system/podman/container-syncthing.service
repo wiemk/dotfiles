@@ -1,0 +1,52 @@
+# vi: set ft=systemd ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+[Unit]
+Description=Podman container-syncthing.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=%t/containers
+
+[Service]
+Delegate=yes
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=on-failure
+TimeoutStopSec=70
+Type=notify
+NotifyAccess=all
+SyslogIdentifier=syncthing
+
+ExecStartPre=/bin/rm -f %t/%n.ctr-id
+ExecStart=/usr/bin/podman run \
+		  --cap-add=chown,kill,setuid,setgid,sys_chroot \
+		  --cap-drop=all \
+		  --cgroups=split \
+		  --cidfile=%t/%n.ctr-id \
+		  --detach \
+		  --env=PGID=1000 \
+		  --env=PUID=1000 \
+		  --env=TZ=Europe/Berlin \
+		  --init \
+		  --label=io.containers.autoupdate.authfile=/etc/podman/dockerio.json \
+		  --label=io.containers.autoupdate=registry \
+		  --log-driver=passthrough \
+		  --mount=type=volume,source=syncthing,destination=/var/syncthing,U=false \
+		  --name=syncthing \
+		  --network=syncthing \
+		  --no-healthcheck \
+		  --publish="0.0.0.0:22000:22000/tcp" \
+		  --publish="0.0.0.0:22000:22000/udp" \
+		  --publish="127.0.0.1:8384:8384/tcp" \
+		  --pull=missing \
+		  --replace \
+		  --rm \
+		  --sdnotify=conmon \
+		  --security-opt=no-new-privileges \
+		  --subgidname=containers \
+		  --subuidname=containers \
+		  docker.io/syncthing/syncthing:latest
+ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+
+[Install]
+WantedBy=default.target
