@@ -8,15 +8,10 @@ repos:
   - id: check-merge-conflict
   - id: mixed-line-ending
     args: [ --fix=no ]
-# - repo: https://github.com/zricethezav/gitleaks
-#   rev: v8.11.0
-#   hooks:
-#     - id: gitleaks
 - repo: local
   hooks:
-  - id: gitleaks
-    name: Detect hardcoded secrets
-    description: Detect hardcoded secrets using Gitleaks
-    entry: gitleaks protect --verbose --staged
-    language: system
-    pass_filenames: false
+    - id: gitleaks-docker
+      name: Detect hardcoded secrets
+      description: Detect hardcoded secrets using Gitleaks
+      entry: docker.io/zricethezav/gitleaks:latest protect --verbose --redact --staged
+      language: docker_image

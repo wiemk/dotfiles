@@ -25,6 +25,7 @@ ExecStart=/usr/bin/podman run \
 		  --detach \
 		  --env=TZ=Europe/Berlin \
 		  --hostname=soju \
+		  --init \
 		  --label=io.containers.autoupdate.authfile=/etc/podman/betaco.json \
 		  --label=io.containers.autoupdate=registry \
 		  --log-driver=passthrough \

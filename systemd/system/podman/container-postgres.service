@@ -43,7 +43,7 @@ ExecStart=/usr/bin/podman run \
 		  --subgidname=containers \
 		  --subuidname=containers \
 		  --tmpfs=/tmp:rw,size=1024M,mode=1777 \
-		  docker.io/library/postgres:14.5
+		  docker.io/library/postgres:15.0
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 

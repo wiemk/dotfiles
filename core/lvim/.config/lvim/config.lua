@@ -13,6 +13,22 @@ lvim.use_icons = true
 vim.opt.lazyredraw = true
 vim.opt.synmaxcol = 256
 
+-- Use ANSI OSC 52 support when running inside tmux
+if os.getenv("TMUX") then
+  vim.g.clipboard = {
+    cache_enabled = 1,
+    copy = {
+      ["*"] = { "tmux", "load-buffer", "-w", "-" },
+      ["+"] = { "tmux", "load-buffer", "-w", "-" }
+    },
+    name = "myClipboard",
+    paste = {
+      ["*"] = { "tmux", "save-buffer", "-" },
+      ["+"] = { "tmux", "save-buffer", "-" }
+    }
+  }
+end
+
 -- Override default options
 (function()
   local opts = {
@@ -43,7 +59,7 @@ lvim.keys.normal_mode["<Down>"] = "<NOP>"
 lvim.keys.normal_mode["<Left>"] = "<NOP>"
 lvim.keys.normal_mode["<Right>"] = "<NOP>"
 
--- tmux bugfix (nvim 0.7 api)
+-- tmux bugfix
 vim.keymap.set({ 'i', 'n', 'v' }, '<C-a>', '<Home>', { noremap = true, silent = true })
 vim.keymap.set({ 'i', 'n', 'v' }, '<C-e>', '<End>', { noremap = true, silent = true })
 
@@ -94,7 +110,7 @@ lvim.builtin.which_key.mappings["h"] = {
 }
 lvim.builtin.which_key.mappings["P"] = lvim.builtin.which_key.mappings["p"]
 if lvim.builtin.project.active then
-  lvim.builtin.which_key.mappings["p"] = { "<Cmd>Telescope projects<CR>", "Projects" }
+  lvim.builtin.which_key.mappings["p"] = { "<Cmd>Telescope projects theme=ivy<CR>", "Projects" }
 end
 
 local ok, builtin = pcall(require, "telescope.builtin")
@@ -142,11 +158,8 @@ lvim.builtin.telescope.defaults.mappings = vim.tbl_deep_extend("force",
     ["<C-n>"] = actions.cycle_history_next,
   }
 })
--- set ivy as default for all pickers
-lvim.builtin.telescope.defaults = vim.tbl_extend("force", lvim.builtin.telescope.defaults or {},
-  require "telescope.themes".get_ivy({ prompt_prefix = ">> " }))
 -- close buffers with hotkey inside telescope
-lvim.builtin.telescope.pickers = vim.tbl_extend("force", lvim.builtin.telescope.pickers or {}, {
+lvim.builtin.telescope.pickers = vim.tbl_deep_extend("force", lvim.builtin.telescope.pickers or {}, {
   buffers = {
     sort_lastused = true,
     mappings = {
@@ -156,22 +169,23 @@ lvim.builtin.telescope.pickers = vim.tbl_extend("force", lvim.builtin.telescope.
       n = {
         ["<C-d>"] = require("telescope.actions").delete_buffer,
       }
-    }
-  },
-  current_buffer_fuzzy_find = {
-    theme = "dropdown",
-  },
-  find_files = {
+    },
     theme = "ivy",
   },
-  git_files = {
+  builtin = {
+    previewer = false,
+    theme = "ivy",
+  },
+  live_grep = {
     theme = "ivy",
   },
 })
 -- extensions
 lvim.builtin.telescope.extensions = vim.tbl_deep_extend("force",
   lvim.builtin.telescope.extensions or {}, {
-  frecency = { db_root = get_cache_dir() }
+  frecency = {
+    db_root = get_cache_dir()
+  },
 })
 
 -- autopairs
