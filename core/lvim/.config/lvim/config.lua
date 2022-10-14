@@ -253,6 +253,7 @@ lvim.plugins = {
   { "p00f/nvim-ts-rainbow" },
   { "machakann/vim-sandwich" },
   { "gpanders/editorconfig.nvim" },
+  { "folke/tokyonight.nvim" },
   {
     "https://betaco.de/zeno/modeline.nvim",
     cmd = "InsertModeline",
