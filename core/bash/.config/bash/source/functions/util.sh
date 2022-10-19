@@ -93,6 +93,10 @@ mem() {
 		}'
 }
 
+deleted() {
+	sudo lsof 2>/dev/null | grep '(deleted)' | grep -vE 'memfd|shm|/tmp|gvfs|flatpak|Metrics|\.log'
+}
+
 netns() {
 	local -r ns=$1
 	shift 1
@@ -148,4 +152,40 @@ oomscore() {
 			fi
 		fi
 	done < <(ps -e -o pid= -o comm=) | sort -k 2nr
+}
+
+webget() {
+	local dest=$PWD
+	if has xdg-user-dir; then
+		dest=$(xdg-user-dir DOWNLOAD)
+		if [[ -z $dest ]]; then
+			dest=$PWD
+		fi
+	fi
+	if has curl; then
+		if curl \
+			--connect-timeout 5 \
+			--location \
+			--max-redirs 10 \
+			--output-dir "${dest}" \
+			--remote-header-name \
+			--remote-name-all \
+			--remove-on-error \
+			"$@"; then
+			msg 'File written to' "$dest"
+		fi
+	elif has wget; then
+		wget \
+			--continue \
+			--content-disposition \
+			--directory-prefix="${dest}" \
+			--no-config \
+			--no-hsts \
+			--no-verbose \
+			--timeout=5 \
+			--trust-server-names \
+			"$@"
+	else
+		msg 'Neither curl nor wget could be found.'
+	fi
 }

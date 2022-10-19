@@ -43,6 +43,7 @@ assburn() {
 			--audio-lang-list jpn --first-audio --aencoder copy --audio-copy-mask aac,ac3,eac3,truehd,dts,dtshd,mp3 \
 			--audio-fallback av_aac --ab 192 --normalize-mix --arate auto --native-language eng \
 			--subtitle-lang-list eng,und --first-subtitle --subtitle-burned \
+			--maxHeight 1080 --maxWidth 1920 \
 			"${args[@]}" \
 			--output "${base}.new.mp4" && command mv -vuf "${base}.new.mp4" "${base}.mp4"' \
 		shell {} "$@" \; -o -quit \) || exit 1

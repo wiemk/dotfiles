@@ -5,20 +5,20 @@ The `core`, `bin`, `extra`, or `staging` are designed to be used with [GNU stow]
 ##### Using GNU Stow
 
 ```sh
-stow -d "$REPO/{core,bin,extra,staging}" -t "$HOME" -S <config>
+stow -d "$REPO/{core,bin,extra,staging}" -t "$HOME" -S package…
 ```
 
 #### Examples
 
 ```sh
-git clone --depth=1 --branch=main -- https://betaco.de/strom/dotfiles.git dotfiles
-stow -d "$PWD/dotfiles/core" -t "$HOME" -S tmux
+git clone --depth=1 --branch=main -- https://betaco.de/strom/dotfiles.git
+stow -d "./dotfiles/core" -t "$HOME" -S tmux readline
 ```
 
 ##### This example will create the following symbolic links:
 
-1. `~/.tmux.conf` 🡒 `$PWD/zeno-dotfiles/core/tmux/.tmux.conf`
-2. `~/.config/tmux` 🡒 `$PWD/zeno-dotfiles/core/tmux/.config/tmux`
+1. `~/.inputrc` 🡒 `./dotfiles/core/readline/.inputrc`
+2. `~/.config/tmux/tmux.conf` 🡒 `./dotfiles/core/tmux/.config/tmux.conf`
 
 #### Notes
 

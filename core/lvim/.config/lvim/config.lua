@@ -5,7 +5,7 @@ lvim = global options object
 -- General
 lvim.log.level = "error"
 -- lvim.format_on_save = true
-lvim.builtin.theme.options.style = "moon"
+lvim.builtin.theme.tokyonight.options.style = "moon"
 lvim.colorscheme = "tokyonight-moon"
 lvim.use_icons = true
 
@@ -194,9 +194,6 @@ lvim.builtin.autopairs.active = false
 -- alpha
 lvim.builtin.alpha.active = false
 lvim.builtin.alpha.mode = "startify"
-
--- notify
-lvim.builtin.notify.active = true
 
 -- toggleterm
 lvim.builtin.terminal.active = true
