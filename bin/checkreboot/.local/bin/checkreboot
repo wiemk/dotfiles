@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+# shellcheck disable=2155,1091
+
+# shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
+source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
+
+shopt -s nullglob
+
+declare -i reboot=0
+declare -ar excludes=('memfd:libffi')
+
+get_kernels() {
+	local -r arch=$(uname -m)
+	local -i is_vtok=0
+
+	# shellcheck disable=2231
+	for kernel in /boot/vmlinuz-[56].[[:digit:]].[[:digit:]]-*.${arch}; do
+		for field in $(file "$kernel"); do
+			if ((is_vtok == 1)); then
+				printf '%s\n' "$field"
+				is_vtok=0
+				break
+			elif [[ $field == version ]]; then
+				is_vtok=1
+			fi
+		done
+	done
+}
+
+is_active_current() {
+	local -r active=$(uname -r)
+	local -r latest=$(get_kernels | sort -rV | head -n1)
+
+	if [[ $active == "$latest" ]]; then
+		return 0
+	fi
+
+	msg "Active kernel (${active}) may be outdated, found a newer one (${latest})."
+	return 1
+}
+
+create_pattern() {
+	local pattern
+	for exclude in "${excludes[@]}"; do
+		printf -v pattern '%s|%s$' "$pattern" "$exclude"
+	done
+
+	printf '%s' "${pattern:1}"
+}
+
+stale_libs_mapped() {
+	local -r pattern=$(create_pattern)
+	libs=$(lsof -n +c 0 2>/dev/null | grep 'DEL.*lib' | grep -vE "$pattern" | awk '1 { print $1 ": " $NF }' | sort -u)
+
+	if [[ -n $libs ]]; then
+		cat <<<"$libs" >&2
+		return 0
+	fi
+
+	return 1
+}
+
+if stale_libs_mapped; then
+	reboot=1
+fi
+
+if ! is_active_current; then
+	reboot=1
+fi
+
+if ((reboot > 0)); then
+	msg "Reboot may be required."
+fi
+
+exit $reboot
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

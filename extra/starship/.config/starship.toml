@@ -60,7 +60,7 @@ symbol = "✖"
 format = "[\\[$symbol \\($status\\)\\]]($style) "
 
 [sudo]
-disabled = false
+disabled = true
 
 [time]
 disabled = true

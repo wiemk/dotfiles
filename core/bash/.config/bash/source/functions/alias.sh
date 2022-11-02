@@ -37,6 +37,7 @@ alias tma='tm'
 alias top='htop'
 alias unsha='socat -t 5 - tcp:unsha.re:10000'
 alias ydl='yt-dlp'
+alias mpvr="command mpv --input-ipc-server=\${XDG_RUNTIME_DIR}/mpv.sock"
 
 if has batman; then
 	alias man='batman'

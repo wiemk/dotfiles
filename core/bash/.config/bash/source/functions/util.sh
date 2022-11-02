@@ -94,7 +94,9 @@ mem() {
 }
 
 deleted() {
-	sudo lsof 2>/dev/null | grep '(deleted)' | grep -vE 'memfd|shm|/tmp|gvfs|flatpak|Metrics|\.log'
+	if has lsof; then
+		sudo lsof / 2>/dev/null | grep '(deleted)' | grep -vE 'memfd|shm|/tmp|gvfs|flatpak|Metrics|\.log'
+	fi
 }
 
 netns() {
