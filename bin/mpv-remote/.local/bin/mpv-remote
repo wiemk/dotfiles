@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+# shellcheck disable=2155,1091
+
+# shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
+source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
+
+if ! has socat; then
+	die "socat not found"
+fi
+
+MPV_SOCKET=${MPV_SOCKET:-${XDG_RUNTIME_DIR}/mpv.sock}
+
+flag_compress=0
+flag_dyn=0
+flag_limit=0
+flag_res=0
+flag_mono=0
+flag_night=0
+
+while :; do
+	case ${1-} in
+	-h | --help)
+		cat <<-'HELP'
+			Flags:
+				-c|--compress : apply audio compressor
+				-d|--dyn      : apply dynamic audio
+				-l|--limit    : apply audio limiter
+				-m|--mono     : downmix to mono
+				-n|--night    : enable night mode
+				-r|--reset    : reset audio filter
+		HELP
+		exit 0
+		;;
+	-c | --compress) flag_compress=1 ;;
+	-d | --dyn) flag_dyn=1 ;;
+	-l | --limit) flag_limit=1 ;;
+	-m | --mono) flag_mono=1 ;;
+	-n | --night) flag_night=1 ;;
+	-r | --reset) flag_res=1 ;;
+	*)
+		break
+		;;
+	esac
+	shift
+done
+
+declare -a cmd
+
+add_filter() {
+	if ((flag_res)); then
+		cmd=('{ "command": ["af", "reset", ""] }')
+		return
+	fi
+
+	if ((flag_night)); then
+		# not compatible with mpv 0.35+
+		cmd+=('{ "command": [ "af", "add", "pan=stereo|FL=FC+0.30*FL+0.30*FLC+0.30*BL+0.30*SL+0.60*LFE|FR=FC+0.30*FR+0.30*FRC+0.30*BR+0.30*SR+0.60*LFE"] }')
+	fi
+	if ((flag_compress)); then
+		cmd+=('{ "command": [ "af", "add", "acompressor=ratio=4,loudnorm"] }')
+	fi
+	if ((flag_dyn)); then
+		cmd+=('{ "command": [ "af", "add", "dynaudnorm=g=5:f=250:r=0.9:p=0.5"] }')
+	fi
+	if ((flag_limit)); then
+		cmd+=('{ "command": [ "af", "add", "lavfi=[alimiter=10:1:1:5:8000]"] }')
+	fi
+	if ((flag_mono)); then
+		cmd+=('{ "command": [ "af", "add", "lavfi=[pan=1c|c0=0.5*c0+0.5*c1]"] }')
+	fi
+
+	cmd+=('{ "command": ["get_property", "af"] }')
+}
+
+add_filter
+
+for c in "${cmd[@]}"; do
+	printf '%s\n' "$c" | socat - "${MPV_SOCKET}"
+done
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

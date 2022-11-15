@@ -13,6 +13,7 @@ declare -A FUNC=(
 	[fedora]=50
 	[info]=90
 	[misc]=90
+	[nix]=90
 	[podman]=90
 	[systemd]=20
 	[tmux]=50

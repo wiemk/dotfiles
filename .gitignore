@@ -1,8 +1,6 @@
 *.bak
 # profile
 core/profile/.config/profile/local/*
-core/profile/.config/profile/conf.d/*
-!core/profile/.config/profile/conf.d/README.md
 # bash
 core/bash/.config/bash/rc.pre
 core/bash/.config/bash/rc.post
