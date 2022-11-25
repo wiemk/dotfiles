@@ -170,4 +170,3 @@
 		oci-containers.backend = "podman";
 	};
 }
-# vi: set ft=nix ts=4 sw=0 sts=-1 sr noet nosi tw=0 fdm=manual:

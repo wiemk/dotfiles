@@ -32,7 +32,8 @@ is_active_current() {
 	local -r active=$(uname -r)
 	local -r latest=$(get_kernels | sort -rV | head -n1)
 
-	if [[ $active == "$latest" ]]; then
+	# latest can be empty if host is a container
+	if [[ -z $latest || $active == "$latest" ]]; then
 		return 0
 	fi
 

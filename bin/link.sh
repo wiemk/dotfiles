@@ -20,15 +20,15 @@ prompt() {
 		msg "$question"
 		read -p "[y]es or [n]o (default: no) : " -r answer
 		case "$answer" in
-		y | Y | yes | YES | Yes)
-			return 0
-			;;
-		n | N | no | NO | No | *[[:blank:]]* | "")
-			return 1
-			;;
-		*)
-			msg "Please answer [y]es or [n]o."
-			;;
+			y | Y | yes | YES | Yes)
+				return 0
+				;;
+			n | N | no | NO | No | *[[:blank:]]* | "")
+				return 1
+				;;
+			*)
+				msg "Please answer [y]es or [n]o."
+				;;
 		esac
 	done
 }
@@ -37,7 +37,7 @@ declare -A targets
 
 build_list() {
 	for i in "${base}"/!(lib); do
-		if [[ -d "$i" ]]; then
+		if [[ -d $i ]]; then
 			local source target
 			printf -v source '%s/.local/bin/%s' "$i" "${i##*/}"
 			printf -v target '%s/.local/bin/%s' "$HOME" "${i##*/}"

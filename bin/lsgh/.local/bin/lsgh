@@ -11,8 +11,8 @@ fi
 
 page=1
 while :; do
-	repos="$(curl -s "https://api.github.com/users/$1/repos?page=$page&per_page=100" |
-		jq -r '.[] | select(.fork or .archived | not) | .clone_url')"
+	repos="$(curl -s "https://api.github.com/users/$1/repos?page=$page&per_page=100" \
+		| jq -r '.[] | select(.fork or .archived | not) | .clone_url')"
 	if [[ -z $repos ]]; then
 		break
 	fi

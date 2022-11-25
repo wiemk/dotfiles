@@ -15,8 +15,8 @@ _wttr_param() {
 
 		for tok in $(locale LC_MEASUREMENT); do
 			case $tok in
-			1) wttr_params+=('m') ;;
-			2) wttr_params+=('u') ;;
+				1) wttr_params+=('m') ;;
+				2) wttr_params+=('u') ;;
 			esac
 		done 2>/dev/null
 		wttr_params+=('F')

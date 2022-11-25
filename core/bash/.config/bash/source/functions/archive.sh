@@ -99,11 +99,11 @@ compress-stream() {
 	local -a flag=(--long -9)
 	while :; do
 		case ${1-} in
-		-f | --fast) flag=(-3) ;;
-		-u | --ultra) flag=(--long -19) ;;
-		*)
-			break
-			;;
+			-f | --fast) flag=(-3) ;;
+			-u | --ultra) flag=(--long -19) ;;
+			*)
+				break
+				;;
 		esac
 		shift
 	done
@@ -118,7 +118,7 @@ create-fec() {
 }
 
 dearc() {
-	if [[ -f "$1" && $(file -b "$1") == PGP* ]]; then
+	if [[ -f $1 && $(file -b "$1") == PGP* ]]; then
 		command gpg --decrypt "$1" | zstd -d -- | tar -vx --
 		return
 	else
@@ -146,42 +146,42 @@ arc() {
 
 	while :; do
 		case ${1-} in
-		-h | --help)
-			cat <<-'HELP'
-				Flags:
-					-a|--age     : use age instead of gpg
-					-b|--bare    : no tar
-					-d|--dry-run : dry-run, shows execution pipeline
-					-f|--fec     : forward error correction
-					-m|--meta    : embed all supported metadata
-					-n|--noenc   : do not encrpyt
-					-p|--pass    : use pass tool entry 'archive' as PSK
-					-r|--root    : run with sudo
-					-s|--store   : faster compression
+			-h | --help)
+				cat <<-'HELP'
+					Flags:
+						-a|--age     : use age instead of gpg
+						-b|--bare    : no tar
+						-d|--dry-run : dry-run, shows execution pipeline
+						-f|--fec     : forward error correction
+						-m|--meta    : embed all supported metadata
+						-n|--noenc   : do not encrpyt
+						-p|--pass    : use pass tool entry 'archive' as PSK
+						-r|--root    : run with sudo
+						-s|--store   : faster compression
 
-				Pos:
-					<src> [<dst/>]
-			HELP
-			return 0
-			;;
-		-a | --age)
-			{ has_emit age && flag_age=1; } ||
-				return 1
-			;;
-		-b | --bare) flag_bare=1 ;;
-		-d | --dry-run) flag_dry=1 ;;
-		-f | --fec) flag_fec=1 ;;
-		-m | --meta) flag_meta=1 ;;
-		-n | --noenc) flag_enc=0 ;;
-		-p | --pass)
-			{ has_emit pass && flag_pass=1; } ||
-				return 1
-			;;
-		-r | --root) flag_root=1 ;;
-		-s | --store) flag_store='--fast' ;;
-		*)
-			break
-			;;
+					Pos:
+						<src> [<dst/>]
+				HELP
+				return 0
+				;;
+			-a | --age)
+				{ has_emit age && flag_age=1; } \
+					|| return 1
+				;;
+			-b | --bare) flag_bare=1 ;;
+			-d | --dry-run) flag_dry=1 ;;
+			-f | --fec) flag_fec=1 ;;
+			-m | --meta) flag_meta=1 ;;
+			-n | --noenc) flag_enc=0 ;;
+			-p | --pass)
+				{ has_emit pass && flag_pass=1; } \
+					|| return 1
+				;;
+			-r | --root) flag_root=1 ;;
+			-s | --store) flag_store='--fast' ;;
+			*)
+				break
+				;;
 		esac
 		shift
 	done
@@ -204,7 +204,7 @@ arc() {
 	local -r base=$(basename "$1")
 	local out
 
-	if ((flag_bare)) && [[ ! -d "$src" ]]; then
+	if ((flag_bare)) && [[ ! -d $src ]]; then
 		printf -v out '%s%s.zst' "${dest:+$dest/}" "$base"
 	else
 		printf -v out '%s%s.tar.zst' "${dest:+$dest/}" "$base"
@@ -278,26 +278,26 @@ if has mksquashfs; then
 
 		while :; do
 			case ${1-} in
-			-h | --help)
-				cat <<-'HELP'
+				-h | --help)
+					cat <<-'HELP'
 
-					Flags:
-						-d|--dry-run : dry-run, shows execution pipeline
-						-s|--store   : lz4 compression
-						-r|--root    : run with sudo
+						Flags:
+							-d|--dry-run : dry-run, shows execution pipeline
+							-s|--store   : lz4 compression
+							-r|--root    : run with sudo
 
-					Pos:
-						<src> [<dst/>]
+						Pos:
+							<src> [<dst/>]
 
-				HELP
-				return 0
-				;;
-			-d | --dry-run) flag_dry=1 ;;
-			-s | --store) opt_fast=lz4 ;;
-			-r | --root) flag_root=1 ;;
-			*)
-				break
-				;;
+					HELP
+					return 0
+					;;
+				-d | --dry-run) flag_dry=1 ;;
+				-s | --store) opt_fast=lz4 ;;
+				-r | --root) flag_root=1 ;;
+				*)
+					break
+					;;
 			esac
 			shift
 		done

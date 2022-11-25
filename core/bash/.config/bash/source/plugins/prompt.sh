@@ -6,13 +6,13 @@ init_debug
 # Init window title (ssh, ..)
 if [[ -z $PROMPT_COMMAND ]]; then
 	case $TERM in
-	xterm* | vte* | alacritty | kitty)
-		PROMPT_COMMAND='printf "\033]0;%s@%s:%s\007" "${USER}" "${HOSTNAME%%.*}" "${PWD/#$HOME/\~}"'
-		;;
-	tmux* | screen*)
-		PROMPT_COMMAND='printf "\033k%s@%s:%s\033\\" "${USER}" "${HOSTNAME%%.*}" "${PWD/#$HOME/\~}"'
-		;;
-	*) ;;
+		xterm* | vte* | alacritty | kitty)
+			PROMPT_COMMAND='printf "\033]0;%s@%s:%s\007" "${USER}" "${HOSTNAME%%.*}" "${PWD/#$HOME/\~}"'
+			;;
+		tmux* | screen*)
+			PROMPT_COMMAND='printf "\033k%s@%s:%s\033\\" "${USER}" "${HOSTNAME%%.*}" "${PWD/#$HOME/\~}"'
+			;;
+		*) ;;
 	esac
 fi
 
@@ -21,7 +21,7 @@ if has starship; then
 else
 	PS4='+ ${BASH_SOURCE:-}:${FUNCNAME[0]:-}:L${LINENO:-}:   '
 
-	if has tput && [[ $(/usr/bin/tput colors) = 256 ]]; then
+	if has tput && [[ $(/usr/bin/tput colors) == 256 ]]; then
 		declare -a seq=(bold dim blink smul rmul rev smso rmso sgr0 tsl fsl)
 		declare -A osc
 		for i in "${seq[@]}"; do

@@ -17,10 +17,10 @@ alias ll='command ls -l --color=auto' 2>/dev/null
 alias ls='command ls --color=auto --show-control-chars --group-directories-first -AlhXF'
 alias sl='ls'
 
-alias cp='command cp -avi'
+alias cp='command cp -av'
 alias ln='command ln -vi'
 alias mkdir='command mkdir -v'
-alias mv='command mv -vi'
+alias mv='command mv -v'
 alias rm='command rm -vI'
 
 alias dnf='sudo dnf'

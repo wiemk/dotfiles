@@ -28,8 +28,8 @@ share() {
 		return 1
 	fi
 
-	local resp=$($cmd > >(tee >(jq '.' >&2)) |
-		jq --raw-output \
+	local resp=$($cmd > >(tee >(jq '.' >&2)) \
+		| jq --raw-output \
 			'{ expires, secret, url } | to_entries | .[] | "local " + .key + "=" + (.value | @sh)')
 
 	if [[ -n $resp ]]; then

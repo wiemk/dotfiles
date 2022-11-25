@@ -8,6 +8,12 @@ if ! has nix-env; then
 fi
 
 nix-lean() {
+	nix profile wipe-history
+	nix store gc
+	nix store optimise
+}
+
+nix-lean-legacy() {
 	nix-env --delete-generations old
 	nix-store --gc
 	nix-store --optimise

@@ -20,27 +20,27 @@ flag_night=0
 
 while :; do
 	case ${1-} in
-	-h | --help)
-		cat <<-'HELP'
-			Flags:
-				-c|--compress : apply audio compressor
-				-d|--dyn      : apply dynamic audio
-				-l|--limit    : apply audio limiter
-				-m|--mono     : downmix to mono
-				-n|--night    : enable night mode
-				-r|--reset    : reset audio filter
-		HELP
-		exit 0
-		;;
-	-c | --compress) flag_compress=1 ;;
-	-d | --dyn) flag_dyn=1 ;;
-	-l | --limit) flag_limit=1 ;;
-	-m | --mono) flag_mono=1 ;;
-	-n | --night) flag_night=1 ;;
-	-r | --reset) flag_res=1 ;;
-	*)
-		break
-		;;
+		-h | --help)
+			cat <<-'HELP'
+				Flags:
+					-c|--compress : apply audio compressor
+					-d|--dyn      : apply dynamic audio
+					-l|--limit    : apply audio limiter
+					-m|--mono     : downmix to mono
+					-n|--night    : enable night mode
+					-r|--reset    : reset audio filter
+			HELP
+			exit 0
+			;;
+		-c | --compress) flag_compress=1 ;;
+		-d | --dyn) flag_dyn=1 ;;
+		-l | --limit) flag_limit=1 ;;
+		-m | --mono) flag_mono=1 ;;
+		-n | --night) flag_night=1 ;;
+		-r | --reset) flag_res=1 ;;
+		*)
+			break
+			;;
 	esac
 	shift
 done

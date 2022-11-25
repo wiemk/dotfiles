@@ -14,18 +14,18 @@ vim.opt.lazyredraw = true
 vim.opt.synmaxcol = 256
 
 -- Use ANSI OSC 52 support when running inside tmux
-if os.getenv("TMUX") then
+if os.getenv "TMUX" then
   vim.g.clipboard = {
     cache_enabled = 1,
     copy = {
       ["*"] = { "tmux", "load-buffer", "-w", "-" },
-      ["+"] = { "tmux", "load-buffer", "-w", "-" }
+      ["+"] = { "tmux", "load-buffer", "-w", "-" },
     },
     name = "myClipboard",
     paste = {
       ["*"] = { "tmux", "save-buffer", "-" },
-      ["+"] = { "tmux", "save-buffer", "-" }
-    }
+      ["+"] = { "tmux", "save-buffer", "-" },
+    },
   }
 end
 
@@ -60,8 +60,8 @@ lvim.keys.normal_mode["<Left>"] = "<NOP>"
 lvim.keys.normal_mode["<Right>"] = "<NOP>"
 
 -- tmux bugfix
-vim.keymap.set({ 'i', 'n', 'v' }, '<C-a>', '<Home>', { noremap = true, silent = true })
-vim.keymap.set({ 'i', 'n', 'v' }, '<C-e>', '<End>', { noremap = true, silent = true })
+vim.keymap.set({ "i", "n", "v" }, "<C-a>", "<Home>", { noremap = true, silent = true })
+vim.keymap.set({ "i", "n", "v" }, "<C-e>", "<End>", { noremap = true, silent = true })
 
 -- Don't yank on backspace or x
 lvim.keys.normal_mode["<Del>"] = '"_x'
@@ -106,7 +106,10 @@ lvim.keys.term_mode["<C-l>"] = false
 lvim.builtin.which_key.mappings["w"] = nil
 lvim.builtin.which_key.mappings["<leader>"] = { "<C-^>", "Cycle Buffer" }
 lvim.builtin.which_key.mappings["h"] = {
-  function() vim.opt.hlsearch = not vim.o.hlsearch end, "Toggle Highlight"
+  function()
+    vim.opt.hlsearch = not vim.o.hlsearch
+  end,
+  "Toggle Highlight",
 }
 lvim.builtin.which_key.mappings["P"] = lvim.builtin.which_key.mappings["p"]
 if lvim.builtin.project.active then
@@ -117,9 +120,9 @@ local ok, builtin = pcall(require, "telescope.builtin")
 if ok then
   lvim.builtin.which_key.mappings["/"] = {
     function()
-      builtin.current_buffer_fuzzy_find({ layout_config = { width = 0.5 } })
+      builtin.current_buffer_fuzzy_find { layout_config = { width = 0.5 } }
     end,
-    "Buffer Fuzzy"
+    "Buffer Fuzzy",
   }
   lvim.builtin.which_key.mappings["sB"] = { builtin.builtin, "Builtins" }
   lvim.builtin.which_key.mappings["F"] = { builtin.live_grep, "Text" }
@@ -140,23 +143,32 @@ lvim.builtin.which_key.mappings["u"] = {
       :sort
       :%s/@/\r/g<CR>
     ]],
-    "Sort Paragraphs"
+    "Sort Paragraphs",
   },
-  s = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
-  w = { function() vim.opt.list = not vim.o.list end, "Show whitespaces" },
+  s = {
+    function()
+      vim.opt.spell = not vim.o.spell
+    end,
+    "Spellcheck",
+  },
+  w = {
+    function()
+      vim.opt.list = not vim.o.list
+    end,
+    "Show whitespaces",
+  },
 }
 
 -- telescope
 -- change default navigation mappings
-local actions = require("telescope.actions")
-lvim.builtin.telescope.defaults.mappings = vim.tbl_deep_extend("force",
-  lvim.builtin.telescope.defaults.mappings, {
+local actions = require "telescope.actions"
+lvim.builtin.telescope.defaults.mappings = vim.tbl_deep_extend("force", lvim.builtin.telescope.defaults.mappings, {
   i = {
     ["<C-k>"] = actions.move_selection_previous,
     ["<C-j>"] = actions.move_selection_next,
     ["<C-p>"] = actions.cycle_history_prev,
     ["<C-n>"] = actions.cycle_history_next,
-  }
+  },
 })
 -- close buffers with hotkey inside telescope
 lvim.builtin.telescope.pickers = vim.tbl_deep_extend("force", lvim.builtin.telescope.pickers or {}, {
@@ -168,7 +180,7 @@ lvim.builtin.telescope.pickers = vim.tbl_deep_extend("force", lvim.builtin.teles
       },
       n = {
         ["<C-d>"] = require("telescope.actions").delete_buffer,
-      }
+      },
     },
     theme = "ivy",
   },
@@ -181,10 +193,9 @@ lvim.builtin.telescope.pickers = vim.tbl_deep_extend("force", lvim.builtin.teles
   },
 })
 -- extensions
-lvim.builtin.telescope.extensions = vim.tbl_deep_extend("force",
-  lvim.builtin.telescope.extensions or {}, {
+lvim.builtin.telescope.extensions = vim.tbl_deep_extend("force", lvim.builtin.telescope.extensions or {}, {
   frecency = {
-    db_root = get_cache_dir()
+    db_root = get_cache_dir(),
   },
 })
 
@@ -251,12 +262,12 @@ lvim.lsp.installer.setup.automatic_installation = false
 vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "rust_analyzer", "bashls" })
 
 -- Custom linters
-if vim.fn.executable("shellcheck") == 1 then
+if vim.fn.executable "shellcheck" == 1 then
   local null_ls = require "null-ls"
   lvim.lsp.null_ls.setup.sources = {
     null_ls.builtins.diagnostics.shellcheck,
     null_ls.builtins.code_actions.shellcheck,
-    null_ls.builtins.formatting.shfmt
+    null_ls.builtins.formatting.shfmt,
   }
 end
 -- Additional Plugins
@@ -269,7 +280,12 @@ lvim.plugins = {
     cmd = "InsertModeline",
     module = "modeline",
     setup = function()
-      lvim.builtin.which_key.mappings["M"] = { function() require("modeline").insertModeline() end, "Insert Modeline" }
+      lvim.builtin.which_key.mappings["M"] = {
+        function()
+          require("modeline").insertModeline()
+        end,
+        "Insert Modeline",
+      }
       lvim.builtin.which_key.mappings["uM"] = lvim.builtin.which_key.mappings["M"]
     end,
   },
@@ -281,7 +297,7 @@ lvim.plugins = {
       lvim.builtin.which_key.mappings["uz"] = { "<cmd>ZenMode<CR>", "Zen Mode" }
     end,
     config = function()
-      require("zen-mode").setup({
+      require("zen-mode").setup {
         window = {
           backdrop = 1,
           height = 0.85,
@@ -298,7 +314,7 @@ lvim.plugins = {
         plugins = {
           gitsigns = { enabled = false },
         },
-      })
+      }
     end,
   },
   {
@@ -309,7 +325,7 @@ lvim.plugins = {
       lvim.builtin.which_key.mappings["ut"] = { "<Cmd>Twilight<CR>", "Twilight Mode" }
     end,
     config = function()
-      require("twilight").setup({
+      require("twilight").setup {
         dimming = {
           alpha = 0.25,
           color = { "Normal", "#ffffff" },
@@ -322,15 +338,15 @@ lvim.plugins = {
           "if_statement",
         },
         exclude = {},
-      })
+      }
     end,
   },
   {
     "nvim-pack/nvim-spectre",
     -- event = "BufRead",
-    module = 'spectre',
+    module = "spectre",
     config = function()
-      require "spectre".setup()
+      require("spectre").setup()
     end,
     setup = function()
       lvim.builtin.which_key.mappings["S"] = {
@@ -364,10 +380,10 @@ lvim.plugins = {
       }
     end,
     config = function()
-      require "trouble".setup {
+      require("trouble").setup {
         mode = "document_diagnostics",
       }
-    end
+    end,
   },
   {
     "mbbill/undotree",
@@ -379,9 +395,9 @@ lvim.plugins = {
   {
     "nvim-telescope/telescope-frecency.nvim",
     config = function()
-      require "telescope".load_extension("frecency")
+      require("telescope").load_extension "frecency"
     end,
-    requires = { "tami5/sqlite.lua" }
+    requires = { "tami5/sqlite.lua" },
   },
   {
     "tpope/vim-fugitive",
@@ -398,9 +414,9 @@ lvim.plugins = {
       "GRemove",
       "GRename",
       "Glgrep",
-      "Gedit"
+      "Gedit",
     },
-    ft = { "fugitive" }
+    ft = { "fugitive" },
   },
   {
     "andymass/vim-matchup",
@@ -442,7 +458,7 @@ lvim.plugins = {
               { "─", "FloatBorder" },
               { "╰", "FloatBorder" },
               { "│", "FloatBorder" },
-            };
+            },
             auto_focus = true,
           },
         },
@@ -452,10 +468,10 @@ lvim.plugins = {
           settings = {
             ["rust-analyzer"] = {
               checkOnSave = {
-                command = "clippy"
-              }
-            }
-          }
+                command = "clippy",
+              },
+            },
+          },
         },
       }
       rust_tools.setup(opts)

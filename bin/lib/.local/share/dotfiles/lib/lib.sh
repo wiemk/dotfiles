@@ -2,7 +2,6 @@
 # shellcheck shell=bash
 # shellcheck disable=2155,1090
 
-
 if hash &>/dev/null; then
 	has() {
 		hash "$1" &>/dev/null
@@ -22,7 +21,6 @@ has_oneof() {
 	done
 	return 1
 }
-
 
 has_emit() {
 	if ! has "$1"; then
@@ -70,15 +68,15 @@ prompt() {
 		msg "$question"
 		read -p "[y]es or [n]o (default: no) : " -r answer
 		case "$answer" in
-		y | Y | yes | YES | Yes)
-			return 0
-			;;
-		n | N | no | NO | No | *[[:blank:]]* | "")
-			return 1
-			;;
-		*)
-			msg "Please answer [y]es or [n]o."
-			;;
+			y | Y | yes | YES | Yes)
+				return 0
+				;;
+			n | N | no | NO | No | *[[:blank:]]* | "")
+				return 1
+				;;
+			*)
+				msg "Please answer [y]es or [n]o."
+				;;
 		esac
 	done
 }

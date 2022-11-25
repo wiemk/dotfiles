@@ -10,16 +10,16 @@ NCURSES_VERSION=6.3
 TMUX_VERSION=3.3
 
 TARGETDIR=$1
-if [[ "${TARGETDIR}" = "" ]]; then
+if [[ ${TARGETDIR} == "" ]]; then
 	TARGETDIR="${PWD}/out"
 fi
 mkdir -p "${TARGETDIR}"
 
 TASKS=$(($(nproc) + 1))
 CC=("${TARGETDIR}/bin/musl-gcc" -static)
-_CFLAGS=( -Os -ffunction-sections -fdata-sections )
+_CFLAGS=(-Os -ffunction-sections -fdata-sections)
 if "${REALGCC:-gcc}" -v 2>&1 | grep -q -- --enable-default-pie; then
-  _CFLAGS+=( -no-pie )
+	_CFLAGS+=(-no-pie)
 fi
 _LDFLAGS=("-Wl,--gc-sections" -flto)
 

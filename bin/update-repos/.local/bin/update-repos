@@ -32,21 +32,21 @@ parse() {
 
 	while :; do
 		case ${1-} in
-		-h | --help) usage ;;
-		-v | --verbose) set -x ;;
-		--no-color) NO_COLOR=1 ;;
-		-p | --parallel) flag_parallel=1 ;;
-		-q | --quiet) flag_quiet=1 ;;
-		-j | --jobs)
-			flag_jobs=${2-}
-			shift
-			;;
-		-d | --depth)
-			flag_depth=${2-}
-			shift
-			;;
-		-?*) die "Unknown option: ${1}" ;;
-		*) break ;;
+			-h | --help) usage ;;
+			-v | --verbose) set -x ;;
+			--no-color) NO_COLOR=1 ;;
+			-p | --parallel) flag_parallel=1 ;;
+			-q | --quiet) flag_quiet=1 ;;
+			-j | --jobs)
+				flag_jobs=${2-}
+				shift
+				;;
+			-d | --depth)
+				flag_depth=${2-}
+				shift
+				;;
+			-?*) die "Unknown option: ${1}" ;;
+			*) break ;;
 		esac
 		shift
 	done
@@ -91,11 +91,11 @@ update() {
 		find "${argv[0]}" -maxdepth "${flag_depth}" -name '.git' -prune -type d -exec \
 			bash -c 'c=$(readlink -en -- "${1}/.."); printf "${PURPLE}╠%s${NOFORMAT}\n" "${c##*/}"; git_pull "$c"' shell {} \;
 	elif ((GNU_PARALLEL == 1)); then
-		find "${argv[0]}" -maxdepth "${flag_depth}" -name '.git' -prune -type d -printf '%h\0' |
-			parallel -0 -j "$flag_jobs" --keep-order "printf \"${PURPLE}╠%s${NOFORMAT}\n\" {}; git_pull {}"
+		find "${argv[0]}" -maxdepth "${flag_depth}" -name '.git' -prune -type d -printf '%h\0' \
+			| parallel -0 -j "$flag_jobs" --keep-order "printf \"${PURPLE}╠%s${NOFORMAT}\n\" {}; git_pull {}"
 	else
-		find "${argv[0]}" -maxdepth "${flag_depth}" -name '.git' -prune -type d -printf '%h\0' |
-			xargs -0 -I{} -P "$flag_jobs" sh -c "printf \"${PURPLE}╠%s${NOFORMAT}\n\" {}; git_pull {}"
+		find "${argv[0]}" -maxdepth "${flag_depth}" -name '.git' -prune -type d -printf '%h\0' \
+			| xargs -0 -I{} -P "$flag_jobs" sh -c "printf \"${PURPLE}╠%s${NOFORMAT}\n\" {}; git_pull {}"
 	fi
 }
 

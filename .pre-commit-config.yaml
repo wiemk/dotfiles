@@ -10,8 +10,24 @@ repos:
     args: [ --fix=no ]
 - repo: local
   hooks:
-    - id: gitleaks-docker
-      name: Detect hardcoded secrets
+    - id: gitleaks
+      name: gitleaks
       description: Detect hardcoded secrets using Gitleaks
-      entry: docker.io/zricethezav/gitleaks:latest protect --verbose --redact --staged
-      language: docker_image
+      language: system
+      entry: gitleaks
+      args: ["protect", "--verbose", "--redact", "--staged"]
+    - id: stylua
+      name: stylua
+      description: Format lua files
+      language: system
+      entry: stylua
+      types: [lua]
+      args: ["--check"]
+    - id: shfmt
+      name: shfmt
+      description: Format shell files
+      minimum_pre_commit_version: 2.4.0
+      language: system
+      types: [shell]
+      entry: shfmt
+      args: ["--case-indent", "--binary-next-line", "--simplify"]

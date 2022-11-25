@@ -46,7 +46,7 @@ sh <(curl --proto '=https' --tlsv1.2 -sSf curl -L https://nixos.org/nix/install)
 if [[ -v has_selinux ]]; then
 	msg 'Relabeling default nix store [/nix/store]..'
 	# work around restorecon hard-link limitation
-	sudo sh -c 'for path in /nix/store/*; do sudo restorecon -FR "$path"; done'
+	sudo sh -c 'for path in /nix/store/*; do sudo restorecon -vFR "$path"; done'
 fi
 
 # vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:
