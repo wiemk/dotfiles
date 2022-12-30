@@ -1,0 +1,5 @@
+# vi: set ft=zsh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+if has selinuxenabled && selinuxenabled; then
+	sudo ausearch -m AVC,USER_AVC,SELINUX_ERR,USER_SELINUX_ERR -ts recent
+fi

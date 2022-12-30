@@ -1,0 +1,5 @@
+# vi: set ft=zsh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+nix profile wipe-history
+nix store gc
+nix store optimise

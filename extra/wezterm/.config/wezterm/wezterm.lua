@@ -20,7 +20,7 @@ local sc = {
 
 local fallback = function(name, params)
   -- $ wezterm ls-fonts --list-system
-  -- font_dirs = { "/home/zeno/.local/share/fonts" },
+  -- font_dirs = { "/home/strom/.local/share/fonts" },
   local names = { name, "CaskaydiaCove Nerd Font Mono", "FiraCode Nerd Font Mono", "monospace" }
   return term.font_with_fallback(names, params)
 end

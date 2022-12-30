@@ -19,6 +19,7 @@ if has selinuxenabled && selinuxenabled; then
 	has_selinux=1
 fi
 
+# https://github.com/nix-community/nix-installers/blob/master/selinux/nix.fc
 if [[ -v has_selinux ]]; then
 	msg 'Checking for presence of custom SELinux fcontext entries..'
 	if ! grep -q '/nix/var/nix/profiles' < <(sudo semanage fcontext --locallist --list); then

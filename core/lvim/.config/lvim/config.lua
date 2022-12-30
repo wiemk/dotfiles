@@ -4,7 +4,7 @@ lvim = global options object
 
 -- General
 lvim.log.level = "error"
--- lvim.format_on_save = true
+lvim.format_on_save = false
 lvim.builtin.theme.tokyonight.options.style = "moon"
 lvim.colorscheme = "tokyonight-moon"
 lvim.use_icons = true
@@ -102,7 +102,6 @@ lvim.keys.term_mode["<C-k>"] = false
 lvim.keys.term_mode["<C-l>"] = false
 
 -- which-key
--- lvim.builtin.which_key.setup.triggers_blacklist = { n = { "g" } }
 lvim.builtin.which_key.mappings["w"] = nil
 lvim.builtin.which_key.mappings["<leader>"] = { "<C-^>", "Cycle Buffer" }
 lvim.builtin.which_key.mappings["h"] = {
@@ -171,6 +170,7 @@ lvim.builtin.telescope.defaults.mappings = vim.tbl_deep_extend("force", lvim.bui
   },
 })
 -- close buffers with hotkey inside telescope
+lvim.builtin.telescope.theme = "ivy"
 lvim.builtin.telescope.pickers = vim.tbl_deep_extend("force", lvim.builtin.telescope.pickers or {}, {
   buffers = {
     sort_lastused = true,
@@ -186,10 +186,6 @@ lvim.builtin.telescope.pickers = vim.tbl_deep_extend("force", lvim.builtin.teles
   },
   builtin = {
     previewer = false,
-    theme = "ivy",
-  },
-  live_grep = {
-    theme = "ivy",
   },
 })
 -- extensions
@@ -276,7 +272,7 @@ lvim.plugins = {
   { "machakann/vim-sandwich" },
   { "gpanders/editorconfig.nvim" },
   {
-    "https://betaco.de/zeno/modeline.nvim",
+    "https://betaco.de/strom/modeline.nvim",
     cmd = "InsertModeline",
     module = "modeline",
     setup = function()
@@ -305,10 +301,6 @@ lvim.plugins = {
             signcolumn = "no",
             number = false,
             relativenumber = false,
-            -- cursorline = false,
-            -- cursorcolumn = false,
-            -- foldcolumn = "0",
-            -- list = false,
           },
         },
         plugins = {
@@ -338,23 +330,6 @@ lvim.plugins = {
           "if_statement",
         },
         exclude = {},
-      }
-    end,
-  },
-  {
-    "nvim-pack/nvim-spectre",
-    -- event = "BufRead",
-    module = "spectre",
-    config = function()
-      require("spectre").setup()
-    end,
-    setup = function()
-      lvim.builtin.which_key.mappings["S"] = {
-        name = "Spectre",
-        t = { "<cmd>lua require('spectre').open()<CR>", "Spectre" },
-        w = { "<cmd>lua require('spectre').open_visual({select_word=true})<CR>", "Word" },
-        v = { "<cmd>lua require('spectre').open_visual()<CR>", "Visual" },
-        f = { "<cmd>sp viw:lua require('spectre').open_file_search()<CR>", "Current File" },
       }
     end,
   },
@@ -424,58 +399,5 @@ lvim.plugins = {
     config = function()
       vim.g.matchup_matchparen_offscreen = { method = "popup" }
     end,
-  },
-  {
-    "simrat39/rust-tools.nvim",
-    config = function()
-      local status_ok, rust_tools = pcall(require, "rust-tools")
-      if not status_ok then
-        return
-      end
-      local opts = {
-        tools = {
-          executor = require("rust-tools/executors").termopen,
-          reload_workspace_from_cargo_toml = true,
-          inlay_hints = {
-            auto = true,
-            only_current_line = false,
-            show_parameter_hints = true,
-            parameter_hints_prefix = "<-",
-            other_hints_prefix = "=>",
-            max_len_align = false,
-            max_len_align_padding = 1,
-            right_align = false,
-            right_align_padding = 7,
-            highlight = "Comment",
-          },
-          hover_actions = {
-            border = {
-              { "╭", "FloatBorder" },
-              { "─", "FloatBorder" },
-              { "╮", "FloatBorder" },
-              { "│", "FloatBorder" },
-              { "╯", "FloatBorder" },
-              { "─", "FloatBorder" },
-              { "╰", "FloatBorder" },
-              { "│", "FloatBorder" },
-            },
-            auto_focus = true,
-          },
-        },
-        server = {
-          on_attach = require("lvim.lsp").common_on_attach,
-          on_init = require("lvim.lsp").common_on_init,
-          settings = {
-            ["rust-analyzer"] = {
-              checkOnSave = {
-                command = "clippy",
-              },
-            },
-          },
-        },
-      }
-      rust_tools.setup(opts)
-    end,
-    ft = { "rust", "rs" },
   },
 }

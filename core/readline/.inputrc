@@ -2,6 +2,8 @@
 # ~/.inputrc
 
 set enable-bracketed-paste on
+set colored-stats on
+set colored-completion-prefix on
 
 set keyseq-timeout 100
 # set editing-mode vi

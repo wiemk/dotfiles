@@ -17,7 +17,6 @@ column:fg:magenta
 --engine
 --mmap
 --hidden
---follow
 --column
 --smart-case
 --trim

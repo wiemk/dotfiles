@@ -6,6 +6,9 @@ core/bash/.config/bash/rc.pre
 core/bash/.config/bash/rc.post
 core/bash/.config/bash/source.d/*
 core/bash/.config/bash/source/local/*.sh
+# zsh
+core/zsh/.config/zsh/.z*.local
+core/zsh/.config/zsh/functions/_*
 # git
 core/git/.config/git/*.local
 # systemd

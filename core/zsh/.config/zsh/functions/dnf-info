@@ -1,0 +1,23 @@
+# vi: set ft=zsh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+local -r pkg=$1
+if ! rpm -q "$pkg" &>/dev/null; then
+	print "package not installed"
+	return 1
+fi
+# prime sudo
+sudo -v
+print "=== Install reason ==="
+dnf-reason "$pkg"
+print "=== Member of groups ==="
+dnf-group "$pkg"
+print "=== Weak dependencies ==="
+rpm-weak "$pkg"
+print "=== Marked for autoremove ==="
+if [[ $(dnf-needed "$pkg" | wc -l) -gt 0 ]]; then
+	print "YES"
+fi
+print "=== History ==="
+dnf-history "$pkg"
+print "\n=== Description ===\n"
+rpm -qi "$pkg"

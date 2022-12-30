@@ -28,6 +28,7 @@ repos:
       description: Format shell files
       minimum_pre_commit_version: 2.4.0
       language: system
+      files: ^core/bash
       types: [shell]
       entry: shfmt
       args: ["--case-indent", "--binary-next-line", "--simplify"]

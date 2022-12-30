@@ -1,0 +1,7 @@
+# vi: set ft=zsh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+# weak dependencies of a package
+print "=== Supplements ==="
+rpm -q --whatsupplements "$1"
+print "=== Recommends ==="
+rpm -q --whatrecommends "$1"
