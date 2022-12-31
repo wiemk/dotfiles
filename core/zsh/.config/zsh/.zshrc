@@ -13,8 +13,6 @@ setopt \
 	autocd \
 	autoparamslash \
 	autopushd \
-	correct \
-	correctall \
 	extendedglob \
 	globcomplete \
 	markdirs \
@@ -219,7 +217,7 @@ if has zoxide; then
 		dir="$(command zoxide query -i -- "$@")"
 		# BUFFER="builtin cd -- ${(q)dir}"
 		# zle accept-line
-		builtin cd -- "${(q)dir}"
+		builtin cd -- "$dir"
 		local ret=$?
 		unset dir
 		zle reset-prompt
@@ -258,17 +256,13 @@ alias rm='command rm -vI'
 
 alias dnf='sudo dnf'
 alias dnfw='sudo dnf --setopt=install_weak_deps=False'
-alias dust='dust -rx'
 alias grep='grep --color=auto'
 alias mm='neomutt'
 alias mutt='neomutt'
 alias top='htop'
 alias unsha='socat -t 5 - tcp:unsha.re:10000'
 alias mpvr="mpv --input-ipc-server=\${XDG_RUNTIME_DIR}/mpv.sock"
-
-if has batman; then
-	alias man='batman'
-fi
+alias iface="ip route get 8.8.8.8 | sed -n '1 s/.* dev \([^ ]*\).*/\1/p'"
 #}}}
 #
 # {{{zshrc.local

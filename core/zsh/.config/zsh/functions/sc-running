@@ -1,0 +1,12 @@
+# vi: set ft=zsh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+if (($# > 0)); then
+  if [[ $1 == --user ]]; then
+    local -r user=1
+  else
+    print >&2 'Only --user is supported.'
+    return 1
+  fi
+fi
+
+systemctl ${user:+--user} list-units --type=service --state=running

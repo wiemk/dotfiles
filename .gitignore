@@ -15,6 +15,7 @@ core/git/.config/git/*.local
 **/systemd/user/**/override.conf
 # neovim
 core/[nl]vim/.config/[nl]vim/plugin/*
+core/lvim/.config/lvim/lazy-lock.json
 # vifm
 core/vifm/.config/vifm/vifminfo.json
 # gnupg

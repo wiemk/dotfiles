@@ -1,3 +1,4 @@
+-- vi: set ft=lua ts=2 sw=2 sts=-1 nosr et nosi tw=0 fdm=manual:
 --[[
 lvim = global options object
 ]]
@@ -223,6 +224,7 @@ lvim.builtin.dap.active = false
 lvim.builtin.lualine.sections.lualine_a = { "mode" }
 
 -- tree-sitter
+lvim.builtin.treesitter.auto_install = false
 lvim.builtin.treesitter.ensure_installed = {
   "bash",
   "c",
@@ -272,10 +274,9 @@ lvim.plugins = {
   { "machakann/vim-sandwich" },
   { "gpanders/editorconfig.nvim" },
   {
-    "https://betaco.de/strom/modeline.nvim",
+    url = "https://betaco.de/strom/modeline.nvim",
     cmd = "InsertModeline",
-    module = "modeline",
-    setup = function()
+    init = function()
       lvim.builtin.which_key.mappings["M"] = {
         function()
           require("modeline").insertModeline()
@@ -286,84 +287,9 @@ lvim.plugins = {
     end,
   },
   {
-    "folke/zen-mode.nvim",
-    cmd = "ZenMode",
-    module = "zen-mode",
-    setup = function()
-      lvim.builtin.which_key.mappings["uz"] = { "<cmd>ZenMode<CR>", "Zen Mode" }
-    end,
-    config = function()
-      require("zen-mode").setup {
-        window = {
-          backdrop = 1,
-          height = 0.85,
-          options = {
-            signcolumn = "no",
-            number = false,
-            relativenumber = false,
-          },
-        },
-        plugins = {
-          gitsigns = { enabled = false },
-        },
-      }
-    end,
-  },
-  {
-    "folke/twilight.nvim",
-    cmd = "Twilight",
-    module = "twilight",
-    setup = function()
-      lvim.builtin.which_key.mappings["ut"] = { "<Cmd>Twilight<CR>", "Twilight Mode" }
-    end,
-    config = function()
-      require("twilight").setup {
-        dimming = {
-          alpha = 0.25,
-          color = { "Normal", "#ffffff" },
-        },
-        context = 20,
-        expand = {
-          "function",
-          "method",
-          "table",
-          "if_statement",
-        },
-        exclude = {},
-      }
-    end,
-  },
-  {
-    "simrat39/symbols-outline.nvim",
-    cmd = "SymbolsOutline",
-    setup = function()
-      lvim.builtin.which_key.mappings["lo"] = { "<Cmd>SymbolsOutline<CR>", "Outline" }
-    end,
-  },
-  {
-    "folke/trouble.nvim",
-    cmd = "TroubleToggle",
-    setup = function()
-      lvim.builtin.which_key.mappings["t"] = {
-        name = "Diagnostics",
-        t = { "<cmd>TroubleToggle<CR>", "trouble" },
-        w = { "<cmd>TroubleToggle workspace_diagnostics<CR>", "workspace" },
-        d = { "<cmd>TroubleToggle document_diagnostics<CR>", "document" },
-        q = { "<cmd>TroubleToggle quickfix<CR>", "quickfix" },
-        l = { "<cmd>TroubleToggle loclist<CR>", "loclist" },
-        r = { "<cmd>TroubleToggle lsp_references<CR>", "references" },
-      }
-    end,
-    config = function()
-      require("trouble").setup {
-        mode = "document_diagnostics",
-      }
-    end,
-  },
-  {
     "mbbill/undotree",
     cmd = "UndotreeToggle",
-    setup = function()
+    init = function()
       lvim.builtin.which_key.mappings["uU"] = { "<cmd>UndotreeToggle<CR>", "UndoTree" }
     end,
   },
@@ -372,7 +298,7 @@ lvim.plugins = {
     config = function()
       require("telescope").load_extension "frecency"
     end,
-    requires = { "tami5/sqlite.lua" },
+    dependencies = { "tami5/sqlite.lua" },
   },
   {
     "tpope/vim-fugitive",
