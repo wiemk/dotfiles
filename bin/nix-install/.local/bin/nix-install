@@ -11,19 +11,19 @@ set -e
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
 if [[ -d /nix ]]; then
-	msg 'Nix install found, please uninstall or delete /nix.'
+	_msg 'Nix install found, please uninstall or delete /nix.'
 	exit 1
 fi
 
-if has selinuxenabled && selinuxenabled; then
+if _has selinuxenabled && selinuxenabled; then
 	has_selinux=1
 fi
 
 # https://github.com/nix-community/nix-installers/blob/master/selinux/nix.fc
 if [[ -v has_selinux ]]; then
-	msg 'Checking for presence of custom SELinux fcontext entries..'
+	_msg 'Checking for presence of custom SELinux fcontext entries..'
 	if ! grep -q '/nix/var/nix/profiles' < <(sudo semanage fcontext --locallist --list); then
-		msg 'Adding local SELinux fcontext entries..'
+		_msg 'Adding local SELinux fcontext entries..'
 		sudo sh -c "
 			semanage fcontext -a -t etc_t '/nix/store/[^/]+/etc(/.*)?'
 			semanage fcontext -a -t lib_t '/nix/store/[^/]+/lib(/.*)?'
@@ -36,16 +36,16 @@ if [[ -v has_selinux ]]; then
 	fi
 
 	if [[ $(getenforce) == Enforcing ]]; then
-		msg 'SELinux is in enforcing mode, temporarily setting to permissive..'
+		_msg 'SELinux is in enforcing mode, temporarily setting to permissive..'
 		sudo setenforce 0
-		trap 'msg "Restoring enforcing mode.."; sudo setenforce 1' EXIT
+		trap '_msg "Restoring enforcing mode.."; sudo setenforce 1' EXIT
 	fi
 fi
 
 sh <(curl --proto '=https' --tlsv1.2 -sSf curl -L https://nixos.org/nix/install) --daemon
 
 if [[ -v has_selinux ]]; then
-	msg 'Relabeling default nix store [/nix/store]..'
+	_msg 'Relabeling default nix store [/nix/store]..'
 	# work around restorecon hard-link limitation
 	sudo sh -c 'for path in /nix/store/*; do sudo restorecon -vFR "$path"; done'
 fi

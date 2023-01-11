@@ -5,11 +5,11 @@
 # shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
-if ! has_emit jq; then
+if ! _has_emit jq; then
 	exit 1
 fi
 
-if ! has clip; then
+if ! _has clip; then
 	script=$(dirname "$(readlink -f -- "$0")")
 	src=${script}/../../../clip/.local/bin/clip
 	if [[ -f $src ]]; then
@@ -19,9 +19,9 @@ fi
 
 share() {
 	local cmd
-	if has socat; then
+	if _has socat; then
 		cmd='socat -t 5 - tcp:unsha.re:9999'
-	elif has ncat; then
+	elif _has ncat; then
 		cmd='ncat unsha.re 9999'
 	else
 		echo 'Please make sure you have either socat or ncat in your path.' >&2

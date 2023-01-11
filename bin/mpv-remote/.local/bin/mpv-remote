@@ -5,8 +5,8 @@
 # shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
-if ! has socat; then
-	die "socat not found"
+if ! _has socat; then
+	_die "socat not found"
 fi
 
 MPV_SOCKET=${MPV_SOCKET:-${XDG_RUNTIME_DIR}/mpv.sock}

@@ -37,7 +37,7 @@ is_active_current() {
 		return 0
 	fi
 
-	msg "Active kernel (${active}) may be outdated, found a newer one (${latest})."
+	_msg "Active kernel (${active}) may be outdated, found a newer one (${latest})."
 	return 1
 }
 
@@ -71,7 +71,7 @@ if ! is_active_current; then
 fi
 
 if ((reboot > 0)); then
-	msg "Reboot may be required."
+	_msg "Reboot may be required."
 fi
 
 exit $reboot

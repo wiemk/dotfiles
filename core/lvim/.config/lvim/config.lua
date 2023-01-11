@@ -126,6 +126,13 @@ if ok then
   }
   lvim.builtin.which_key.mappings["sB"] = { builtin.builtin, "Builtins" }
   lvim.builtin.which_key.mappings["F"] = { builtin.live_grep, "Text" }
+  lvim.builtin.which_key.mappings["A"] = {
+    function()
+      builtin.find_files { hidden = true, no_ignore = true }
+    end,
+    "Find hidden",
+  }
+  lvim.builtin.which_key.mappings["sA"] = lvim.builtin.which_key.mappings["A"]
   lvim.builtin.which_key.mappings["B"] = lvim.builtin.which_key.mappings["b"]
   -- Close all but current buffer
   lvim.builtin.which_key.mappings["Bo"] = { ':%bd!|e #|bd #|normal`"<CR>', "Close inactive buffers" }
@@ -295,6 +302,14 @@ lvim.plugins = {
   },
   {
     "nvim-telescope/telescope-frecency.nvim",
+    cond = function()
+      if vim.fn.executable "pkg-config" then
+        vim.fn.system { "pkg-config", "--libs", "sqlite3" }
+        return vim.v.shell_error == 0
+      end
+      local libpath = "/usr/lib64/libsqlite3.so"
+      return vim.loop.fs_stat(libpath)
+    end,
     config = function()
       require("telescope").load_extension "frecency"
     end,

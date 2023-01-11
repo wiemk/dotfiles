@@ -5,7 +5,7 @@
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
 urlencode() {
-	if has jq; then
+	if _has jq; then
 		printf '%s' "$(jq -sRr @uri < <(printf "%s" "$1"))"
 	else
 		local length=${#1}
@@ -21,7 +21,7 @@ urlencode() {
 
 transfer() {
 	if (($# < 1)); then
-		die 'No arguments specified.\nUsage:\n  transfer <file|directory>\n  ... | transfer <file_name>\n'
+		_die 'No arguments specified.\nUsage:\n  transfer <file|directory>\n  ... | transfer <file_name>\n'
 	fi
 
 	local fname
@@ -30,7 +30,7 @@ transfer() {
 		fname=$(urlencode "$(basename "$file")")
 
 		if [[ ! -e $file ]]; then
-			die "${file}: No such file or directory"
+			_die "${file}: No such file or directory"
 		fi
 
 		if [[ -d $file ]]; then
@@ -43,7 +43,7 @@ transfer() {
 		fname=$(urlencode "$1")
 		curl --include --progress-bar --upload-file "-" "https://file.unsha.re/${fname}"
 	fi
-	msg ''
+	_msg ''
 }
 
 transfer "$@"

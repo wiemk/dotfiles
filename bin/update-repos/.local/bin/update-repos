@@ -20,7 +20,7 @@ EOF
 	exit
 }
 
-if has parallel; then
+if _has parallel; then
 	GNU_PARALLEL=1
 fi
 
@@ -45,14 +45,14 @@ parse() {
 				flag_depth=${2-}
 				shift
 				;;
-			-?*) die "Unknown option: ${1}" ;;
+			-?*) _die "Unknown option: ${1}" ;;
 			*) break ;;
 		esac
 		shift
 	done
 
 	argv=("$@")
-	[[ ${#argv[@]} -eq 0 ]] && die 'Missing script arguments'
+	[[ ${#argv[@]} -eq 0 ]] && _die 'Missing script arguments'
 
 	return 0
 }

@@ -4,12 +4,13 @@ has() {
 	(( ${+commands[$1]} ))
 }
 # }}}
-#
 #{{{Variables
-if has nvim; then
-	EDITOR=nvim
-else
-	EDITOR=vi
+if [[ ! -v EDITOR ]]; then
+	if has nvim; then
+		EDITOR=nvim
+	else
+		EDITOR=vi
+	fi
 fi
 
 PAGER=less

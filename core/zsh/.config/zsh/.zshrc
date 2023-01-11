@@ -1,13 +1,22 @@
-# vi: set ft=zsh ts=4 sw=0 sts=-1 sr noet nosi tw=0 fdm=marker:
+# vi: set ft=zsh ts=4 sw=0 sts=-1 sr noet nosi tw=0 fdm=marker nofoldenable:
 #
-# {{{General
-# This *should* be set in .zshenv
+# {{{Environment
+# Wayland sources environment.d configuration fragments for us
+if [[ $XDG_SESSION_TYPE != wayland \
+	&& -x /usr/lib/systemd/user-environment-generators/30-systemd-environment-d-generator ]]; then
+	export $(/usr/lib/systemd/user-environment-generators/30-systemd-environment-d-generator | xargs)
+fi
+
+# Don't rely on environment.d for prepending .local/bin and dedup items
+path=($(readlink -eq "${XDG_DATA_HOME}/../bin") $path)
+typeset -U path
+
+# fallback
 if [[ ! -d $ZPLUGIN ]]; then
-	# if ZDOTDIR isn't defined, everything breaks anyways
 	ZPLUGIN=$ZDOTDIR
 fi
 # }}}
-#
+
 # {{{Options
 setopt \
 	autocd \
@@ -22,7 +31,7 @@ setopt \
 
 unsetopt beep
 # }}}
-#
+
 # {{{History
 setopt \
 	histfcntllock \
@@ -38,7 +47,7 @@ HISTFILE=${XDG_STATE_HOME}/zsh/history
 HISTSIZE=10000
 SAVEHIST=10000
 # }}}
-#
+
 # {{{Title
 if (( ${+terminfo[fsl]} && ${+terminfo[tsl]} )); then
 	window-title() {
@@ -52,7 +61,7 @@ if (( ${+terminfo[fsl]} && ${+terminfo[tsl]} )); then
 	add-zsh-hook precmd window-title
 fi
 # }}}
-#
+
 # {{{Keybinds
 bindkey -e
 
@@ -117,14 +126,14 @@ if (( ${+terminfo[smkx]} && ${+terminfo[rmkx]} )); then
 	add-zle-hook-widget -Uz zle-line-finish zle_application_mode_stop
 fi
 # }}}
-#
+
 # {{{help
 unalias run-help 2>/dev/null
 autoload run-help
 HELPDIR=/usr/share/zsh/${ZSH_VERSION}/help
 alias help=run-help
 # }}}
-#
+
 # {{{GPG
 # gpg-agent should be started by systemd but we need to refresh the tty
 export GPG_TTY=$(tty)
@@ -134,7 +143,7 @@ if [[ -S $gpgsock ]]; then
 fi
 unset gpgsock
 # }}}
-#
+
 # {{{Functions
 has() {
 	(( ${+commands[$1]} ))
@@ -152,17 +161,30 @@ fload() {
 }
 fload
 #}}}
-#
+
 # {{{Completion
 autoload -Uz compinit
 command mkdir -p "${XDG_CACHE_HOME}/zsh" 2>/dev/null
 compinit -d "${XDG_CACHE_HOME}/zsh/zcompdump"
 # }}}
-#
+
 # {{{Plugins
 if ! has git; then
-	NOCLONE=1
+	NO_CLONE=1
 fi
+
+# {{{Prompt
+if has starship; then
+  eval "$(command starship init zsh --print-full-init)"
+else
+	# fall back to minimal prompt
+	if [[ ! -e ${ZPLUGIN}/minimal/minimal.zsh && ! -v NO_CLONE ]]; then
+		GIT_CONFIG_GLOBAL=/dev/null git -C "$ZPLUGIN" clone --depth=1 https://github.com/subnixr/minimal.git
+	fi
+	source "${ZPLUGIN}/minimal/minimal.zsh"
+fi
+# }}}
+
 # {{{fzf
 if has fzf; then
 	if [[ -r /usr/share/zsh/site-functions/fzf ]]; then
@@ -179,7 +201,7 @@ if has fzf; then
 		fi
 	fi
 
-	if [[ ! -e ${ZPLUGIN}/fzf-tab/fzf-tab.plugin.zsh && ! -v NOCLONE ]]; then
+	if [[ ! -e ${ZPLUGIN}/fzf-tab/fzf-tab.plugin.zsh && ! -v NO_CLONE ]]; then
 		GIT_CONFIG_GLOBAL=/dev/null git -C "$ZPLUGIN" clone --depth=1 https://github.com/Aloxaf/fzf-tab.git
 	fi
 	source "${ZPLUGIN}/fzf-tab/fzf-tab.plugin.zsh"
@@ -187,24 +209,12 @@ fi
 # }}}
 #
 # {{{zsh-autosuggestions
-if [[ ! -e ${ZPLUGIN}/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh && ! -v NOCLONE ]]; then
+if [[ ! -e ${ZPLUGIN}/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh && ! -v NO_CLONE ]]; then
 		GIT_CONFIG_GLOBAL=/dev/null git -C "$ZPLUGIN" clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git
 fi
 source "${ZPLUGIN}/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
 ZSH_AUTOSUGGEST_STRATEGY+=(completion)
 bindkey -- '^[[Z' autosuggest-accept
-# }}}
-
-# {{{prompt
-if has starship; then
-  eval "$(command starship init zsh --print-full-init)"
-else
-	#fallback to minimal prompt
-	if [[ ! -e ${ZPLUGIN}/minimal/minimal.zsh && ! -v NOCLONE ]]; then
-		GIT_CONFIG_GLOBAL=/dev/null git -C "$ZPLUGIN" clone --depth=1 https://github.com/subnixr/minimal.git
-	fi
-	source "${ZPLUGIN}/minimal/minimal.zsh"
-fi
 # }}}
 
 # {{{zoxide
@@ -235,7 +245,7 @@ if [[ -n $VIVID_LS_THEME ]] && has vivid; then
 fi
 # }}}
 # }}}
-#
+
 # {{{Aliase
 alias chgrp='command chgrp -c --preserve-root'
 alias chmod='command chmod -c --preserve-root'
@@ -256,15 +266,18 @@ alias rm='command rm -vI'
 
 alias dnf='sudo dnf'
 alias dnfw='sudo dnf --setopt=install_weak_deps=False'
+alias e='editor'
+alias ed='editor'
 alias grep='grep --color=auto'
+alias iface="ip route get 8.8.8.8 | sed -n '1 s/.* dev \([^ ]*\).*/\1/p'"
+alias kc='koji-arch'
 alias mm='neomutt'
+alias mpvr="mpv --input-ipc-server=\${XDG_RUNTIME_DIR}/mpv.sock"
 alias mutt='neomutt'
 alias top='htop'
 alias unsha='socat -t 5 - tcp:unsha.re:10000'
-alias mpvr="mpv --input-ipc-server=\${XDG_RUNTIME_DIR}/mpv.sock"
-alias iface="ip route get 8.8.8.8 | sed -n '1 s/.* dev \([^ ]*\).*/\1/p'"
 #}}}
-#
+
 # {{{zshrc.local
 if [[ -e ${ZDOTDIR}/.zshrc.local ]]; then
 	source "${ZDOTDIR}/.zshrc.local"

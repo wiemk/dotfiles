@@ -7,7 +7,7 @@
 # shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
-if ! has_emit HandBrakeCLI; then
+if ! _has_emit HandBrakeCLI; then
 	exit 1
 fi
 
@@ -22,7 +22,7 @@ if [[ -d ${args[-1]} ]]; then
 	workdir=$(readlink -f -- "${args[-1]}")
 	unset 'args[-1]'
 else
-	die "Not a valid directory: ${args[-1]}"
+	_die "Not a valid directory: ${args[-1]}"
 fi
 
 numfiles() {
@@ -52,7 +52,7 @@ assburn() {
 }
 
 if (($(numfiles "$workdir") < 1)); then
-	die "No files to process found."
+	_die "No files to process found."
 fi
 
 declare -a aopts
