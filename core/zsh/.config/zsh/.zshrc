@@ -12,8 +12,9 @@ path=($(readlink -eq "${XDG_DATA_HOME}/../bin") $path)
 typeset -U path
 
 # fallback
+ZPLUGIN=${ZPLUGIN:-${XDG_STATE_HOME}/zsh/plugins}
 if [[ ! -d $ZPLUGIN ]]; then
-	ZPLUGIN=$ZDOTDIR
+	command mkdir -p "${XDG_STATE_HOME}/zsh/plugins" 2>/dev/null || ZPLUGIN=$ZDOTDIR
 fi
 # }}}
 
@@ -42,7 +43,6 @@ setopt \
 
 unsetopt histsavebycopy
 
-command mkdir -p "${XDG_STATE_HOME}/zsh/plugins" 2>/dev/null
 HISTFILE=${XDG_STATE_HOME}/zsh/history
 HISTSIZE=10000
 SAVEHIST=10000
@@ -187,24 +187,57 @@ fi
 
 # {{{fzf
 if has fzf; then
-	if [[ -r /usr/share/zsh/site-functions/fzf ]]; then
-		source /usr/share/zsh/site-functions/fzf
-		_fzf_compgen_path() {
-			fd --hidden --follow --exclude ".git" . "$1"
-		}
-
-		_fzf_compgen_dir() {
-			fd --type d --hidden --follow --exclude ".git" . "$1"
-		}
-		if [[ -r /usr/share/fzf/shell/key-bindings.zsh ]]; then
-			source /usr/share/fzf/shell/key-bindings.zsh
+	_source_xdg_data() {
+		local args=("$@")
+		local src
+		if [[ -v XDG_DATA_DIRS ]]; then
+			for dir in ${(@s/:/)XDG_DATA_DIRS}; do
+				for file in $args; do
+					src=$dir/$file
+					src=${src:a}
+					if [[ -r $src ]]; then
+						source "$src"
+						return
+					fi
+				done
+			done
 		fi
+
+		# try system wide standard directory
+		for file in $args; do
+			src=/usr/share/${file}
+			src=${src:a}
+			if [[ -r $src ]]; then
+				source "$src"
+				return
+			fi
+		done
+
+		# nothing found
+		return 1
+	}
+
+	# Packager may have left completion.zsh untouched,
+	# residing in fzf's data dir instead of zsh's (nix).
+	# Don't append fpath, just source it.
+	if _source_xdg_data zsh/site-functions/fzf fzf/completion.zsh; then
+		if has fd; then
+			_fzf_compgen_path() {
+				fd --hidden --follow --exclude ".git" . "$1"
+			}
+
+			_fzf_compgen_dir() {
+				fd --type d --hidden --follow --exclude ".git" . "$1"
+			}
+		fi
+		_source_xdg_data fzf/{,shell}/key-bindings.zsh || true
 	fi
 
 	if [[ ! -e ${ZPLUGIN}/fzf-tab/fzf-tab.plugin.zsh && ! -v NO_CLONE ]]; then
 		GIT_CONFIG_GLOBAL=/dev/null git -C "$ZPLUGIN" clone --depth=1 https://github.com/Aloxaf/fzf-tab.git
 	fi
 	source "${ZPLUGIN}/fzf-tab/fzf-tab.plugin.zsh"
+	unset -f _source_xdg_data
 fi
 # }}}
 #
@@ -268,6 +301,7 @@ alias dnf='sudo dnf'
 alias dnfw='sudo dnf --setopt=install_weak_deps=False'
 alias e='editor'
 alias ed='editor'
+alias edit='editor'
 alias grep='grep --color=auto'
 alias iface="ip route get 8.8.8.8 | sed -n '1 s/.* dev \([^ ]*\).*/\1/p'"
 alias kc='koji-arch'
@@ -276,6 +310,7 @@ alias mpvr="mpv --input-ipc-server=\${XDG_RUNTIME_DIR}/mpv.sock"
 alias mutt='neomutt'
 alias top='htop'
 alias unsha='socat -t 5 - tcp:unsha.re:10000'
+alias upd='plug-up'
 #}}}
 
 # {{{zshrc.local
