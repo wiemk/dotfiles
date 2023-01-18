@@ -49,7 +49,7 @@ SAVEHIST=10000
 # }}}
 
 # {{{Title
-if (( ${+terminfo[fsl]} && ${+terminfo[tsl]} )); then
+if ((${+terminfo[fsl]} && ${+terminfo[tsl]})); then
 	window-title() {
 		title=${PWD##*/}
 		if [[ ${#title} -gt 16 ]]; then
@@ -163,9 +163,23 @@ fload
 #}}}
 
 # {{{Completion
-autoload -Uz compinit
+autoload -Uz compinit bashcompinit
 command mkdir -p "${XDG_CACHE_HOME}/zsh" 2>/dev/null
 compinit -d "${XDG_CACHE_HOME}/zsh/zcompdump"
+
+# source manually linked bash-completions
+bashcomp() {
+	setopt nullglob
+	if [[ -d $ZDOTDIR/bash-completion.d && files=("${ZDOTDIR}"/bash-completion.d/*) 2>/dev/null ]]; then
+		# only now invoke the bash completion wrapper
+		bashcompinit
+		for comp in "${ZDOTDIR}"/bash-completion.d/*; do
+			if [[ -e "$comp" ]]; then
+				source "$comp" 2>/dev/null
+			fi
+		done
+	fi
+}
 # }}}
 
 # {{{Plugins
@@ -304,7 +318,8 @@ alias ed='editor'
 alias edit='editor'
 alias grep='grep --color=auto'
 alias iface="ip route get 8.8.8.8 | sed -n '1 s/.* dev \([^ ]*\).*/\1/p'"
-alias kc='koji-arch'
+alias kc='koji-check'
+alias kdl='koji-arch'
 alias mm='neomutt'
 alias mpvr="mpv --input-ipc-server=\${XDG_RUNTIME_DIR}/mpv.sock"
 alias mutt='neomutt'

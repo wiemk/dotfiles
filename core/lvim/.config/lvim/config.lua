@@ -14,6 +14,9 @@ lvim.use_icons = true
 vim.opt.lazyredraw = true
 vim.opt.synmaxcol = 256
 
+-- Don't skip over '_'
+vim.opt.iskeyword:remove "_"
+
 -- Use ANSI OSC 52 support when running inside tmux
 if os.getenv "TMUX" then
   vim.g.clipboard = {
@@ -342,3 +345,12 @@ lvim.plugins = {
     end,
   },
 }
+
+if vim.g.neovide ~= nil then
+  vim.g.neovide_refresh_rate = 60
+  vim.g.neovide_refresh_rate_idle = 5
+  vim.g.neovide_cursor_antialiasing = false
+  vim.g.neovide_cursor_vfx_mode = ""
+  vim.g.neovide_cursor_animation_length = 0
+  vim.g.neovide_cursor_trail_size = 0
+end

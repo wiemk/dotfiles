@@ -16,7 +16,7 @@ flag_dyn=0
 flag_limit=0
 flag_res=0
 flag_mono=0
-flag_night=0
+flag_norm=0
 
 while :; do
 	case ${1-} in
@@ -27,7 +27,7 @@ while :; do
 					-d|--dyn      : apply dynamic audio
 					-l|--limit    : apply audio limiter
 					-m|--mono     : downmix to mono
-					-n|--night    : enable night mode
+					-n|--norm     : apply loudness normalization
 					-r|--reset    : reset audio filter
 			HELP
 			exit 0
@@ -36,7 +36,7 @@ while :; do
 		-d | --dyn) flag_dyn=1 ;;
 		-l | --limit) flag_limit=1 ;;
 		-m | --mono) flag_mono=1 ;;
-		-n | --night) flag_night=1 ;;
+		-n | --norm) flag_norm=1 ;;
 		-r | --reset) flag_res=1 ;;
 		*)
 			break
@@ -53,9 +53,8 @@ add_filter() {
 		return
 	fi
 
-	if ((flag_night)); then
-		# not compatible with mpv 0.35+
-		cmd+=('{ "command": [ "af", "add", "pan=stereo|FL=FC+0.30*FL+0.30*FLC+0.30*BL+0.30*SL+0.60*LFE|FR=FC+0.30*FR+0.30*FRC+0.30*BR+0.30*SR+0.60*LFE"] }')
+	if ((flag_norm)); then
+		cmd+=('{ "command": [ "af", "add", "lavfi=[loudnorm=I=-16:TP=-3:LRA=4]" ] }')
 	fi
 	if ((flag_compress)); then
 		cmd+=('{ "command": [ "af", "add", "acompressor=ratio=4,loudnorm"] }')
