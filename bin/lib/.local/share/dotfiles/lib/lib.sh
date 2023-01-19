@@ -56,6 +56,14 @@ _die() {
 	exit "$code"
 }
 
+_invoke-cmd() {
+	if ((SHOW_CMD)); then
+		echo -ne "$*" >&2
+	else
+		eval "$*"
+	fi
+}
+
 _prompt() {
 	__msg() {
 		local text=$1

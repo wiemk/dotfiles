@@ -6,7 +6,7 @@ insert_final_newline = false
 charset = utf-8
 trim_trailing_whitespace = true
 
-[*.{conf,local,sh}]
+[*.{conf,local,sh,zsh}]
 indent_style = tab
 indent_size = 4
 

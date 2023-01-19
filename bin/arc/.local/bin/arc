@@ -1,45 +1,12 @@
-# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=0 fdm=manual:
+#!/usr/bin/env bash
 # shellcheck shell=bash
-# shellcheck disable=2155,1090
+# shellcheck disable=2155
 
-init_debug
-
-if ! has_all tar zstd; then
-	return
-fi
-
-invoke-cmd() {
-	if ((SHOW_CMD)); then
-		echo -ne "$*" >&2
-	else
-		eval "$*"
-	fi
-}
-
-fcrypt() {
-	invoke-cmd gpg \
-		--no-option \
-		--symmetric \
-		--yes \
-		--compress-algo none \
-		--s2k-cipher-algo AES256 \
-		--s2k-digest-algo SHA512 \
-		--s2k-mode 3 \
-		--s2k-count 65011712 \
-		-- "$*"
-}
-
-fdecrypt() {
-	invoke-cmd gpg \
-		--no-option \
-		--decrypt \
-		--yes \
-		--output "$(basename "$1" .gpg)" \
-		-- "$*"
-}
+# shellcheck source=../../../lib/.local/share/dotfiles/lib/lib.sh
+source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
 archive-stream() {
-	invoke-cmd tar \
+	_invoke-cmd tar \
 		--no-acls \
 		--no-selinux \
 		--no-xattrs \
@@ -49,7 +16,7 @@ archive-stream() {
 }
 
 mirror-stream() {
-	invoke-cmd tar \
+	_invoke-cmd tar \
 		--numeric-owner \
 		--acls \
 		--xattrs \
@@ -60,7 +27,7 @@ mirror-stream() {
 }
 
 encrypt-stream-gpg() {
-	invoke-cmd gpg \
+	_invoke-cmd gpg \
 		--no-option \
 		--symmetric \
 		--compress-algo none \
@@ -72,11 +39,11 @@ encrypt-stream-gpg() {
 }
 
 encrypt-stream-pass() {
-	if has_emit pass; then
-		invoke-cmd gpg \
+	if _has_emit pass; then
+		_invoke-cmd gpg \
 			--no-option \
 			--pinentry-mode loopback \
-			--passphrase-file "<(pass archive)" \
+			--passphrase-file "<(command pass archive)" \
 			--symmetric \
 			--compress-algo none \
 			--s2k-cipher-algo AES256 \
@@ -90,7 +57,7 @@ encrypt-stream-pass() {
 }
 
 encrypt-stream-age() {
-	invoke-cmd age \
+	_invoke-cmd age \
 		-p \
 		-- -
 }
@@ -109,30 +76,14 @@ compress-stream() {
 	done
 
 	local -r threads=$(($(nproc) / 2))
-	invoke-cmd zstd -T"$threads" "${flag[@]}" -C --
+	_invoke-cmd zstd -T"$threads" "${flag[@]}" -C --
 }
 
 create-fec() {
-	has_emit par2create || return 1
-	invoke-cmd par2create -qq -r1 -n1 "$@"
+	_has_emit par2create || return 1
+	_invoke-cmd par2create -qq -r1 -n1 "$@"
 }
 
-dearc() {
-	if [[ -f $1 && $(file -b "$1") == PGP* ]]; then
-		command gpg --decrypt "$1" | zstd -d -- | tar -vx --
-		return
-	else
-		local ec=$(basename "$1" .age)
-		if [[ $1 != "$ec" ]]; then
-			command age --decrypt "$1" | zstd -d -- | tar -vx --
-			return
-		fi
-	fi
-	msg 'Not a valid arc file.'
-	return 1
-}
-
-# create lean archive preserving filename, permissions and data only
 arc() {
 	local flag_age=0 \
 		flag_bare=0 \
@@ -165,7 +116,7 @@ arc() {
 				return 0
 				;;
 			-a | --age)
-				{ has_emit age && flag_age=1; } \
+				{ _has_emit age && flag_age=1; } \
 					|| return 1
 				;;
 			-b | --bare) flag_bare=1 ;;
@@ -174,7 +125,7 @@ arc() {
 			-m | --meta) flag_meta=1 ;;
 			-n | --noenc) flag_enc=0 ;;
 			-p | --pass)
-				{ has_emit pass && flag_pass=1; } \
+				{ _has_emit pass && flag_pass=1; } \
 					|| return 1
 				;;
 			-r | --root) flag_root=1 ;;
@@ -188,7 +139,7 @@ arc() {
 
 	local -r src=$(readlink -qnm "$1")
 	if [[ ! -r $1 ]]; then
-		msg 'Cannot read source:' "$src"
+		_msg 'Cannot read source:' "$src"
 		return 1
 	fi
 
@@ -196,7 +147,7 @@ arc() {
 	if (($# == 2)); then
 		local -r dest=$(readlink -qne -- "$2")
 		if [[ -z $dest ]]; then
-			msg 'Target directory does not exist.' "$dest"
+			_msg 'Target directory does not exist.' "$dest"
 			return 1
 		fi
 	fi
@@ -211,7 +162,7 @@ arc() {
 	fi
 
 	if ((flag_enc)); then
-		if ! has_emit gpg; then
+		if ! _has_emit gpg; then
 			return 1
 		fi
 		if ((flag_age)); then
@@ -262,93 +213,16 @@ arc() {
 	fi
 
 	if ((flag_dry)); then
-		msg "$cmd"
+		_msg "$cmd"
 	else
-		invoke-cmd "$cmd"
+		_invoke-cmd "$cmd"
 	fi
 }
 
-if has mksquashfs; then
-	mksfs() {
-		trap 'command rm -f -- "${dst}/acl.log"' RETURN
-
-		local flag_dry=0 \
-			flag_root=0 \
-			opt_fast=
-
-		while :; do
-			case ${1-} in
-				-h | --help)
-					cat <<-'HELP'
-
-						Flags:
-							-d|--dry-run : dry-run, shows execution pipeline
-							-s|--store   : lz4 compression
-							-r|--root    : run with sudo
-
-						Pos:
-							<src> [<dst/>]
-
-					HELP
-					return 0
-					;;
-				-d | --dry-run) flag_dry=1 ;;
-				-s | --store) opt_fast=lz4 ;;
-				-r | --root) flag_root=1 ;;
-				*)
-					break
-					;;
-			esac
-			shift
-		done
-
-		if (($# < 2)); then
-			set -- "$1" '.'
-		fi
-
-		local -r src=$(readlink -qne -- "$1")
-		local -r dst=$(readlink -qne -- "$2")
-		shift 2
-
-		local san=$(printf '%s' "$src" | tr -d '\n' | sed -E 's/\//-/g;s/^-|-$//g;s/\./dot-/g;s/\s/_/g')
-
-		if [[ -z $src ]]; then
-			msg 'Source directory does not exist:' "$src"
-			return 1
-		fi
-
-		if [[ -z $dst ]]; then
-			msg 'Target directory does not exist:' "$dst"
-			return 1
-		fi
-
-		if [[ -z $san ]]; then
-			san='root'
-		fi
-		local out
-		printf -v out '%s/%s-%u.sfs' "$dst" "$san" "$EPOCHSECONDS"
-
-		local cmd=$(
-			{
-				#shellcheck disable=SC2030,SC2031
-				export SHOW_CMD=1
-				if has getfacl; then
-					invoke-cmd getfacl -Rs "'$src'"
-					printf '>%s' "'${dst}/acl.log'"
-					printf ' &&\n' >&2
-				fi
-				invoke-cmd mksquashfs "'$src'" "'${dst}/acl.log'" "'$out'" -not-reproducible -noappend -xattrs -comp "${opt_fast:-zstd}" -keep-as-directory -progress -wildcards "${@:-}"
-			} 2>&1
-		)
-
-		if ((flag_root)); then
-			printf -v cmd "command sudo -- bash -c '%s &&\nchown --quiet --preserve-root %u:%u %s'" "$cmd" "$(id -u)" "$(id -g)" "'$out'"
-		fi
-
-		if ((flag_dry)); then
-			msg "$cmd"
-		else
-			invoke-cmd "$cmd"
-		fi
-	}
+if ! _has_all tar zstd; then
+	_die "Need tar and zstd"
 fi
+
+arc "$@"
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 
-# shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
+# shellcheck source=../../../lib/.local/share/dotfiles/lib/lib.sh
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
 urlencode() {

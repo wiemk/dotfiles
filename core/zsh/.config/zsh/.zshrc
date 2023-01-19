@@ -2,8 +2,7 @@
 #
 # {{{Environment
 # Wayland sources environment.d configuration fragments for us
-if [[ $XDG_SESSION_TYPE != wayland \
-	&& -x /usr/lib/systemd/user-environment-generators/30-systemd-environment-d-generator ]]; then
+if [[ $XDG_SESSION_TYPE != wayland && -d /run/systemd/system ]]; then
 	export $(/usr/lib/systemd/user-environment-generators/30-systemd-environment-d-generator | xargs)
 fi
 
@@ -25,6 +24,7 @@ setopt \
 	autopushd \
 	extendedglob \
 	globcomplete \
+	interactivecomments \
 	markdirs \
 	pushdignoredups \
 	pushdsilent \
@@ -64,7 +64,6 @@ fi
 
 # {{{Keybinds
 bindkey -e
-
 # https://wiki.archlinux.org/title/zsh#Key_bindings
 # for additional keys see terminfo(5)
 typeset -g -A key
@@ -192,8 +191,8 @@ if has starship; then
   eval "$(command starship init zsh --print-full-init)"
 else
 	# fall back to minimal prompt
-	if [[ ! -e ${ZPLUGIN}/minimal/minimal.zsh && ! -v NO_CLONE ]]; then
-		GIT_CONFIG_GLOBAL=/dev/null git -C "$ZPLUGIN" clone --depth=1 https://github.com/subnixr/minimal.git
+	if [[ ! -e ${ZPLUGIN}/minimal/minimal.zsh && NO_CLONE -ne 1 ]]; then
+		GIT_CONFIG_GLOBAL=/dev/null git -C "$ZPLUGIN" clone --depth=1 https://betaco.de/mirror/minimal.git
 	fi
 	source "${ZPLUGIN}/minimal/minimal.zsh"
 fi
@@ -247,21 +246,25 @@ if has fzf; then
 		_source_xdg_data fzf/{,shell}/key-bindings.zsh || true
 	fi
 
-	if [[ ! -e ${ZPLUGIN}/fzf-tab/fzf-tab.plugin.zsh && ! -v NO_CLONE ]]; then
-		GIT_CONFIG_GLOBAL=/dev/null git -C "$ZPLUGIN" clone --depth=1 https://github.com/Aloxaf/fzf-tab.git
+	if [[ ! -e ${ZPLUGIN}/fzf-tab/fzf-tab.plugin.zsh && NO_CLONE -ne 1 ]]; then
+		GIT_CONFIG_GLOBAL=/dev/null git -C "$ZPLUGIN" clone --depth=1 https://betaco.de/mirror/fzf-tab.git
 	fi
-	source "${ZPLUGIN}/fzf-tab/fzf-tab.plugin.zsh"
+	if [[ -r ${ZPLUGIN}/fzf-tab/fzf-tab.plugin.zsh ]]; then
+		source "${ZPLUGIN}/fzf-tab/fzf-tab.plugin.zsh"
+	fi
 	unset -f _source_xdg_data
 fi
 # }}}
 #
 # {{{zsh-autosuggestions
-if [[ ! -e ${ZPLUGIN}/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh && ! -v NO_CLONE ]]; then
-		GIT_CONFIG_GLOBAL=/dev/null git -C "$ZPLUGIN" clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git
+if [[ ! -e ${ZPLUGIN}/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh && NO_CLONE -ne 1 ]]; then
+		GIT_CONFIG_GLOBAL=/dev/null git -C "$ZPLUGIN" clone --depth=1 https://betaco.de/mirror/zsh-autosuggestions.git
 fi
-source "${ZPLUGIN}/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
-ZSH_AUTOSUGGEST_STRATEGY+=(completion)
-bindkey -- '^[[Z' autosuggest-accept
+if [[ -r ${ZPLUGIN}/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh ]]; then
+	source "${ZPLUGIN}/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
+	ZSH_AUTOSUGGEST_STRATEGY+=(completion)
+	bindkey -- '^[[Z' autosuggest-accept
+fi
 # }}}
 
 # {{{zoxide

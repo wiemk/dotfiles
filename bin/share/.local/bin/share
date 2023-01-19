@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
-# shellcheck disable=2155,1090
 
-# shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
+# shellcheck source=../../../lib/.local/share/dotfiles/lib/lib.sh
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
 if ! _has_emit jq; then
@@ -28,6 +27,7 @@ share() {
 		return 1
 	fi
 
+	# shellcheck disable=2155
 	local resp=$($cmd > >(tee >(jq '.' >&2)) \
 		| jq --raw-output \
 			'{ expires, secret, url } | to_entries | .[] | "local " + .key + "=" + (.value | @sh)')

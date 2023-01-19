@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
 
-# shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
-# source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
-
 shopt -s extglob nullglob
 
 declare core
@@ -34,7 +31,9 @@ for governor in $gov_avail; do
 done
 printf '\n\n'
 
-trap 'printf "\n\nMax freq %u on %s\n" "$max" "$core"' EXIT
+trap 'tput cnorm; printf "\n\nMax freq %u on %s\n" "$max" "$core"' EXIT
+# hide cursor
+tput civis
 while :; do
 	declare -i freq=0 top=0
 	for i in /sys/devices/system/cpu/cpu+([0-9]); do

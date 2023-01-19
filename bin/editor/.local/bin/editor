@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# vi: set ft=sh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
 # shellcheck shell=bash
 
-# shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
+# shellcheck source=../../../lib/.local/share/dotfiles/lib/lib.sh
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
 if ! [[ -d /run/systemd/system && -z $CONTAINER ]]; then
@@ -36,3 +35,4 @@ if [[ -d /run/systemd/system && -z $CONTAINER ]]; then
 		_tmux_rename_window edit systemd-run --quiet --user --collect --scope "$cmd" "$@"
 	fi
 fi
+# vi: set ft=sh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:

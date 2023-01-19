@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
-# shellcheck disable=2155,1091
 
-# shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
+# shellcheck source=../../../lib/.local/share/dotfiles/lib/lib.sh
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
 if ! _has socat; then
@@ -47,12 +46,34 @@ done
 
 declare -a cmd
 
-add_filter() {
-	if ((flag_res)); then
-		cmd=('{ "command": ["af", "reset", ""] }')
-		return
-	fi
+issue_command() {
+	local -n cmdref=$1
+	for c in "${cmdref[@]}"; do
+		printf '%s\n' "$c" | socat - "${MPV_SOCKET}"
+	done
+}
 
+query_status() {
+	#shellcheck disable=2034
+	local status=('{ "command": ["get_property", "af"] }')
+	issue_command status
+}
+
+is_mono() {
+	local query='.data[] | select(.name=="lavfi") and select(.params.graph=="pan=1c|c0=0.5*c0+0.5*c1")'
+	query_status | jq -e "$query" &>/dev/null
+}
+
+downmix() {
+	# always prepend downmix
+	cmd=('{ "command": [ "af", "add", "lavfi=[pan=1c|c0=0.5*c0+0.5*c1]"] }' "${cmd[@]}")
+}
+
+reset() {
+	cmd=('{ "command": ["af", "reset", ""] }')
+}
+
+add_filter() {
 	if ((flag_norm)); then
 		cmd+=('{ "command": [ "af", "add", "lavfi=[loudnorm=I=-16:TP=-3:LRA=4]" ] }')
 	fi
@@ -65,17 +86,22 @@ add_filter() {
 	if ((flag_limit)); then
 		cmd+=('{ "command": [ "af", "add", "lavfi=[alimiter=10:1:1:5:8000]"] }')
 	fi
-	if ((flag_mono)); then
-		cmd+=('{ "command": [ "af", "add", "lavfi=[pan=1c|c0=0.5*c0+0.5*c1]"] }')
-	fi
-
-	cmd+=('{ "command": ["get_property", "af"] }')
 }
 
-add_filter
+if ((flag_res)); then
+	reset
+elif ((flag_mono)); then
+	if ! is_mono; then
+		downmix
+	fi
+else
+	add_filter
+	if ((${#cmd[@]} > 0)) && ! is_mono; then
+		downmix
+	fi
+fi
 
-for c in "${cmd[@]}"; do
-	printf '%s\n' "$c" | socat - "${MPV_SOCKET}"
-done
+issue_command cmd
+query_status | jq -r
 
 # vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

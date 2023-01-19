@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 # shellcheck shell=bash
-# shellcheck disable=2155,1091
 
 # Install multi-user nix even on SELinux enabled hosts
 # https://github.com/NixOS/nix/issues/2374
 
 set -e
 
-# shellcheck source=../../../../share/lib/.local/share/dotfiles/lib/lib.sh
+# shellcheck source=../../../lib/.local/share/dotfiles/lib/lib.sh
 source "${0%/*}/../share/dotfiles/lib/lib.sh" || exit 1
 
 if [[ -d /nix ]]; then
