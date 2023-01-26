@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+# shellcheck disable=2155,1090
+
+# burn in English subtitle track and transcode to constant quality 8bit h264 yuv420p, Japanese audio
+
+# shellcheck source=../../lib/common.sh
+source "${0%/*}/../share/dotfiles/lib/common.sh" || exit 1
+
+if ! _has_emit HandBrakeCLI; then
+	exit 1
+fi
+
+if (($# < 1)); then
+	set -- "$PWD"
+fi
+
+declare -a args=("$@")
+declare workdir
+
+if [[ -d ${args[-1]} ]]; then
+	workdir=$(readlink -f -- "${args[-1]}")
+	unset 'args[-1]'
+else
+	_die "Not a valid directory: ${args[-1]}"
+fi
+
+numfiles() {
+	find "$1" -maxdepth 1 -type f -iname "*.mkv" -printf . | wc -c
+}
+
+assburn() {
+	local dir=$1
+	shift
+
+	# shellcheck disable=SC1004
+	find "$dir" -maxdepth 1 -type f -iname "*.mkv" \( -exec bash -c ' \
+			src="$1"; shift; args=("$@"); base="$(dirname "$src")/$(basename "$src" .mkv)"
+			systemd-run --quiet --user --collect --pty --nice=19 --property=CPUSchedulingPolicy=idle --property=IOSchedulingClass=idle \
+			taskset -c 1-$(($(nproc)-1)) \
+			HandBrakeCLI --input "$src" --encoder x264 --encoder-preset faster --encoder-tune animation \
+			--encoder-profile high --encoder-level 5.2 --quality 18 -vfr --turbo --optimize \
+			--audio-lang-list jpn --first-audio --aencoder copy --audio-copy-mask aac,ac3,eac3,truehd,dts,dtshd,mp3 \
+			--audio-fallback av_aac --ab 192 --normalize-mix --arate auto --native-language eng \
+			--subtitle-lang-list eng,und --first-subtitle --subtitle-burned \
+			--maxHeight 1080 --maxWidth 1920 \
+			"${args[@]}" \
+			--output "${base}.new.mp4" && command mv -vuf "${base}.new.mp4" "${base}.mp4"' \
+		shell {} "$@" \; -o -quit \) || exit 1
+
+	command ls --color=auto --show-control-chars --group-directories-first -AlhXF "$dir"
+}
+
+if (($(numfiles "$workdir") < 1)); then
+	_die "No files to process found."
+fi
+
+declare -a aopts
+if [[ -v CH5 ]]; then
+	aopts=(--aencoder ac3 --mixdown 5point1 --ab 640)
+else
+	aopts=(--mixdown stereo)
+fi
+
+assburn "$workdir" "${aopts[@]}" "${args[@]}"
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=0 fdm=manual:

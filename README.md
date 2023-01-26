@@ -1,11 +1,11 @@
 #### Linking
 
-The `core`, `bin`, `extra`, or `staging` are designed to be used with [GNU stow](https://www.gnu.org/software/stow/).
+The `core`, `extra`, or `staging` are designed to be used with [GNU stow](https://www.gnu.org/software/stow/).
 
 ##### Using GNU Stow
 
 ```sh
-stow -d "$REPO/{core,bin,extra,staging}" -t "$HOME" -S package…
+stow -d "$REPO/{core,extra,staging}" -t "$HOME" -S package…
 ```
 
 #### Examples

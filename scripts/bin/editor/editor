@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+
+# shellcheck source=../../lib/common.sh
+source "${0%/*}/../share/dotfiles/lib/common.sh" || exit 1
+
+if ! [[ -d /run/systemd/system && -z $CONTAINER ]]; then
+	_die "Need systemd for spawning the editor."
+fi
+
+declare cmd
+if [[ -v VISUAL ]] && _has "$VISUAL"; then
+	cmd=$VISUAL
+elif [[ -v EDITOR ]] && _has "$EDITOR"; then
+	cmd=$EDITOR
+else
+	if _has nvim; then
+		cmd='nvim'
+	elif _has vim; then
+		cmd='vim'
+	elif _has vi; then
+		cmd='vi'
+	elif _has nano; then
+		cmd='nano'
+	else
+		_die "No suitable editor found."
+	fi
+fi
+
+if [[ -d /run/systemd/system && -z $CONTAINER ]]; then
+	if ! type -t _is_tmux &>/dev/null || ! _is_tmux; then
+		# Create own scope for editor and child processes
+		systemd-run --quiet --user --collect --scope "$cmd" "$@"
+	else
+		_tmux_rename_window edit systemd-run --quiet --user --collect --scope "$cmd" "$@"
+	fi
+fi
+# vi: set ft=sh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
