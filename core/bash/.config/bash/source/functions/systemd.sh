@@ -10,21 +10,21 @@ sc-run() {
 
 	while :; do
 		case ${1-} in
-		-h | --help)
-			cat <<-'HELP'
-				Flags:
-					-f|--fg   : launch into foreground
-					-i|--idle : idle priority
-					-r|--root : launch as system service
-			HELP
-			return 0
-			;;
-		-f | --fg) flag_fg=1 ;;
-		-i | --idle) flag_idle=1 ;;
-		-r | --root) flag_root=1 ;;
-		*)
-			break
-			;;
+			-h | --help)
+				cat <<-'HELP'
+					Flags:
+						-f|--fg   : launch into foreground
+						-i|--idle : idle priority
+						-r|--root : launch as system service
+				HELP
+				return 0
+				;;
+			-f | --fg) flag_fg=1 ;;
+			-i | --idle) flag_idle=1 ;;
+			-r | --root) flag_root=1 ;;
+			*)
+				break
+				;;
 		esac
 		shift
 	done

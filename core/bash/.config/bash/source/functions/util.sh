@@ -13,8 +13,8 @@ lsansi() {
 }
 
 lsmono() {
-	fc-list : family spacing outline scalable |
-		grep -E 'spacing=(100|90).*?outline=True.*?scalable=True' | cut -d':' -f1 | sort -u
+	fc-list : family spacing outline scalable \
+		| grep -E 'spacing=(100|90).*?outline=True.*?scalable=True' | cut -d':' -f1 | sort -u
 }
 
 fonttest() {
@@ -53,8 +53,8 @@ calc() {
 	#                       └─ default (when `--mathlib` is used) is 20
 	if [[ $result == *.* ]]; then
 		# improve the output for decimal numbers
-		printf '%s' "$result" |
-			sed -e 's/^\./0./' `# add "0" for cases like ".5"` \
+		printf '%s' "$result" \
+			| sed -e 's/^\./0./' `# add "0" for cases like ".5"` \
 				-e 's/^-\./-0./' `# add "0" for cases like "-.5"` \
 				-e 's/0*$//;s/\.$//' `# remove trailing zeros`
 	else
@@ -83,14 +83,20 @@ con() {
 
 mem() {
 	#shellcheck disable=2009
-	ps -eo rss,vsz,pid,euser,args --cols=100 --sort %mem |
-		grep -v grep |
-		grep -i "$@" |
-		awk '{
+	ps -eo rss,vsz,pid,euser,args --cols=100 --sort %mem \
+		| grep -v grep \
+		| grep -i "$@" \
+		| awk '{
 			rss=$1;vsz=$2;pid=$3;uid=$4;$1=$2=$3=$4="";sub(/^[ \t\r\n]+/, "", $0);
 			printf("%d: (%s) # %s\n\tRSS: %8.2f M\n\tVSZ: %8.2f M\n",
 		   	pid, uid, $0, rss/1024, vsz/1024);
 		}'
+}
+
+deleted() {
+	if has lsof; then
+		sudo lsof / 2>/dev/null | grep '(deleted)' | grep -vE 'memfd|shm|/tmp|gvfs|flatpak|Metrics|\.log'
+	fi
 }
 
 netns() {
@@ -107,9 +113,9 @@ netns() {
 
 fsudo() {
 	local -r arg=$1
-	if [[ $(type -t "$arg") = 'function' ]]; then
+	if [[ $(type -t "$arg") == 'function' ]]; then
 		shift && command sudo bash -c "$(declare -f "$arg");$arg $*"
-	elif [[ $(type -t "$arg") = 'alias' ]]; then
+	elif [[ $(type -t "$arg") == 'alias' ]]; then
 		local -r bak=$(alias sudo 2>/dev/null)
 		alias sudo='\sudo '
 		eval "sudo $*"
@@ -148,4 +154,40 @@ oomscore() {
 			fi
 		fi
 	done < <(ps -e -o pid= -o comm=) | sort -k 2nr
+}
+
+webget() {
+	local dest=$PWD
+	if has xdg-user-dir; then
+		dest=$(xdg-user-dir DOWNLOAD)
+		if [[ -z $dest ]]; then
+			dest=$PWD
+		fi
+	fi
+	if has curl; then
+		if curl \
+			--connect-timeout 5 \
+			--location \
+			--max-redirs 10 \
+			--output-dir "${dest}" \
+			--remote-header-name \
+			--remote-name-all \
+			--remove-on-error \
+			"$@"; then
+			msg 'File written to' "$dest"
+		fi
+	elif has wget; then
+		wget \
+			--continue \
+			--content-disposition \
+			--directory-prefix="${dest}" \
+			--no-config \
+			--no-hsts \
+			--no-verbose \
+			--timeout=5 \
+			--trust-server-names \
+			"$@"
+	else
+		msg 'Neither curl nor wget could be found.'
+	fi
 }

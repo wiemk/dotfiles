@@ -55,8 +55,8 @@ fi
 
 if has mediainfo; then
 	minfo() {
-		mediainfo --inform_version=0 --Output=JSON "$@" |
-			jq --raw-output --slurp 'map({FPS: .media.track[0].FrameRate,
+		mediainfo --inform_version=0 --Output=JSON "$@" \
+			| jq --raw-output --slurp 'map({FPS: .media.track[0].FrameRate,
 					AudioTracks: .media.track[0].AudioCount,
 					Format: .media.track[1].Format,
 					Profile: .media.track[1].Format_Profile,
@@ -77,7 +77,7 @@ if has mullvad; then
 
 	vpn-latency() {
 		local -r status=$(mullvad status)
-		if [[ "$status" != 'Disconnected' ]]; then
+		if [[ $status != 'Disconnected' ]]; then
 			mullvad disconnect
 			sleep 2s
 			if ip --brief link show wg-mullvad up type wireguard &>/dev/null; then

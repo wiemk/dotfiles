@@ -21,16 +21,16 @@ init_debug
 if has koji; then
 	# transform space delimited input to null bytes
 	koji-check() {
-		printf '%s\0' "$@" |
-			xargs -P8 -L1 -0 koji list-builds --state=COMPLETE --after="$(env LC_ALL=C date -d -'2 days')" --package
+		printf '%s\0' "$@" \
+			| xargs -P8 -L1 -0 koji list-builds --state=COMPLETE --after="$(env LC_ALL=C date -d -'2 days')" --package
 	}
 	koji-arch() {
-		printf '%s\0' "$@" |
-			xargs -P8 -L1 -0 koji download-build --arch=x86_64
+		printf '%s\0' "$@" \
+			| xargs -P8 -L1 -0 koji download-build --arch=x86_64
 	}
 	koji-noarch() {
-		printf '%s\0' "$@" |
-			xargs -P8 -L1 -0 koji download-build --arch=noarch
+		printf '%s\0' "$@" \
+			| xargs -P8 -L1 -0 koji download-build --arch=noarch
 	}
 fi
 

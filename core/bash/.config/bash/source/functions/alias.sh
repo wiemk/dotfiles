@@ -17,10 +17,10 @@ alias ll='command ls -l --color=auto' 2>/dev/null
 alias ls='command ls --color=auto --show-control-chars --group-directories-first -AlhXF'
 alias sl='ls'
 
-alias cp='command cp -avi'
+alias cp='command cp -av'
 alias ln='command ln -vi'
 alias mkdir='command mkdir -v'
-alias mv='command mv -vi'
+alias mv='command mv -v'
 alias rm='command rm -vI'
 
 alias dnf='sudo dnf'
@@ -37,6 +37,7 @@ alias tma='tm'
 alias top='htop'
 alias unsha='socat -t 5 - tcp:unsha.re:10000'
 alias ydl='yt-dlp'
+alias mpvr="command mpv --input-ipc-server=\${XDG_RUNTIME_DIR}/mpv.sock"
 
 if has batman; then
 	alias man='batman'

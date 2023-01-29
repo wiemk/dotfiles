@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+
+shopt -s extglob nullglob
+
+declare core
+declare -i max=0
+
+sysfs=/sys/devices/system/cpu/cpu0/cpufreq
+
+if [[ ! -e $sysfs ]]; then
+	echo "Not found: ${sysfs}"
+	exit 1
+fi
+
+printf 'Scaling driver %s\nScaling min freq %u\nScaling max freq %u\n' \
+	"$(<${sysfs}/scaling_driver)" \
+	"$(<${sysfs}/scaling_min_freq)" \
+	"$(<${sysfs}/scaling_max_freq)"
+
+gov_active=$(<${sysfs}/scaling_governor)
+gov_avail=$(<${sysfs}/scaling_available_governors)
+
+printf 'Governor [active]: '
+for governor in $gov_avail; do
+	if [[ $governor == "$gov_active" ]]; then
+		printf '[%s] ' "$governor"
+	else
+		printf '%s ' "$governor"
+	fi
+done
+printf '\n\n'
+
+trap 'tput cnorm; printf "\n\nMax freq %u on %s\n" "$max" "$core"' EXIT
+# hide cursor
+tput civis
+while :; do
+	declare -i freq=0 top=0
+	for i in /sys/devices/system/cpu/cpu+([0-9]); do
+		freq=$(<"${i}"/cpufreq/scaling_cur_freq)
+		if ((freq > top)); then
+			top=$freq
+			if ((top > max)); then
+				max=$top
+				core=${i##*/}
+			fi
+		fi
+	done
+	printf '\r'
+	tput el
+	printf '%u' "$top"
+	sleep "${1:-1s}"
+done
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

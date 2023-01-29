@@ -8,11 +8,11 @@ set -eo pipefail
 
 declare -A FUNC=(
 	[alias]=50
-	[archive]=90
 	[editor]=51
 	[fedora]=50
 	[info]=90
 	[misc]=90
+	[nix]=90
 	[podman]=90
 	[systemd]=20
 	[tmux]=50
@@ -20,7 +20,6 @@ declare -A FUNC=(
 )
 declare -A PLUGIN=(
 	[fzf]=10
-	[gnupg]=10
 	[prompt]=10
 	[vivid]=10
 	[zoxide]=10

@@ -1,19 +1,21 @@
 *.bak
 # profile
 core/profile/.config/profile/local/*
-core/profile/.config/profile/conf.d/*
-!core/profile/.config/profile/conf.d/README.md
 # bash
 core/bash/.config/bash/rc.pre
 core/bash/.config/bash/rc.post
 core/bash/.config/bash/source.d/*
 core/bash/.config/bash/source/local/*.sh
+# zsh
+core/zsh/.config/zsh/.z*.local
+core/zsh/.config/zsh/functions/_*
 # git
 core/git/.config/git/*.local
 # systemd
 **/systemd/user/**/override.conf
 # neovim
 core/[nl]vim/.config/[nl]vim/plugin/*
+core/lvim/.config/lvim/lazy-lock.json
 # vifm
 core/vifm/.config/vifm/vifminfo.json
 # gnupg

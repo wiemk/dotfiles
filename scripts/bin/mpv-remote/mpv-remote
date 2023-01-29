@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+
+# shellcheck source=../../lib/common.sh
+source "${0%/*}/../share/dotfiles/lib/common.sh" || exit 1
+
+if ! _has socat; then
+	_die "socat not found"
+fi
+
+MPV_SOCKET=${MPV_SOCKET:-${XDG_RUNTIME_DIR}/mpv.sock}
+
+flag_compress=0
+flag_dyn=0
+flag_limit=0
+flag_res=0
+flag_mono=0
+flag_norm=0
+
+while :; do
+	case ${1-} in
+		-h | --help)
+			cat <<-'HELP'
+				Flags:
+					-c|--compress : apply audio compressor
+					-d|--dyn      : apply dynamic audio
+					-l|--limit    : apply audio limiter
+					-m|--mono     : downmix to mono
+					-n|--norm     : apply loudness normalization
+					-r|--reset    : reset audio filter
+			HELP
+			exit 0
+			;;
+		-c | --compress) flag_compress=1 ;;
+		-d | --dyn) flag_dyn=1 ;;
+		-l | --limit) flag_limit=1 ;;
+		-m | --mono) flag_mono=1 ;;
+		-n | --norm) flag_norm=1 ;;
+		-r | --reset) flag_res=1 ;;
+		*)
+			break
+			;;
+	esac
+	shift
+done
+
+declare -a cmd
+
+issue_command() {
+	local -n cmdref=$1
+	for c in "${cmdref[@]}"; do
+		printf '%s\n' "$c" | socat - "${MPV_SOCKET}"
+	done
+}
+
+query_status() {
+	#shellcheck disable=2034
+	local status=('{ "command": ["get_property", "af"] }')
+	issue_command status
+}
+
+is_mono() {
+	local query='.data[] | select(.name=="lavfi") and select(.params.graph=="pan=1c|c0=0.5*c0+0.5*c1")'
+	query_status | jq -e "$query" &>/dev/null
+}
+
+downmix() {
+	# always prepend downmix
+	cmd=('{ "command": [ "af", "add", "lavfi=[pan=1c|c0=0.5*c0+0.5*c1]"] }' "${cmd[@]}")
+}
+
+reset() {
+	cmd=('{ "command": ["af", "reset", ""] }')
+}
+
+add_filter() {
+	if ((flag_norm)); then
+		cmd+=('{ "command": [ "af", "add", "lavfi=[loudnorm=I=-16:TP=-3:LRA=4]" ] }')
+	fi
+	if ((flag_compress)); then
+		cmd+=('{ "command": [ "af", "add", "acompressor=ratio=4,loudnorm"] }')
+	fi
+	if ((flag_dyn)); then
+		cmd+=('{ "command": [ "af", "add", "dynaudnorm=g=5:f=250:r=0.9:p=0.5"] }')
+	fi
+	if ((flag_limit)); then
+		cmd+=('{ "command": [ "af", "add", "lavfi=[alimiter=10:1:1:5:8000]"] }')
+	fi
+}
+
+if ((flag_res)); then
+	reset
+elif ((flag_mono)); then
+	if ! is_mono; then
+		downmix
+	fi
+else
+	add_filter
+	if ((${#cmd[@]} > 0)) && ! is_mono; then
+		downmix
+	fi
+fi
+
+issue_command cmd
+query_status | jq -r
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

@@ -1,0 +1,22 @@
+# vi: set ft=zsh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+if has mullvad && has mullvad-best-server; then
+	local mvs=$(mullvad status)
+	if [[ $mvs != 'Disconnected' ]]; then
+		mullvad disconnect
+		sleep 2s
+		if ip --brief link show wg-mullvad up type wireguard &>/dev/null; then
+			sudo ip link del wg-mullvad
+		fi
+	fi
+	local country
+	if (($# < 1)); then
+		country=de
+	else
+		country=$1
+	fi
+	local server=$(mullvad-best-server -country "$country" -provider=31173 -warmup)
+	printf -v host '%s-wireguard' "$server"
+	mullvad relay set hostname "$host"
+	mullvad connect
+fi

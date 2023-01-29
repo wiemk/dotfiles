@@ -1,0 +1,27 @@
+# vi: set ft=zsh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+local ans
+
+_q() {
+	local compcontext='yn:yes or no:(y n)'
+	vared -cp "${1} (y/n) ? " ans
+}
+
+if ! sudo dnf offline-distrosync download --refresh; then
+	return 1
+fi
+
+_q 'Schedule action?'
+
+if [[ $ans == (y|Y) ]]; then
+	unset ans
+	_q 'Reboot now?'
+	if [[ $ans == (y|Y) ]]; then
+		sudo dnf offline-distrosync reboot
+	else
+		# just prepare the system without actually rebooting
+		sudo DNF_SYSTEM_UPGRADE_NO_REBOOT=1 dnf offline-distrosync reboot
+	fi
+fi
+
+unset -f _q

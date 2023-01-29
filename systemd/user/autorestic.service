@@ -4,4 +4,4 @@ Description=autorestic
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/autorestic --restic-bin /usr/local/bin/restic cron --lean
-WorkingDirectory=/home/zeno/tmpfs
+WorkingDirectory=/home/strom/tmpfs

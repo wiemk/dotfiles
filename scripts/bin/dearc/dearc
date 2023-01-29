@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+# shellcheck disable=2155
+
+# shellcheck source=../../lib/common.sh
+source "${0%/*}/../share/dotfiles/lib/common.sh" || exit 1
+
+dearc() {
+	if [[ -f $1 && $(file -b "$1") == PGP* ]]; then
+		command gpg --decrypt "$1" | zstd -d -- | tar -vx --
+		return
+	else
+		local ec=$(basename "$1" .age)
+		if [[ $1 != "$ec" ]]; then
+			command age --decrypt "$1" | zstd -d -- | tar -vx --
+			return
+		fi
+	fi
+	_die 'Not a valid arc (.tar.zst.(gpg|age)) file.'
+}
+
+dearc "$@"
+
+# vi: set ft=sh ts=4 sw=0 sts=-1 sr noet nosi tw=80 fdm=manual:

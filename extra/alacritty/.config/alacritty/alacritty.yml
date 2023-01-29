@@ -1,8 +1,8 @@
 # vi: set ft=yaml ts=2 sw=2 sts=-1 sr et si tw=0 fdm=manual:
 
 import:
-  - /home/zeno/.config/alacritty/font.yml
-  - /home/zeno/.config/alacritty/theme.yml
+  - /home/strom/.config/alacritty/font.yml
+  - /home/strom/.config/alacritty/theme.yml
 
 window:
   dimensions:

@@ -1,4 +1,4 @@
-local term = require 'wezterm'
+local term = require "wezterm"
 local mux = term.mux
 
 local myfont = "JetBrainsMonoNL NFM"
@@ -15,12 +15,12 @@ local sc = {
   selection_fg = "#c0caf5",
 
   ansi = { "#1D202F", "#f7768e", "#9ece6a", "#e0af68", "#7aa2f7", "#bb9af7", "#7dcfff", "#a9b1d6" },
-  brights = { "#414868", "#f7768e", "#9ece6a", "#e0af68", "#7aa2f7", "#bb9af7", "#7dcfff", "#c0caf5" }
+  brights = { "#414868", "#f7768e", "#9ece6a", "#e0af68", "#7aa2f7", "#bb9af7", "#7dcfff", "#c0caf5" },
 }
 
 local fallback = function(name, params)
   -- $ wezterm ls-fonts --list-system
-  -- font_dirs = { "/home/zeno/.local/share/fonts" },
+  -- font_dirs = { "/home/strom/.local/share/fonts" },
   local names = { name, "CaskaydiaCove Nerd Font Mono", "FiraCode Nerd Font Mono", "monospace" }
   return term.font_with_fallback(names, params)
 end
@@ -39,16 +39,12 @@ term.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
   }
 end)
 
-term.on('gui-startup', function(cmd)
+term.on("gui-startup", function(cmd)
   local tab, pane, window = mux.spawn_window(cmd or {})
   window:gui_window():maximize()
 end)
 
-return {
-  set_environment_variables = {
-    prompt = 'test123',
-  },
-  default_prog = { 'wsl.exe', '--cd', '~' },
+local options = {
   adjust_window_size_when_changing_font_size = false,
   animation_fps = 1,
   audible_bell = "SystemBeep",
@@ -186,7 +182,7 @@ return {
     {
       event = { Down = { streak = 1, button = "Middle" } },
       mods = "SHIFT",
-      action = { PasteFrom = "PrimarySelection" }
+      action = { PasteFrom = "PrimarySelection" },
     },
     {
       event = { Down = { streak = 1, button = "Middle" } },
@@ -232,6 +228,12 @@ return {
   key_tables = {
     search_mode = {
       { key = "n", mods = "CTRL|SHIFT", action = { CopyMode = "PriorMatch" } },
-    }
+    },
   },
 }
+
+if term.target_triple == "x86_64-pc-windows-msvc" then
+  options.default_prog = { "wsl.exe", "--cd", "~" }
+end
+
+return options

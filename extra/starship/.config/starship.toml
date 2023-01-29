@@ -9,9 +9,9 @@ command_timeout = 100
 disabled = true
 
 [character]
-success_symbol = '[λ](bold green)'
-error_symbol = '[λ](bold red)'
-vicmd_symbol = '[λ](bold green)'
+success_symbol = '[#](bold bright-blue)'
+error_symbol = '[#](bold red)'
+vicmd_symbol = '[#](bold green)'
 
 [cmd_duration]
 style = "bold green"
@@ -28,13 +28,13 @@ disabled = false
 commit_hash_length = 7
 
 [git_metrics]
-disabled = true
+disabled = false
 
 [git_state]
 disabled = false
 
 [git_status]
-disabled = true
+disabled = false
 
 [jobs]
 disabled = false
@@ -43,6 +43,9 @@ disabled = false
 disabled = false
 
 [memory_usage]
+disabled = true
+
+[nodejs]
 disabled = true
 
 [package]
@@ -60,7 +63,7 @@ symbol = "✖"
 format = "[\\[$symbol \\($status\\)\\]]($style) "
 
 [sudo]
-disabled = false
+disabled = true
 
 [time]
 disabled = true

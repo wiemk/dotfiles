@@ -52,7 +52,7 @@ __fzf_history() {
 
 fkill() {
 	local pid
-	if [[ "$UID" != "0" ]]; then
+	if [[ $UID != "0" ]]; then
 		pid=$(ps -f -u $UID --no-headers | fzf -m | awk '{print $2}')
 	else
 		pid=$(ps -ef --no-headers | fzf -m | awk '{print $2}')
@@ -69,9 +69,9 @@ fcd() {
 		dir="$({
 			echo ..
 			fd --max-depth=1 --hidden --unrestricted --fixed-strings --follow --type=d --type=l --color=always
-		} |
-			fzf --reverse --ansi --no-multi --preview='pwd' --preview-window=up,1,border-none --no-info)"
-		if [[ -z "${dir}" ]]; then
+		} \
+			| fzf --reverse --ansi --no-multi --preview='pwd' --preview-window=up,1,border-none --no-info)"
+		if [[ -z ${dir} ]]; then
 			break
 		else
 			builtin cd "${dir}" || return

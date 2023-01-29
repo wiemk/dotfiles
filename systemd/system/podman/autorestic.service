@@ -1,0 +1,17 @@
+[Unit]
+Description=autorestic
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/autorestic --config /root/.config/autorestic/.autorestic.yml --restic-bin /usr/local/bin/restic --docker-image betaco.de/strom/restic:amd64 cron --lean
+WorkingDirectory=/tmp
+PrivateTmp=true
+
+[Unit]
+ConditionPathExists=/root/.config/autorestic/.autorestic.yml
+
+[Service]
+Nice=19
+CPUSchedulingPolicy=idle
+IOSchedulingClass=idle
+IOSchedulingPriority=7

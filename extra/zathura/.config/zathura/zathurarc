@@ -40,5 +40,6 @@ set recolor-darkcolor		"#a9b1d6"
 
 set recolor-keephue			"true"
 
+set scroll-step 100
 
 map i recolor

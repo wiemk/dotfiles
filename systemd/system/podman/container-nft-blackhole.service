@@ -14,7 +14,7 @@ SyslogIdentifier=nft-blackhole
 RemainAfterExit=yes
 RestartSec=5m
 
-ExecStartPre=/usr/bin/sleep 300s
+ExecStartPre=/usr/bin/sleep 60s
 ExecStart=/usr/bin/podman run \
 		  --hostname=nft \
 		  --label=io.containers.autoupdate.authfile=/etc/podman/betaco.json \

@@ -8,15 +8,27 @@ repos:
   - id: check-merge-conflict
   - id: mixed-line-ending
     args: [ --fix=no ]
-# - repo: https://github.com/zricethezav/gitleaks
-#   rev: v8.11.0
-#   hooks:
-#     - id: gitleaks
 - repo: local
   hooks:
-  - id: gitleaks
-    name: Detect hardcoded secrets
-    description: Detect hardcoded secrets using Gitleaks
-    entry: gitleaks protect --verbose --staged
-    language: system
-    pass_filenames: false
+    - id: gitleaks
+      name: gitleaks
+      description: Detect hardcoded secrets using Gitleaks
+      language: system
+      entry: gitleaks
+      args: ["protect", "--verbose", "--redact", "--staged"]
+    - id: stylua
+      name: stylua
+      description: Format lua files
+      language: system
+      entry: stylua
+      types: [lua]
+      args: ["--check"]
+    - id: shfmt
+      name: shfmt
+      description: Format shell files
+      minimum_pre_commit_version: 2.4.0
+      language: system
+      files: ^core/bash
+      types: [shell]
+      entry: shfmt
+      args: ["--case-indent", "--binary-next-line", "--simplify"]

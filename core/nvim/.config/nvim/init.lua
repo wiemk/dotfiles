@@ -12,8 +12,8 @@ vim.g.loaded_2html_plugin = 0
 vim.g.loaded_remote_plugins = 0
 
 -- Disable welcome text
-vim.opt.shortmess:append({ I = true, c = true })
-vim.opt.completeopt = {'menuone', 'noselect'}
+vim.opt.shortmess:append { I = true, c = true }
+vim.opt.completeopt = { "menuone", "noselect" }
 
 -- Set highlight on search
 vim.opt.hlsearch = true
@@ -27,10 +27,10 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 
 --Enable mouse mode
-vim.opt.mouse = 'a'
+vim.opt.mouse = "a"
 
 -- Use primary clipboard
-vim.opt.clipboard = 'unnamed'
+vim.opt.clipboard = "unnamed"
 
 -- no residual files
 vim.opt.undofile = false
@@ -47,7 +47,7 @@ vim.opt.wrap = false
 
 -- Window settings
 vim.opt.sidescroll = 10
-vim.opt.colorcolumn = '80'
+vim.opt.colorcolumn = "80"
 
 --Indentation
 vim.opt.tabstop = 4
@@ -58,8 +58,8 @@ vim.opt.textwidth = 0
 vim.opt.copyindent = true
 
 -- Colors
-vim.opt.cursorline = true
+vim.opt.cursorline = false
 vim.opt.termguicolors = true
-vim.cmd [[ colorscheme default ]]
+vim.cmd [[ colorscheme slate ]]
 
-vim.api.nvim_set_keymap("n", "<C-q>", ":qa!<CR>", {noremap = true})
+vim.api.nvim_set_keymap("n", "<C-q>", ":qa!<CR>", { noremap = true })

@@ -1,17 +1,37 @@
+-- vi: set ft=lua ts=2 sw=2 sts=-1 nosr et nosi tw=0 fdm=manual:
 --[[
 lvim = global options object
 ]]
 
 -- General
 lvim.log.level = "error"
--- lvim.format_on_save = true
-lvim.builtin.theme.options.style = "moon"
+lvim.format_on_save = false
+lvim.builtin.theme.tokyonight.options.style = "moon"
 lvim.colorscheme = "tokyonight-moon"
 lvim.use_icons = true
 
 -- Don't redraw during macro execution
 vim.opt.lazyredraw = true
 vim.opt.synmaxcol = 256
+
+-- Don't skip over '_'
+vim.opt.iskeyword:remove "_"
+
+-- Use ANSI OSC 52 support when running inside tmux
+if os.getenv "TMUX" then
+  vim.g.clipboard = {
+    cache_enabled = 1,
+    copy = {
+      ["*"] = { "tmux", "load-buffer", "-w", "-" },
+      ["+"] = { "tmux", "load-buffer", "-w", "-" },
+    },
+    name = "myClipboard",
+    paste = {
+      ["*"] = { "tmux", "save-buffer", "-" },
+      ["+"] = { "tmux", "save-buffer", "-" },
+    },
+  }
+end
 
 -- Override default options
 (function()
@@ -43,9 +63,9 @@ lvim.keys.normal_mode["<Down>"] = "<NOP>"
 lvim.keys.normal_mode["<Left>"] = "<NOP>"
 lvim.keys.normal_mode["<Right>"] = "<NOP>"
 
--- tmux bugfix (nvim 0.7 api)
-vim.keymap.set({ 'i', 'n', 'v' }, '<C-a>', '<Home>', { noremap = true, silent = true })
-vim.keymap.set({ 'i', 'n', 'v' }, '<C-e>', '<End>', { noremap = true, silent = true })
+-- tmux bugfix
+vim.keymap.set({ "i", "n", "v" }, "<C-a>", "<Home>", { noremap = true, silent = true })
+vim.keymap.set({ "i", "n", "v" }, "<C-e>", "<End>", { noremap = true, silent = true })
 
 -- Don't yank on backspace or x
 lvim.keys.normal_mode["<Del>"] = '"_x'
@@ -86,27 +106,36 @@ lvim.keys.term_mode["<C-k>"] = false
 lvim.keys.term_mode["<C-l>"] = false
 
 -- which-key
--- lvim.builtin.which_key.setup.triggers_blacklist = { n = { "g" } }
 lvim.builtin.which_key.mappings["w"] = nil
 lvim.builtin.which_key.mappings["<leader>"] = { "<C-^>", "Cycle Buffer" }
 lvim.builtin.which_key.mappings["h"] = {
-  function() vim.opt.hlsearch = not vim.o.hlsearch end, "Toggle Highlight"
+  function()
+    vim.opt.hlsearch = not vim.o.hlsearch
+  end,
+  "Toggle Highlight",
 }
 lvim.builtin.which_key.mappings["P"] = lvim.builtin.which_key.mappings["p"]
 if lvim.builtin.project.active then
-  lvim.builtin.which_key.mappings["p"] = { "<Cmd>Telescope projects<CR>", "Projects" }
+  lvim.builtin.which_key.mappings["p"] = { "<Cmd>Telescope projects theme=ivy<CR>", "Projects" }
 end
 
 local ok, builtin = pcall(require, "telescope.builtin")
 if ok then
   lvim.builtin.which_key.mappings["/"] = {
     function()
-      builtin.current_buffer_fuzzy_find({ layout_config = { width = 0.5 } })
+      builtin.current_buffer_fuzzy_find { layout_config = { width = 0.5 } }
     end,
-    "Buffer Fuzzy"
+    "Buffer Fuzzy",
   }
   lvim.builtin.which_key.mappings["sB"] = { builtin.builtin, "Builtins" }
   lvim.builtin.which_key.mappings["F"] = { builtin.live_grep, "Text" }
+  lvim.builtin.which_key.mappings["A"] = {
+    function()
+      builtin.find_files { hidden = true, no_ignore = true }
+    end,
+    "Find hidden",
+  }
+  lvim.builtin.which_key.mappings["sA"] = lvim.builtin.which_key.mappings["A"]
   lvim.builtin.which_key.mappings["B"] = lvim.builtin.which_key.mappings["b"]
   -- Close all but current buffer
   lvim.builtin.which_key.mappings["Bo"] = { ':%bd!|e #|bd #|normal`"<CR>', "Close inactive buffers" }
@@ -124,29 +153,36 @@ lvim.builtin.which_key.mappings["u"] = {
       :sort
       :%s/@/\r/g<CR>
     ]],
-    "Sort Paragraphs"
+    "Sort Paragraphs",
   },
-  s = { function() vim.opt.spell = not vim.o.spell end, "Spellcheck" },
-  w = { function() vim.opt.list = not vim.o.list end, "Show whitespaces" },
+  s = {
+    function()
+      vim.opt.spell = not vim.o.spell
+    end,
+    "Spellcheck",
+  },
+  w = {
+    function()
+      vim.opt.list = not vim.o.list
+    end,
+    "Show whitespaces",
+  },
 }
 
 -- telescope
 -- change default navigation mappings
-local actions = require("telescope.actions")
-lvim.builtin.telescope.defaults.mappings = vim.tbl_deep_extend("force",
-  lvim.builtin.telescope.defaults.mappings, {
+local actions = require "telescope.actions"
+lvim.builtin.telescope.defaults.mappings = vim.tbl_deep_extend("force", lvim.builtin.telescope.defaults.mappings, {
   i = {
     ["<C-k>"] = actions.move_selection_previous,
     ["<C-j>"] = actions.move_selection_next,
     ["<C-p>"] = actions.cycle_history_prev,
     ["<C-n>"] = actions.cycle_history_next,
-  }
+  },
 })
--- set ivy as default for all pickers
-lvim.builtin.telescope.defaults = vim.tbl_extend("force", lvim.builtin.telescope.defaults or {},
-  require "telescope.themes".get_ivy({ prompt_prefix = ">> " }))
 -- close buffers with hotkey inside telescope
-lvim.builtin.telescope.pickers = vim.tbl_extend("force", lvim.builtin.telescope.pickers or {}, {
+lvim.builtin.telescope.theme = "ivy"
+lvim.builtin.telescope.pickers = vim.tbl_deep_extend("force", lvim.builtin.telescope.pickers or {}, {
   buffers = {
     sort_lastused = true,
     mappings = {
@@ -155,23 +191,19 @@ lvim.builtin.telescope.pickers = vim.tbl_extend("force", lvim.builtin.telescope.
       },
       n = {
         ["<C-d>"] = require("telescope.actions").delete_buffer,
-      }
-    }
-  },
-  current_buffer_fuzzy_find = {
-    theme = "dropdown",
-  },
-  find_files = {
+      },
+    },
     theme = "ivy",
   },
-  git_files = {
-    theme = "ivy",
+  builtin = {
+    previewer = false,
   },
 })
 -- extensions
-lvim.builtin.telescope.extensions = vim.tbl_deep_extend("force",
-  lvim.builtin.telescope.extensions or {}, {
-  frecency = { db_root = get_cache_dir() }
+lvim.builtin.telescope.extensions = vim.tbl_deep_extend("force", lvim.builtin.telescope.extensions or {}, {
+  frecency = {
+    db_root = get_cache_dir(),
+  },
 })
 
 -- autopairs
@@ -180,9 +212,6 @@ lvim.builtin.autopairs.active = false
 -- alpha
 lvim.builtin.alpha.active = false
 lvim.builtin.alpha.mode = "startify"
-
--- notify
-lvim.builtin.notify.active = true
 
 -- toggleterm
 lvim.builtin.terminal.active = true
@@ -205,6 +234,7 @@ lvim.builtin.dap.active = false
 lvim.builtin.lualine.sections.lualine_a = { "mode" }
 
 -- tree-sitter
+lvim.builtin.treesitter.auto_install = false
 lvim.builtin.treesitter.ensure_installed = {
   "bash",
   "c",
@@ -240,12 +270,12 @@ lvim.lsp.installer.setup.automatic_installation = false
 vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "rust_analyzer", "bashls" })
 
 -- Custom linters
-if vim.fn.executable("shellcheck") == 1 then
+if vim.fn.executable "shellcheck" == 1 then
   local null_ls = require "null-ls"
   lvim.lsp.null_ls.setup.sources = {
     null_ls.builtins.diagnostics.shellcheck,
     null_ls.builtins.code_actions.shellcheck,
-    null_ls.builtins.formatting.shfmt
+    null_ls.builtins.formatting.shfmt,
   }
 end
 -- Additional Plugins
@@ -255,123 +285,39 @@ lvim.plugins = {
   { "gpanders/editorconfig.nvim" },
   { "folke/tokyonight.nvim" },
   {
-    "https://betaco.de/zeno/modeline.nvim",
+    url = "https://betaco.de/strom/modeline.nvim",
     cmd = "InsertModeline",
-    module = "modeline",
-    setup = function()
-      lvim.builtin.which_key.mappings["M"] = { function() require("modeline").insertModeline() end, "Insert Modeline" }
+    init = function()
+      lvim.builtin.which_key.mappings["M"] = {
+        function()
+          require("modeline").insertModeline()
+        end,
+        "Insert Modeline",
+      }
       lvim.builtin.which_key.mappings["uM"] = lvim.builtin.which_key.mappings["M"]
     end,
   },
   {
-    "folke/zen-mode.nvim",
-    cmd = "ZenMode",
-    module = "zen-mode",
-    setup = function()
-      lvim.builtin.which_key.mappings["uz"] = { "<cmd>ZenMode<CR>", "Zen Mode" }
-    end,
-    config = function()
-      require("zen-mode").setup({
-        window = {
-          backdrop = 1,
-          height = 0.85,
-          options = {
-            signcolumn = "no",
-            number = false,
-            relativenumber = false,
-            -- cursorline = false,
-            -- cursorcolumn = false,
-            -- foldcolumn = "0",
-            -- list = false,
-          },
-        },
-        plugins = {
-          gitsigns = { enabled = false },
-        },
-      })
-    end,
-  },
-  {
-    "folke/twilight.nvim",
-    cmd = "Twilight",
-    module = "twilight",
-    setup = function()
-      lvim.builtin.which_key.mappings["ut"] = { "<Cmd>Twilight<CR>", "Twilight Mode" }
-    end,
-    config = function()
-      require("twilight").setup({
-        dimming = {
-          alpha = 0.25,
-          color = { "Normal", "#ffffff" },
-        },
-        context = 20,
-        expand = {
-          "function",
-          "method",
-          "table",
-          "if_statement",
-        },
-        exclude = {},
-      })
-    end,
-  },
-  {
-    "nvim-pack/nvim-spectre",
-    -- event = "BufRead",
-    module = 'spectre',
-    config = function()
-      require "spectre".setup()
-    end,
-    setup = function()
-      lvim.builtin.which_key.mappings["S"] = {
-        name = "Spectre",
-        t = { "<cmd>lua require('spectre').open()<CR>", "Spectre" },
-        w = { "<cmd>lua require('spectre').open_visual({select_word=true})<CR>", "Word" },
-        v = { "<cmd>lua require('spectre').open_visual()<CR>", "Visual" },
-        f = { "<cmd>sp viw:lua require('spectre').open_file_search()<CR>", "Current File" },
-      }
-    end,
-  },
-  {
-    "simrat39/symbols-outline.nvim",
-    cmd = "SymbolsOutline",
-    setup = function()
-      lvim.builtin.which_key.mappings["lo"] = { "<Cmd>SymbolsOutline<CR>", "Outline" }
-    end,
-  },
-  {
-    "folke/trouble.nvim",
-    cmd = "TroubleToggle",
-    setup = function()
-      lvim.builtin.which_key.mappings["t"] = {
-        name = "Diagnostics",
-        t = { "<cmd>TroubleToggle<CR>", "trouble" },
-        w = { "<cmd>TroubleToggle workspace_diagnostics<CR>", "workspace" },
-        d = { "<cmd>TroubleToggle document_diagnostics<CR>", "document" },
-        q = { "<cmd>TroubleToggle quickfix<CR>", "quickfix" },
-        l = { "<cmd>TroubleToggle loclist<CR>", "loclist" },
-        r = { "<cmd>TroubleToggle lsp_references<CR>", "references" },
-      }
-    end,
-    config = function()
-      require "trouble".setup {
-        mode = "document_diagnostics",
-      }
-    end
-  },
-  {
     "mbbill/undotree",
     cmd = "UndotreeToggle",
-    setup = function()
+    init = function()
       lvim.builtin.which_key.mappings["uU"] = { "<cmd>UndotreeToggle<CR>", "UndoTree" }
     end,
   },
   {
     "nvim-telescope/telescope-frecency.nvim",
-    config = function()
-      require "telescope".load_extension("frecency")
+    cond = function()
+      if vim.fn.executable "pkg-config" then
+        vim.fn.system { "pkg-config", "--libs", "sqlite3" }
+        return vim.v.shell_error == 0
+      end
+      local libpath = "/usr/lib64/libsqlite3.so"
+      return vim.loop.fs_stat(libpath)
     end,
-    requires = { "tami5/sqlite.lua" }
+    config = function()
+      require("telescope").load_extension "frecency"
+    end,
+    dependencies = { "tami5/sqlite.lua" },
   },
   {
     "tpope/vim-fugitive",
@@ -388,9 +334,9 @@ lvim.plugins = {
       "GRemove",
       "GRename",
       "Glgrep",
-      "Gedit"
+      "Gedit",
     },
-    ft = { "fugitive" }
+    ft = { "fugitive" },
   },
   {
     "andymass/vim-matchup",
@@ -399,57 +345,13 @@ lvim.plugins = {
       vim.g.matchup_matchparen_offscreen = { method = "popup" }
     end,
   },
-  {
-    "simrat39/rust-tools.nvim",
-    config = function()
-      local status_ok, rust_tools = pcall(require, "rust-tools")
-      if not status_ok then
-        return
-      end
-      local opts = {
-        tools = {
-          executor = require("rust-tools/executors").termopen,
-          reload_workspace_from_cargo_toml = true,
-          inlay_hints = {
-            auto = true,
-            only_current_line = false,
-            show_parameter_hints = true,
-            parameter_hints_prefix = "<-",
-            other_hints_prefix = "=>",
-            max_len_align = false,
-            max_len_align_padding = 1,
-            right_align = false,
-            right_align_padding = 7,
-            highlight = "Comment",
-          },
-          hover_actions = {
-            border = {
-              { "╭", "FloatBorder" },
-              { "─", "FloatBorder" },
-              { "╮", "FloatBorder" },
-              { "│", "FloatBorder" },
-              { "╯", "FloatBorder" },
-              { "─", "FloatBorder" },
-              { "╰", "FloatBorder" },
-              { "│", "FloatBorder" },
-            };
-            auto_focus = true,
-          },
-        },
-        server = {
-          on_attach = require("lvim.lsp").common_on_attach,
-          on_init = require("lvim.lsp").common_on_init,
-          settings = {
-            ["rust-analyzer"] = {
-              checkOnSave = {
-                command = "clippy"
-              }
-            }
-          }
-        },
-      }
-      rust_tools.setup(opts)
-    end,
-    ft = { "rust", "rs" },
-  },
 }
+
+if vim.g.neovide ~= nil then
+  vim.g.neovide_refresh_rate = 60
+  vim.g.neovide_refresh_rate_idle = 5
+  vim.g.neovide_cursor_antialiasing = false
+  vim.g.neovide_cursor_vfx_mode = ""
+  vim.g.neovide_cursor_animation_length = 0
+  vim.g.neovide_cursor_trail_size = 0
+end

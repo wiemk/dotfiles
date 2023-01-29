@@ -1,0 +1,5 @@
+# vi: set ft=zsh ts=4 sw=4 sts=-1 sr noet si tw=0 fdm=manual:
+
+if has jq; then
+	curl -Ls https://kernel.org/releases.json | jq -r '.releases[] | select(.moniker != "longterm") | .moniker + ":" + .version'
+fi
